@@ -7,6 +7,10 @@
         "woocommerce",
         "woocommerce-extension"
     ],
+    "support": {
+        "issues": "https://github.com/nexcess/woocommerce-limit-orders/issues",
+        "source": "https://github.com/nexcess/woocommerce-limit-orders"
+    },
     "authors": [
         {
             "name": "Nexcess",
