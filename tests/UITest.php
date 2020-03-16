@@ -7,6 +7,7 @@
 
 namespace Tests;
 
+use Nexcess\WooCommerceLimitOrders\OrderLimiter;
 use Nexcess\WooCommerceLimitOrders\UI;
 use WP_UnitTestCase as TestCase;
 
@@ -47,7 +48,7 @@ class UITest extends TestCase {
 			'interval' => HOUR_IN_SECONDS,
 		];
 
-		update_option( 'woocommerce-limit-orders', $values );
+		update_option( OrderLimiter::OPTION_KEY, $values );
 
 		$settings = apply_filters( 'woocommerce_get_settings_general', [] );
 
@@ -58,7 +59,7 @@ class UITest extends TestCase {
 			}
 
 			// Look for IDs that match "woocommerce-limit-orders[$KEY]".
-			if ( ! preg_match( '/^woocommerce-limit-orders\[([^\]]+)\]$/', $setting['id'], $match ) ) {
+			if ( ! preg_match( '/^' . preg_quote( OrderLimiter::OPTION_KEY ) . '\[([^\]]+)\]$/', $setting['id'], $match ) ) {
 				continue;
 			}
 
@@ -87,7 +88,7 @@ class UITest extends TestCase {
 		$settings = apply_filters( 'woocommerce_get_settings_general', [] );
 
 		foreach ( $settings as $setting ) {
-			if ( 'woocommerce-limit-orders[interval]' !== $setting['id'] ) {
+			if ( OrderLimiter::OPTION_KEY . '[interval]' !== $setting['id'] ) {
 				continue;
 			}
 
@@ -95,6 +96,6 @@ class UITest extends TestCase {
 			return;
 		}
 
-		$this->fail( 'Did not find setting with ID "woocommerce-limit-orders[interval]".' );
+		$this->fail( 'Did not find setting with ID "'. OrderLimiter::OPTION_KEY . '[interval]".' );
 	}
 }
