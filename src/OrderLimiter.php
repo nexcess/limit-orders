@@ -17,6 +17,11 @@ class OrderLimiter {
 	private $settings;
 
 	/**
+	 * The default interval, if none is selected.
+	 */
+	const DEFAULT_INTERVAL = MONTH_IN_SECONDS;
+
+	/**
 	 * The key used for the settings stored in wp_options.
 	 */
 	const OPTION_KEY = 'woocommerce-limit-orders';
@@ -47,7 +52,7 @@ class OrderLimiter {
 	public function get_interval() {
 		$interval = $this->get_setting( 'interval' );
 
-		return is_int( $interval ) && 0 < $interval ? $interval : MONTH_IN_SECONDS;
+		return is_int( $interval ) && 0 < $interval ? $interval : self::DEFAULT_INTERVAL;
 	}
 
 	/**

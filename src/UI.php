@@ -24,11 +24,6 @@ class UI {
 	 * @return array The filtered array, including our settings.
 	 */
 	public function get_settings( array $settings ) {
-		$values = wp_parse_args( get_option( OrderLimiter::OPTION_KEY, [] ), [
-			'limit'    => -1,
-			'interval' => MONTH_IN_SECONDS,
-		] );
-
 		return array_merge( $settings, [
 			[
 				'id'   => 'woocommerce-limit-orders',
@@ -37,12 +32,12 @@ class UI {
 				'desc' => __( 'Automatically turn off new orders once the store\'s limit has been met.', 'woocommerce-limit-orders' ),
 			],
 			[
-				'id'    => OrderLimiter::OPTION_KEY . '[limit]',
-				'name'  => 'Order threshold',
-				'desc'  => 'Stop accepting orders once this limit has been reached. -1 will disable limiting.',
-				'type'  => 'number',
-				'css'   => 'width: 150px;',
-				'value' => $values['limit'],
+				'id'      => OrderLimiter::OPTION_KEY . '[limit]',
+				'name'    => 'Order threshold',
+				'desc'    => 'Stop accepting orders once this limit has been reached. -1 will disable limiting.',
+				'type'    => 'number',
+				'css'     => 'width: 150px;',
+				'default' => -1,
 			],
 			[
 				'id'      => OrderLimiter::OPTION_KEY . '[interval]',
@@ -50,7 +45,7 @@ class UI {
 				'desc'    => 'How frequently the limit will be reset.',
 				'type'    => 'select',
 				'options' => $this->get_intervals(),
-				'value'   => $values['interval'],
+				'default' => OrderLimiter::DEFAULT_INTERVAL,
 			],
 			[
 				'id'   => 'woocommerce-limit-orders',

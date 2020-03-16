@@ -70,6 +70,6 @@ class OrderLimiterTest extends TestCase {
 			'interval' => $interval,
 		] );
 
-		$this->assertSame( MONTH_IN_SECONDS, (new OrderLimiter )->get_interval() );
+		$this->assertSame( OrderLimiter::DEFAULT_INTERVAL, ( new OrderLimiter )->get_interval() );
 	}
 }
