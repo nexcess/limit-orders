@@ -1,0 +1,47 @@
+{
+    "name": "nexcess/woocommerce-limit-orders",
+    "description": "Set a maximum number of orders that can be made in a given timeframe for a WooCommerce store.",
+    "type": "wordpress-plugin",
+    "license": "MIT",
+    "tags": [
+        "woocommerce",
+        "woocommerce-extension"
+    ],
+    "authors": [
+        {
+            "name": "Nexcess",
+            "homepage": "https://www.nexcess.net"
+        },
+        {
+            "name": "Steve Grunwell",
+            "homepage": "https://stevegrunwell.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "php": ">=7.0"
+    },
+    "require-dev": {
+        "assertwell/wp-core-test-framework": "^0.1.0",
+        "dealerdirect/phpcodesniffer-composer-installer": "^0.6",
+        "phpcompatibility/phpcompatibility-wp": "*",
+        "phpunit/phpunit": "^7.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Nexcess\\WooCommerceLimitOrders\\": ["src/"]
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": ["tests/"]
+        }
+    },
+    "config": {
+        "platform": {
+            "php": "7.4"
+        },
+        "preferred-install": "dist",
+        "sort-packages": true
+    }
+}
