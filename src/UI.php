@@ -23,7 +23,7 @@ class UI {
 	 *
 	 * @return array The filtered array, including our settings.
 	 */
-	function get_settings( array $settings ) {
+	public function get_settings( array $settings ) {
 		$values = wp_parse_args( get_option( 'woocommerce-limit-orders', [] ), [
 			'limit'    => -1,
 			'interval' => WEEK_IN_SECONDS,

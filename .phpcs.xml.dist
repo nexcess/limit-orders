@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<ruleset name="WooCommerce Limit Orders">
+	<description>Rules for WooCommerce Limit Orders.</description>
+
+	<!-- What to scan -->
+
+
+	<arg value="ps" />
+	<arg name="basepath" value="./" />
+	<arg name="colors" />
+	<arg name="extensions" value="php" />
+	<arg name="parallel" value="8" />
+
+	<file>src</file>
+	<file>woocommerce-limit-orders.php</file>
+
+	<!-- Ensure compatibility with PHP 7.0 and newer. -->
+	<config name="testVersion" value="7.0-" />
+	<rule ref="PHPCompatibilityWP" />
+
+	<!-- Requires WordPress 5.2 or newer. -->
+	<config name="minimum_supported_wp_version" value="5.2" />
+
+	<!-- Configure the plugin text domain. -->
+	<rule ref="WordPress.WP.I18n">
+		<properties>
+			<property name="text_domain" type="array" value="woocommerce-limit-orders"/>
+		</properties>
+	</rule>
+
+	<!-- Use strict WordPress coding standards -->
+	<rule ref="WordPress-Extra">
+		<!-- Embrace PSR-4 autoloading. -->
+		<exclude name="WordPress.Files.FileName" />
+
+		<!-- Short array syntax is absolutely permitted and, in fact, preferred. -->
+		<exclude name="Generic.Arrays.DisallowShortArraySyntax.Found" />
+
+		<!-- Prevent closures from looking terrible. -->
+		<exclude name="PEAR.Functions.FunctionCallSignature.ContentAfterOpenBracket" />
+		<exclude name="PEAR.Functions.FunctionCallSignature.CloseBracketLine" />
+		<exclude name="PEAR.Functions.FunctionCallSignature.MultipleArguments" />
+	</rule>
+</ruleset>
