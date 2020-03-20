@@ -17,20 +17,22 @@ class OrderLimiter {
 	private $settings;
 
 	/**
-	 * The default interval, if none is selected.
-	 */
-	const DEFAULT_INTERVAL = MONTH_IN_SECONDS;
-
-	/**
 	 * The key used for the settings stored in wp_options.
 	 */
 	const OPTION_KEY = 'woocommerce_limit_orders';
 
 	/**
-	 * Add the necessary hooks.
+	 * The transient that holds the current order count per period.
 	 */
-	public function init() {
+	const TRANSIENT_NAME = 'woocommerce_limit_orders_order_count';
 
+	/**
+	 * Is limiting currently enabled for this store?
+	 *
+	 * @return bool
+	 */
+	public function is_enabled() {
+		return (bool) $this->get_setting( 'enabled' );
 	}
 
 	/**
@@ -41,18 +43,7 @@ class OrderLimiter {
 	public function get_limit() {
 		$limit = $this->get_setting( 'limit' );
 
-		return is_int( $limit ) && 0 <= $limit ? $limit : -1;
-	}
-
-	/**
-	 * Retrieve the number of seconds per interval.
-	 *
-	 * @return int The number of seconds in each interval.
-	 */
-	public function get_interval() {
-		$interval = $this->get_setting( 'interval' );
-
-		return is_int( $interval ) && 0 < $interval ? $interval : self::DEFAULT_INTERVAL;
+		return $this->is_enabled() && is_int( $limit ) && 0 <= $limit ? $limit : -1;
 	}
 
 	/**
@@ -61,7 +52,82 @@ class OrderLimiter {
 	 * @return int The maximum number of that may still be accepted, or -1 if there is no limit.
 	 */
 	public function get_remaining_orders() {
+		$limit = $this->get_limit();
 
+		// If there are no limits set, return -1.
+		if ( ! $this->is_enabled() || -1 === $limit ) {
+			return -1;
+		}
+
+		$orders = get_site_transient( self::TRANSIENT_NAME );
+
+		// The transient has been cleared, so re-generate it.
+		if ( false === $orders ) {
+			$orders = $this->regenerate_transient();
+		}
+
+		// Never return less than zero.
+		return max( $limit - $orders, 0 );
+	}
+
+	/**
+	 * Retrieve the number of seconds until the next interval starts.
+	 *
+	 * @return int The number of seconds until the limiting interval resets.
+	 *
+	 * @todo Calculate the beginning of this interval, then add one interval to it.
+	 */
+	public function get_seconds_until_next_interval() {
+		return 0;
+	}
+
+	/**
+	 * Determine whether or not the given store has reached its limits.
+	 *
+	 * @return bool
+	 */
+	public function has_reached_limit() {
+		return 0 === $this->get_remaining_orders();
+	}
+
+	/**
+	 * Disable ordering for a WooCommerce store.
+	 *
+	 * @todo Make the magic happen!
+	 */
+	public function disable_ordering() {
+
+	}
+
+	/**
+	 * Regenerate the site transient.
+	 *
+	 * Rather than simply incrementing, we'll explicitly count qualifying orders as they roll in.
+	 * This guarantees that we'll have accurate numbers and handle race conditions.
+	 *
+	 * @return int The number of qualifying orders.
+	 *
+	 * @todo Hook this into new order creation.
+	 */
+	public function regenerate_transient() {
+		$count = $this->count_qualifying_orders();
+
+		set_site_transient( self::TRANSIENT_NAME, $count, $this->get_seconds_until_next_interval() );
+	}
+
+	/**
+	 * Count the number of qualifying orders.
+	 *
+	 * @return int The number of orders that have taken place within the defined interval.
+	 */
+	protected function count_qualifying_orders() {
+		$orders = wc_get_orders( [
+			'type'       => wc_get_order_types( 'order-count' ),
+			'date_after' => $this->get_interval_start(),
+			'return'     => 'ids',
+		] );
+
+		return count( $orders );
 	}
 
 	/**

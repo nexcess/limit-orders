@@ -21,16 +21,30 @@ class OrderLimiterTest extends TestCase {
 	 * @testdox get_limit() should return the set limit
 	 */
 	public function get_limit_should_return_the_set_limit() {
-		update_option( 'woocommerce-limit-orders', [
-			'limit' => 7,
+		update_option( OrderLimiter::OPTION_KEY, [
+			'enabled' => true,
+			'limit'   => 7,
 		] );
 
-		$this->assertSame( 7, (new OrderLimiter )->get_limit() );
+		$this->assertSame( 7, ( new OrderLimiter )->get_limit() );
 	}
 
 	/**
 	 * @test
-	 * @testdox get_limit() should -1 for any value that is not a zero or a positive integer
+	 * @testdox get_limit() should return -1 if limiting is disabled
+	 */
+	public function get_limit_should_return_negative_one_if_limiting_is_disabled() {
+		update_option( OrderLimiter::OPTION_KEY, [
+			'enabled' => false,
+			'limit'   => 7,
+		] );
+
+		$this->assertSame( -1, ( new OrderLimiter )->get_limit() );
+	}
+
+	/**
+	 * @test
+	 * @testdox get_limit() should return -1 for any value that is not a zero or a positive integer
 	 * @testWith [-1]
 	 *           [-500]
 	 *           ["one"]
@@ -38,38 +52,105 @@ class OrderLimiterTest extends TestCase {
 	 *           [["array", "value"]]
 	 */
 	public function get_limit_should_return_negative_one_for_any_non_positive_int_values( $value ) {
-		update_option( 'woocommerce-limit-orders', [
-			'limit' => $value,
+		update_option( OrderLimiter::OPTION_KEY, [
+			'enabled' => true,
+			'limit'   => $value,
 		] );
 
-		$this->assertSame( -1, (new OrderLimiter )->get_limit() );
+		$this->assertSame( -1, ( new OrderLimiter() )->get_limit() );
 	}
 
 	/**
 	 * @test
-	 * @testdox get_interval() should return the interval in seconds
+	 * @testdox get_remaining_orders() should return the number of orders left for the interval
 	 */
-	public function get_interval_should_return_the_interval_in_seconds() {
-		update_option( 'woocommerce-limit-orders', [
-			'interval' => WEEK_IN_SECONDS,
+	public function get_remaining_orders_should_return_the_number_of_orders_left_for_the_interval() {
+		update_option( OrderLimiter::OPTION_KEY, [
+			'enabled' => true,
+			'limit'   => 5,
 		] );
 
-		$this->assertSame( WEEK_IN_SECONDS, (new OrderLimiter )->get_interval() );
+		set_site_transient( OrderLimiter::TRANSIENT_NAME, 2 );
+
+		$this->assertSame( 3, ( new OrderLimiter() )->get_remaining_orders() );
 	}
 
 	/**
 	 * @test
-	 * @testdox get_interval() should default to one month if the value is not a positive integer.
-	 * @testWith [0]
-	 *           [-1]
-	 *           ["some interval"]
-	 *           [""]
+	 * @testdox get_remaining_orders() should return -1 if limiting is disabled
 	 */
-	public function get_interval_should_default_to_one_month_if_the_value_is_not_a_positive_integer( $interval ) {
-		update_option( 'woocommerce-limit-orders', [
-			'interval' => $interval,
+	public function get_remaining_orders_should_return_negative_one_if_limiting_is_disabled() {
+		update_option( OrderLimiter::OPTION_KEY, [
+			'enabled' => false,
 		] );
 
-		$this->assertSame( OrderLimiter::DEFAULT_INTERVAL, ( new OrderLimiter )->get_interval() );
+		$this->assertSame( -1, ( new OrderLimiter() )->get_remaining_orders() );
+	}
+
+	/**
+	 * @test
+	 * @testdox get_remaining_orders() should return 0 if the limits are met or exceeded
+	 */
+	public function get_remaining_orders_should_return_zero_if_limits_are_met_or_exceeded() {
+		update_option( OrderLimiter::OPTION_KEY, [
+			'enabled' => true,
+			'limit'   => 5,
+		] );
+
+		set_site_transient( OrderLimiter::TRANSIENT_NAME, 10 );
+
+		$this->assertSame( 0, ( new OrderLimiter() )->get_remaining_orders() );
+	}
+
+	/**
+	 * @test
+	 */
+	public function get_seconds_until_next_interval() {
+		$this->markTestIncomplete();
+	}
+
+	/**
+	 * @test
+	 * @testdox has_reached_limit() should return false if the order count meets the limit
+	 */
+	public function has_reached_limit_should_return_true_if_orders_are_under_the_limit() {
+		update_option( OrderLimiter::OPTION_KEY, [
+			'enabled' => true,
+			'limit'   => 5,
+		] );
+
+		set_site_transient( OrderLimiter::TRANSIENT_NAME, 2 );
+
+		$this->assertFalse( ( new OrderLimiter() )->has_reached_limit() );
+	}
+
+	/**
+	 * @test
+	 * @testdox has_reached_limit() should return true if the order count meets the limit
+	 */
+	public function has_reached_limit_should_return_true_if_orders_meet_the_limit() {
+		update_option( OrderLimiter::OPTION_KEY, [
+			'enabled' => true,
+			'limit'   => 5,
+		] );
+
+		set_site_transient( OrderLimiter::TRANSIENT_NAME, 5 );
+
+		$this->assertTrue( ( new OrderLimiter() )->has_reached_limit() );
+	}
+
+	/**
+	 * @test
+	 * @testdox has_reached_limit() should return true if the order count exceeds the limit
+	 */
+	public function has_reached_limit_should_return_true_if_orders_exceed_the_limit() {
+		update_option( OrderLimiter::OPTION_KEY, [
+			'enabled' => true,
+			'limit'   => 5,
+		] );
+
+		set_site_transient( OrderLimiter::TRANSIENT_NAME, 6 );
+
+		$this->assertTrue( ( new OrderLimiter() )->has_reached_limit() );
 	}
 }
