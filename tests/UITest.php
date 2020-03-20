@@ -9,6 +9,8 @@ namespace Tests;
 
 use Nexcess\WooCommerceLimitOrders\OrderLimiter;
 use Nexcess\WooCommerceLimitOrders\UI;
+use WC_Admin;
+use WC_Settings_General;
 use WP_UnitTestCase as TestCase;
 
 /**
@@ -16,6 +18,13 @@ use WP_UnitTestCase as TestCase;
  * @group UI
  */
 class UITest extends TestCase {
+
+	/**
+	 * @beforeClass
+	 */
+	public static function admin_includes() {
+		( new WC_Admin )->includes();
+	}
 
 	/**
 	 * @before
@@ -63,5 +72,20 @@ class UITest extends TestCase {
 		}
 
 		$this->fail( 'Did not find setting with ID "'. OrderLimiter::OPTION_KEY . '[interval]".' );
+	}
+
+	/**
+	 * @test
+	 */
+	public function interval_start_times_should_be_converted_into_unix_timestamps_when_saving() {
+		$datetime = new \DateTimeImmutable( '2020-03-19 01:30:00', wp_timezone() );
+
+		woocommerce_update_options( ( new WC_Settings_General() )->get_settings(), [
+			OrderLimiter::OPTION_KEY => [
+				'interval_start' => $datetime->format( 'Y-m-d H:i' ),
+			],
+		] );
+
+		$this->assertSame( $datetime->format( 'U' ), get_option( OrderLimiter::OPTION_KEY )['interval_start'] );
 	}
 }

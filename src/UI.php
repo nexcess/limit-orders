@@ -14,6 +14,12 @@ class UI {
 	 */
 	public function init() {
 		add_filter( 'woocommerce_get_settings_general', [ $this, 'get_settings' ] );
+		add_filter(
+			'woocommerce_admin_settings_sanitize_option_' . OrderLimiter::OPTION_KEY,
+			[ $this, 'convert_interval_to_unix_timestamp' ],
+			10,
+			2
+		);
 	}
 
 	/**
@@ -22,6 +28,9 @@ class UI {
 	 * @param array $settings The general settings section.
 	 *
 	 * @return array The filtered array, including our settings.
+	 *
+	 * @todo Don't rely on datetime-local in browsers that don't support it (Firefox, Safari); see
+	 *       https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/datetime-local#Browser_compatibility
 	 */
 	public function get_settings( array $settings ) {
 		return array_merge( $settings, [
@@ -48,10 +57,38 @@ class UI {
 				'default' => OrderLimiter::DEFAULT_INTERVAL,
 			],
 			[
+				'id'                => OrderLimiter::OPTION_KEY . '[interval_start]',
+				'name'              => 'Start Date',
+				'desc'              => 'Select the local date/time at which the interval should begin.',
+				'type'              => 'datetime-local',
+				'placeholder'       => 'YYYY-MM-DD HH:MM',
+				'custom_attributes' => [
+					'pattern' => '[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}',
+				],
+			],
+			[
 				'id'   => 'woocommerce-limit-orders',
 				'type' => 'sectionend',
 			],
 		] );
+	}
+
+	/**
+	 * Save interval_start as a Unix timestamp.
+	 *
+	 * @param mixed  $value  The value being saved.
+	 * @param string $option The option being saved.
+	 *
+	 * @return mixed The potentially-filtered $value.
+	 */
+	public function convert_interval_to_unix_timestamp( $value, array $option ) {
+		if ( ! isset( $option['id'] ) || $option['id'] !== OrderLimiter::OPTION_KEY . '[interval_start]' ) {
+			return $value;
+		}
+
+		$date = new \DateTimeImmutable( $value, wp_timezone() );
+
+		return $date->format( 'U' );
 	}
 
 	/**

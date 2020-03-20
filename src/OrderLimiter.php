@@ -24,7 +24,7 @@ class OrderLimiter {
 	/**
 	 * The key used for the settings stored in wp_options.
 	 */
-	const OPTION_KEY = 'woocommerce-limit-orders';
+	const OPTION_KEY = 'woocommerce_limit_orders';
 
 	/**
 	 * Add the necessary hooks.
