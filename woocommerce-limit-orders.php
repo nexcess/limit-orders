@@ -28,4 +28,15 @@ spl_autoload_register( function ( string $class ) {
 } );
 
 // Initialize the plugin.
-( new UI() )->init();
+add_action( 'woocommerce_loaded', function () {
+	$limiter = new OrderLimiter();
+	$ui      = new UI( $limiter );
+
+	// Initialize the UI hooks.
+	$ui->init();
+
+	// Turn off ordering if we've reached the defined limits.
+	if ( $limiter->has_reached_limits() ) {
+		$ui->disable_ordering();
+	}
+} );

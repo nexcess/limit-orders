@@ -10,16 +10,25 @@ namespace Nexcess\WooCommerceLimitOrders;
 class UI {
 
 	/**
+	 * @var \Nexcess\WooCommerceLimitOrders\OrderLimiter
+	 */
+	protected $limiter;
+
+	/**
+	 * Create a new instance of the UI, built around the passed $limiter.
+	 *
+	 * @param \Nexcess\WooCommerceLimitOrders\OrderLimiter $limiter
+	 */
+	public function __construct( OrderLimiter $limiter ) {
+		$this->limiter = $limiter;
+	}
+
+	/**
 	 * Add the necessary hooks.
 	 */
 	public function init() {
 		add_filter( 'woocommerce_get_settings_general', [ $this, 'get_settings' ] );
-		add_filter(
-			'woocommerce_admin_settings_sanitize_option_' . OrderLimiter::OPTION_KEY,
-			[ $this, 'convert_interval_to_unix_timestamp' ],
-			10,
-			2
-		);
+		add_filter( 'admin_notices', [ $this, 'admin_notice' ] );
 	}
 
 	/**
@@ -28,9 +37,6 @@ class UI {
 	 * @param array $settings The general settings section.
 	 *
 	 * @return array The filtered array, including our settings.
-	 *
-	 * @todo Don't rely on datetime-local in browsers that don't support it (Firefox, Safari); see
-	 *       https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/datetime-local#Browser_compatibility
 	 */
 	public function get_settings( array $settings ) {
 		return array_merge( $settings, [
@@ -41,30 +47,29 @@ class UI {
 				'desc' => __( 'Automatically turn off new orders once the store\'s limit has been met.', 'woocommerce-limit-orders' ),
 			],
 			[
-				'id'      => OrderLimiter::OPTION_KEY . '[limit]',
-				'name'    => 'Order threshold',
-				'desc'    => 'Stop accepting orders once this limit has been reached. -1 will disable limiting.',
-				'type'    => 'number',
-				'css'     => 'width: 150px;',
-				'default' => -1,
+				'id'      => OrderLimiter::OPTION_KEY . '[enabled]',
+				'name'    => __( 'Enable Order Limiting', 'woocommerce-limit-orders' ),
+				'desc'    => __( 'Prevent new orders once the specified threshold has been met.', 'woocommerce-limit-orders' ),
+				'type'    => 'checkbox',
+				'default' => false,
+			],
+			[
+				'id'                => OrderLimiter::OPTION_KEY . '[limit]',
+				'name'              => __( 'Order threshold', 'woocommerce-limit-orders' ),
+				'desc'              => __( 'Customers will be unable to checkout after this number of orders are made.', 'woocommerce-limit-orders' ),
+				'type'              => 'number',
+				'css'               => 'width: 150px;',
+				'custom_attributes' => [
+					'min'  => 0,
+					'step' => 1,
+				],
 			],
 			[
 				'id'      => OrderLimiter::OPTION_KEY . '[interval]',
-				'name'    => 'Interval',
-				'desc'    => 'How frequently the limit will be reset.',
+				'name'    => __( 'Reset Limits', 'woocommerce-limit-orders' ),
+				'desc'    => __( 'How frequently the limit will be reset.', 'woocommerce-limit-orders' ),
 				'type'    => 'select',
 				'options' => $this->get_intervals(),
-				'default' => OrderLimiter::DEFAULT_INTERVAL,
-			],
-			[
-				'id'                => OrderLimiter::OPTION_KEY . '[interval_start]',
-				'name'              => 'Start Date',
-				'desc'              => 'Select the local date/time at which the interval should begin.',
-				'type'              => 'datetime-local',
-				'placeholder'       => 'YYYY-MM-DD HH:MM',
-				'custom_attributes' => [
-					'pattern' => '[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}',
-				],
 			],
 			[
 				'id'   => 'woocommerce-limit-orders',
@@ -74,33 +79,54 @@ class UI {
 	}
 
 	/**
-	 * Save interval_start as a Unix timestamp.
+	 * Display an admin notice when ordering is disabled.
 	 *
-	 * @param mixed  $value  The value being saved.
-	 * @param string $option The option being saved.
-	 *
-	 * @return mixed The potentially-filtered $value.
+	 * @todo Get an actual value for $restart.
 	 */
-	public function convert_interval_to_unix_timestamp( $value, array $option ) {
-		if ( ! isset( $option['id'] ) || $option['id'] !== OrderLimiter::OPTION_KEY . '[interval_start]' ) {
-			return $value;
+	public function admin_notice() {
+		if ( ! $this->limiter->has_reached_limits() ) {
+			return;
 		}
 
-		$date = new \DateTimeImmutable( $value, wp_timezone() );
+		$restart = 'reactivated';
 
-		return $date->format( 'U' );
+		echo '<div class="notice notice-warning"><p>';
+
+		if ( current_user_can( 'manage_options' ) ) {
+			echo wp_kses_post( sprintf(
+				/* Translators: %1$s is the settings page URL, %2$s is the reset date for order limiting. */
+				__( '<a href="%1$s">Based on your store\'s configuration</a>, new orders have been put on hold until %2%s.', 'woocommerce-limit-orders' ),
+				admin_url( 'admin.php?page=wc-settings&tab=general' ),
+				$restart
+			) );
+		} else {
+			echo esc_html( sprintf(
+				/* Translators: %1$s is the reset date for order limiting. */
+				__( 'Based on your store\'s configuration, new orders have been put on hold until %1%s.', 'woocommerce-limit-orders' ),
+				$restart
+			) );
+		}
+		echo '</p></div>';
 	}
 
 	/**
 	 * Retrieve the available intervals for order limiting.
 	 *
+	 * @global $wp_locale
+	 *
 	 * @return array An array of interval names, keyed with their lengths in seconds.
 	 */
 	protected function get_intervals() {
+		global $wp_locale;
+
 		$intervals = [
-			DAY_IN_SECONDS   => _x( 'Daily', 'order threshold interval', 'woocommerce-limit-orders' ),
-			WEEK_IN_SECONDS  => _x( 'Weekly', 'order threshold interval', 'woocommerce-limit-orders' ),
-			MONTH_IN_SECONDS => _x( 'Monthly', 'order threshold interval', 'woocommerce-limit-orders' ),
+			'daily'   => _x( 'Every day', 'order threshold interval', 'woocommerce-limit-orders' ),
+			'weekly'  => sprintf(
+				/* Translators: %1$s is the first day of the week, based on site configuration. */
+				_x( 'Every %1$s', 'order threshold interval', 'woocommerce-limit-orders' ),
+				$wp_locale->get_weekday( get_option( 'start_of_week' ) )
+			),
+			'monthly' => _x( 'The first day of each month', 'order threshold interval', 'woocommerce-limit-orders' ),
 		];
 
 		/**

@@ -20,25 +20,11 @@ use WP_UnitTestCase as TestCase;
 class UITest extends TestCase {
 
 	/**
-	 * @beforeClass
-	 */
-	public static function admin_includes() {
-		( new WC_Admin )->includes();
-	}
-
-	/**
-	 * @before
-	 */
-	public function init() {
-		remove_all_filters( 'woocommerce_get_settings_general' );
-
-		( new UI() )->init();
-	}
-
-	/**
 	 * @test
 	 */
 	public function the_options_should_be_added_to_the_general_WooCommerce_settings() {
+		( new UI( new OrderLimiter() ) )->init();
+
 		$settings = apply_filters( 'woocommerce_get_settings_general', [] );
 
 		// The first entry should be the title.
@@ -52,6 +38,8 @@ class UITest extends TestCase {
 	 * @test
 	 */
 	public function available_intervals_should_be_filterable() {
+		( new UI( new OrderLimiter() ) )->init();
+
 		$intervals = [
 			YEAR_IN_SECONDS => uniqid(),
 		];
@@ -77,15 +65,63 @@ class UITest extends TestCase {
 	/**
 	 * @test
 	 */
-	public function interval_start_times_should_be_converted_into_unix_timestamps_when_saving() {
-		$datetime = new \DateTimeImmutable( '2020-03-19 01:30:00', wp_timezone() );
+	public function admin_notices_should_not_be_shown_if_no_limits_have_been_reached() {
+		$limiter = $this->getMockBuilder( OrderLimiter::class )
+			->setMethods( [ 'has_reached_limits' ] )
+			->getMock();
 
-		woocommerce_update_options( ( new WC_Settings_General() )->get_settings(), [
-			OrderLimiter::OPTION_KEY => [
-				'interval_start' => $datetime->format( 'Y-m-d H:i' ),
-			],
-		] );
+		$limiter->method( 'has_reached_limits' )
+			->willReturn( false );
 
-		$this->assertSame( $datetime->format( 'U' ), get_option( OrderLimiter::OPTION_KEY )['interval_start'] );
+		ob_start();
+		( new UI( $limiter ) )->admin_notice();
+		$output = ob_get_clean();
+
+		$this->assertEmpty( $output );
+	}
+
+	/**
+	 * @test
+	 */
+	public function admin_notices_should_be_shown_once_limits_are_reached() {
+		wp_set_current_user( $this->factory->user->create( [
+			'role' => 'administrator',
+		] ) );
+
+		$limiter = $this->getMockBuilder( OrderLimiter::class )
+			->setMethods( [ 'has_reached_limits' ] )
+			->getMock();
+
+		$limiter->method( 'has_reached_limits' )
+			->willReturn( true );
+
+		ob_start();
+		( new UI( $limiter ) )->admin_notice();
+		$output = ob_get_clean();
+
+		$this->assertStringContainsString( admin_url( 'admin.php?page=wc-settings' ), $output );
+	}
+
+	/**
+	 * @test
+	 * @depends admin_notices_should_be_shown_once_limits_are_reached
+	 */
+	public function admin_notices_should_not_include_links_to_settings_for_non_admin_users() {
+		wp_set_current_user( $this->factory->user->create( [
+			'role' => 'author',
+		] ) );
+
+		$limiter = $this->getMockBuilder( OrderLimiter::class )
+			->setMethods( [ 'has_reached_limits' ] )
+			->getMock();
+
+		$limiter->method( 'has_reached_limits' )
+			->willReturn( true );
+
+		ob_start();
+		( new UI( $limiter ) )->admin_notice();
+		$output = ob_get_clean();
+
+		$this->assertStringNotContainsString( admin_url( 'admin.php?page=wc-settings' ), $output );
 	}
 }
