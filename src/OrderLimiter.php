@@ -71,6 +71,44 @@ class OrderLimiter {
 	}
 
 	/**
+	 * Get a DateTime object representing the start of the current interval.
+	 *
+	 * @return \DateTime
+	 */
+	public function get_interval_start() {
+		$interval = $this->get_setting( 'interval' );
+		$start    = new \DateTime( 'now', wp_timezone() );
+
+		switch ( $interval ) {
+			case 'weekly':
+				$start_of_week = (int) get_option( 'week_starts_on' );
+				$current_dow   = (int) $start->format( 'w' );
+
+				// If today isn't the start of the week, get a DateTime representing that day.
+				if ( $current_dow !== $start_of_week ) {
+					$days  = [ 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday' ];
+					$start = new \DateTime( 'last ' . $days[ $start_of_week ], wp_timezone() );
+				}
+				break;
+
+			case 'monthly':
+				$start->setDate( $start->format( 'Y' ), $start->format( 'm' ), 1 );
+				break;
+		}
+
+		// Start everything at midnight.
+		$start->setTime( 0, 0, 0 );
+
+		/**
+		 * Filter the DateTime object representing the start of the current interval.
+		 *
+		 * @param \DateTime $start    The DateTime representing the start of the current interval.
+		 * @param string    $interval The type of interval being calculated.
+		 */
+		return apply_filters( 'woocommerce_limit_orders_interval_start', $start, $interval );
+	}
+
+	/**
 	 * Retrieve the number of seconds until the next interval starts.
 	 *
 	 * @return int The number of seconds until the limiting interval resets.

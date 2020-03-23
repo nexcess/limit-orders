@@ -105,8 +105,87 @@ class OrderLimiterTest extends TestCase {
 	/**
 	 * @test
 	 */
-	public function get_seconds_until_next_interval() {
-		$this->markTestIncomplete();
+	public function get_interval_start_for_daily() {
+		update_option( OrderLimiter::OPTION_KEY, [
+			'interval' => 'daily',
+		] );
+
+		$today = new \DateTime( 'now', wp_timezone() );
+
+		$this->assertSame(
+			$today->setTime( 0, 0, 0 )->format( 'r' ),
+			( new OrderLimiter() )->get_interval_start()->format( 'r' ),
+			'Daily intervals should start at midnight local time.'
+		);
+	}
+
+	/**
+	 * @test
+	 */
+	public function get_interval_start_for_weekly() {
+		update_option( 'week_starts_on', 1 );
+		update_option( OrderLimiter::OPTION_KEY, [
+			'interval' => 'weekly',
+		] );
+
+		$this->assertSame(
+			( new \DateTime( 'Monday', wp_timezone() ) )->format( 'r' ),
+			( new OrderLimiter() )->get_interval_start()->format( 'r' ),
+			'Weekly intervals should start at midnight on the first day of the week.'
+		);
+	}
+
+	/**
+	 * @test
+	 * @depends get_interval_start_for_weekly
+	 */
+	public function get_interval_start_for_weekly_with_a_non_standard_day() {
+		update_option( 'week_starts_on', 3 );
+		update_option( OrderLimiter::OPTION_KEY, [
+			'interval' => 'weekly',
+		] );
+
+		$this->assertSame(
+			( new \DateTime( 'last Wednesday' ) )->format( 'r' ),
+			( new OrderLimiter() )->get_interval_start()->format( 'r' ),
+			'Weekly intervals should adjust to the week_starts_on option.'
+		);
+	}
+
+	/**
+	 * @test
+	 * @depends get_interval_start_for_weekly
+	 */
+	public function get_interval_start_for_weekly_when_today_is_the_first_day_of_the_week() {
+		$today = new \DateTime( 'now', wp_timezone() );
+
+		update_option( 'week_starts_on', $today->format( 'w' ) );
+		update_option( OrderLimiter::OPTION_KEY, [
+			'interval' => 'weekly',
+		] );
+
+		$this->assertSame(
+			$today->setTime( 0, 0, 0 )->format( 'r' ),
+			( new OrderLimiter() )->get_interval_start()->format( 'r' ),
+			'If today is the first day of a weekly interval, the time should be this morning at midnight.'
+		);
+	}
+
+	/**
+	 * @test
+	 */
+	public function get_interval_start_for_monthly() {
+		$today = new \DateTime( 'now', wp_timezone() );
+
+		update_option( OrderLimiter::OPTION_KEY, [
+			'interval' => 'monthly',
+		] );
+
+		$this->assertSame(
+			( new \DateTime( $today->format( 'F' ) . ' 1', wp_timezone() ) )->format( 'r' ),
+			( new OrderLimiter() )->get_interval_start()->format( 'r' ),
+			'Monthly intervals should start at midnight on the first day of the month.'
+		);
 	}
 
 	/**
