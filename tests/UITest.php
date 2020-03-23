@@ -44,7 +44,7 @@ class UITest extends TestCase {
 			YEAR_IN_SECONDS => uniqid(),
 		];
 
-		add_filter( 'woocommerce_limit_orders_intervals', function () use ( $intervals ) {
+		add_filter( 'woocommerce_limit_orders_interval_select', function () use ( $intervals ) {
 			return $intervals;
 		} );
 

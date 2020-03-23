@@ -134,6 +134,6 @@ class UI {
 		 *
 		 * @param array $intervals Available intervals for WooCommerce Limit Orders.
 		 */
-		return apply_filters( 'woocommerce_limit_orders_intervals', $intervals );
+		return apply_filters( 'woocommerce_limit_orders_interval_select', $intervals );
 	}
 }
