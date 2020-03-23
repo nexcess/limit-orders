@@ -116,7 +116,40 @@ class OrderLimiter {
 	 * @todo Calculate the beginning of this interval, then add one interval to it.
 	 */
 	public function get_seconds_until_next_interval() {
-		return 0;
+		$period = $this->get_setting( 'interval' );
+		$start  = $this->get_interval_start();
+
+		switch ( $period ) {
+			case 'daily':
+				$spec = 'P1D';
+				break;
+
+			case 'weekly':
+				$spec = 'P7D';
+				break;
+
+			case 'monthly':
+				$spec = 'P1M';
+				break;
+
+			default:
+				$spec = 'P0D';
+				break;
+		}
+
+		$interval = new \DateInterval( $spec );
+
+		/**
+		 * Change the amount of time before the next order interval starts.
+		 *
+		 * @param \DateInterval $interval The interval being added to the current interval's
+		 *                                start time.
+		 * @param \DateTime     $start    The current interval's starting time.
+		 * @param string        $period   The interval length from the settings.
+		 */
+		$interval = apply_filters( 'woocommerce_limit_orders_interval', $interval, $start, $period );
+
+		return $start->add( $interval )->getTimestamp() - current_datetime()->getTimestamp();
 	}
 
 	/**

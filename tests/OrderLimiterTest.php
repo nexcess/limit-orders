@@ -190,6 +190,61 @@ class OrderLimiterTest extends TestCase {
 
 	/**
 	 * @test
+	 */
+	public function get_seconds_until_next_interval_for_daily() {
+		update_option( OrderLimiter::OPTION_KEY, [
+			'interval' => 'daily',
+		] );
+
+		$current = new \DateTime( 'now', wp_timezone() );
+		$next    = new \DateTime( 'tomorrow', wp_timezone() );
+
+		$this->assertSame(
+			$next->getTimestamp() - $current->getTimestamp(),
+			( new OrderLimiter() )->get_seconds_until_next_interval(),
+			'It should return the number of seconds until midnight.'
+		);
+	}
+
+	/**
+	 * @test
+	 */
+	public function get_seconds_until_next_interval_for_weekly() {
+		update_option( 'week_starts_on', 2 );
+		update_option( OrderLimiter::OPTION_KEY, [
+			'interval' => 'daily',
+		] );
+
+		$current = new \DateTime( 'now', wp_timezone() );
+		$next    = new \DateTime( 'Next Tuesday', wp_timezone() );
+
+		$this->assertSame(
+			$next->getTimestamp() - $current->getTimestamp(),
+			( new OrderLimiter() )->get_seconds_until_next_interval(),
+			'It should return the number of seconds until midnight next Monday.'
+		);
+	}
+
+	/**
+	 * @test
+	 */
+	public function get_seconds_until_next_interval_for_monthly() {
+		update_option( OrderLimiter::OPTION_KEY, [
+			'interval' => 'monthly',
+		] );
+
+		$current = new \DateTime( 'now', wp_timezone() );
+		$next    = ( new \DateTime( 'First day of next Month', wp_timezone() ) )->setTime( 0, 0, 0 );
+
+		$this->assertSame(
+			$next->getTimestamp() - $current->getTimestamp(),
+			( new OrderLimiter() )->get_seconds_until_next_interval(),
+			'It should return the number of seconds until midnight on the first of the month.'
+		);
+	}
+
+	/**
+	 * @test
 	 * @testdox has_reached_limit() should return false if the order count meets the limit
 	 */
 	public function has_reached_limit_should_return_true_if_orders_are_under_the_limit() {
