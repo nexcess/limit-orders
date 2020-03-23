@@ -67,10 +67,10 @@ class UITest extends TestCase {
 	 */
 	public function admin_notices_should_not_be_shown_if_no_limits_have_been_reached() {
 		$limiter = $this->getMockBuilder( OrderLimiter::class )
-			->setMethods( [ 'has_reached_limits' ] )
+			->setMethods( [ 'has_reached_limit' ] )
 			->getMock();
 
-		$limiter->method( 'has_reached_limits' )
+		$limiter->method( 'has_reached_limit' )
 			->willReturn( false );
 
 		ob_start();
@@ -89,10 +89,10 @@ class UITest extends TestCase {
 		] ) );
 
 		$limiter = $this->getMockBuilder( OrderLimiter::class )
-			->setMethods( [ 'has_reached_limits' ] )
+			->setMethods( [ 'has_reached_limit' ] )
 			->getMock();
 
-		$limiter->method( 'has_reached_limits' )
+		$limiter->method( 'has_reached_limit' )
 			->willReturn( true );
 
 		ob_start();
@@ -112,10 +112,10 @@ class UITest extends TestCase {
 		] ) );
 
 		$limiter = $this->getMockBuilder( OrderLimiter::class )
-			->setMethods( [ 'has_reached_limits' ] )
+			->setMethods( [ 'has_reached_limit' ] )
 			->getMock();
 
-		$limiter->method( 'has_reached_limits' )
+		$limiter->method( 'has_reached_limit' )
 			->willReturn( true );
 
 		ob_start();

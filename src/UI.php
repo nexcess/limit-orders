@@ -84,7 +84,7 @@ class UI {
 	 * @todo Get an actual value for $restart.
 	 */
 	public function admin_notice() {
-		if ( ! $this->limiter->has_reached_limits() ) {
+		if ( ! $this->limiter->has_reached_limit() ) {
 			return;
 		}
 

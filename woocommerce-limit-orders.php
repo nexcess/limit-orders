@@ -32,11 +32,12 @@ add_action( 'woocommerce_loaded', function () {
 	$limiter = new OrderLimiter();
 	$ui      = new UI( $limiter );
 
-	// Initialize the UI hooks.
+	// Initialize hooks.
+	$limiter->init();
 	$ui->init();
 
 	// Turn off ordering if we've reached the defined limits.
-	if ( $limiter->has_reached_limits() ) {
+	if ( $limiter->has_reached_limit() ) {
 		$ui->disable_ordering();
 	}
 } );
