@@ -8,6 +8,8 @@
 namespace Tests;
 
 use Nexcess\WooCommerceLimitOrders\OrderLimiter;
+use WC_Checkout;
+use WC_Helper_Product;
 use WP_UnitTestCase as TestCase;
 
 /**
@@ -70,7 +72,7 @@ class OrderLimiterTest extends TestCase {
 			'limit'   => 5,
 		] );
 
-		set_site_transient( OrderLimiter::TRANSIENT_NAME, 2 );
+		set_transient( OrderLimiter::TRANSIENT_NAME, 2 );
 
 		$this->assertSame( 3, ( new OrderLimiter() )->get_remaining_orders() );
 	}
@@ -97,7 +99,7 @@ class OrderLimiterTest extends TestCase {
 			'limit'   => 5,
 		] );
 
-		set_site_transient( OrderLimiter::TRANSIENT_NAME, 10 );
+		set_transient( OrderLimiter::TRANSIENT_NAME, 10 );
 
 		$this->assertSame( 0, ( new OrderLimiter() )->get_remaining_orders() );
 	}
@@ -253,7 +255,7 @@ class OrderLimiterTest extends TestCase {
 			'limit'   => 5,
 		] );
 
-		set_site_transient( OrderLimiter::TRANSIENT_NAME, 2 );
+		set_transient( OrderLimiter::TRANSIENT_NAME, 2 );
 
 		$this->assertFalse( ( new OrderLimiter() )->has_reached_limit() );
 	}
@@ -268,7 +270,7 @@ class OrderLimiterTest extends TestCase {
 			'limit'   => 5,
 		] );
 
-		set_site_transient( OrderLimiter::TRANSIENT_NAME, 5 );
+		set_transient( OrderLimiter::TRANSIENT_NAME, 5 );
 
 		$this->assertTrue( ( new OrderLimiter() )->has_reached_limit() );
 	}
@@ -283,8 +285,64 @@ class OrderLimiterTest extends TestCase {
 			'limit'   => 5,
 		] );
 
-		set_site_transient( OrderLimiter::TRANSIENT_NAME, 6 );
+		set_transient( OrderLimiter::TRANSIENT_NAME, 6 );
 
 		$this->assertTrue( ( new OrderLimiter() )->has_reached_limit() );
+	}
+
+	/**
+	 * @test
+	 */
+	public function regenerate_transient_should_create_the_site_transient() {
+		update_option( OrderLimiter::OPTION_KEY, [
+			'enabled'  => true,
+			'limit'    => 5,
+		] );
+
+		$this->assertFalse( get_transient( OrderLimiter::TRANSIENT_NAME ) );
+
+		$limiter = $this->getMockBuilder( OrderLimiter::class )
+			->setMethods( [ 'count_qualifying_orders' ] )
+			->getMock();
+		$limiter->expects( $this->once() )
+			->method( 'count_qualifying_orders' )
+			->willReturn( 3 );
+
+		$this->assertSame( 3, $limiter->regenerate_transient() );
+		$this->assertSame( 3, get_transient( OrderLimiter::TRANSIENT_NAME ) );
+	}
+
+	/**
+	 * @test
+	 */
+	public function the_transient_should_be_updated_each_time_an_order_is_placed() {
+		update_option( OrderLimiter::OPTION_KEY, [
+			'enabled' => true,
+			'limit'   => 5,
+		] );
+
+		( new OrderLimiter() )->init();
+
+		$this->assertFalse( get_transient( OrderLimiter::TRANSIENT_NAME ) );
+
+		for ( $i = 1; $i <= 3; $i++ ) {
+			$this->generate_order();
+
+			$this->assertSame( $i, get_transient( OrderLimiter::TRANSIENT_NAME ) );
+		}
+	}
+
+	/**
+	 * Create a new order by emulating the checkout process.
+	 */
+	public function generate_order() {
+		$product = WC_Helper_Product::create_simple_product( true );
+
+		WC()->cart->add_to_cart( $product->get_id(), 1 );
+
+		return WC_Checkout::instance()->create_order( [
+			'billing_email'  => 'test_customer@example.com',
+			'payment_method' => 'dummy_payment_gateway',
+		] );
 	}
 }

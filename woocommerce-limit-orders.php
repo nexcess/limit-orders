@@ -38,6 +38,6 @@ add_action( 'woocommerce_loaded', function () {
 
 	// Turn off ordering if we've reached the defined limits.
 	if ( $limiter->has_reached_limit() ) {
-		$ui->disable_ordering();
+		$limiter->disable_ordering();
 	}
 } );

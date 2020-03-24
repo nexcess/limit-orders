@@ -43,7 +43,7 @@ class OrderLimiter {
 	public function get_limit() {
 		$limit = $this->get_setting( 'limit' );
 
-		return $this->is_enabled() && is_int( $limit ) && 0 <= $limit ? $limit : -1;
+		return $this->is_enabled() && is_numeric( $limit ) && 0 <= $limit ? (int) $limit : -1;
 	}
 
 	/**
@@ -59,7 +59,7 @@ class OrderLimiter {
 			return -1;
 		}
 
-		$orders = get_site_transient( self::TRANSIENT_NAME );
+		$orders = get_transient( self::TRANSIENT_NAME );
 
 		// The transient has been cleared, so re-generate it.
 		if ( false === $orders ) {
@@ -112,44 +112,35 @@ class OrderLimiter {
 	 * Retrieve the number of seconds until the next interval starts.
 	 *
 	 * @return int The number of seconds until the limiting interval resets.
-	 *
-	 * @todo Calculate the beginning of this interval, then add one interval to it.
 	 */
 	public function get_seconds_until_next_interval() {
-		$period = $this->get_setting( 'interval' );
-		$start  = $this->get_interval_start();
+		$interval = $this->get_setting( 'interval' );
+		$current  = $start = $this->get_interval_start();
 
-		switch ( $period ) {
+		switch ( $interval ) {
 			case 'daily':
-				$spec = 'P1D';
+				$start->add( new \DateInterval( 'P1D' ) );
 				break;
 
 			case 'weekly':
-				$spec = 'P7D';
+				$start->add( new \DateInterval( 'P7D' ) );
 				break;
 
 			case 'monthly':
-				$spec = 'P1M';
-				break;
-
-			default:
-				$spec = 'P0D';
+				$start->add( new \DateInterval( 'P1M' ) );
 				break;
 		}
 
-		$interval = new \DateInterval( $spec );
-
 		/**
-		 * Change the amount of time before the next order interval starts.
+		 * Filter the DateTime at which the next interval should begin.
 		 *
-		 * @param \DateInterval $interval The interval being added to the current interval's
-		 *                                start time.
-		 * @param \DateTime     $start    The current interval's starting time.
-		 * @param string        $period   The interval length from the settings.
+		 * @param \DateTime $start    A DateTime representing the start time for the next interval.
+		 * @param \DateTime $current  A DateTime representing the beginning of the current interval.
+		 * @param string    $interval The specified interval.
 		 */
-		$interval = apply_filters( 'woocommerce_limit_orders_interval', $interval, $start, $period );
+		$start = apply_filters( 'woocommerce_limit_orders_next_interval', $start, $current, $interval );
 
-		return $start->add( $interval )->getTimestamp() - current_datetime()->getTimestamp();
+		return max( $start->getTimestamp() - current_datetime()->getTimestamp(), 0 );
 	}
 
 	/**
@@ -177,13 +168,13 @@ class OrderLimiter {
 	 * This guarantees that we'll have accurate numbers and handle race conditions.
 	 *
 	 * @return int The number of qualifying orders.
-	 *
-	 * @todo Hook this into new order creation.
 	 */
 	public function regenerate_transient() {
 		$count = $this->count_qualifying_orders();
 
-		set_site_transient( self::TRANSIENT_NAME, $count, $this->get_seconds_until_next_interval() );
+		set_transient( self::TRANSIENT_NAME, $count, $this->get_seconds_until_next_interval() );
+
+		return $count;
 	}
 
 	/**
@@ -193,9 +184,9 @@ class OrderLimiter {
 	 */
 	protected function count_qualifying_orders() {
 		$orders = wc_get_orders( [
-			'type'       => wc_get_order_types( 'order-count' ),
-			'date_after' => $this->get_interval_start(),
-			'return'     => 'ids',
+			'type'         => wc_get_order_types( 'order-count' ),
+			'date_created' => '>=' . $this->get_interval_start()->getTimestamp(),
+			'return'       => 'ids',
 		] );
 
 		return count( $orders );
