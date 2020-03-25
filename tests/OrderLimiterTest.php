@@ -9,6 +9,7 @@ namespace Tests;
 
 use Nexcess\WooCommerceLimitOrders\OrderLimiter;
 use WC_Checkout;
+use WC_Form_Handler;
 use WC_Helper_Product;
 use WP_UnitTestCase as TestCase;
 
@@ -17,6 +18,13 @@ use WP_UnitTestCase as TestCase;
  * @group Limiting
  */
 class OrderLimiterTest extends TestCase {
+
+	/**
+	 * @before
+	 */
+	public function reset_wc_notices() {
+		wc_clear_notices();
+	}
 
 	/**
 	 * @test
@@ -382,6 +390,95 @@ class OrderLimiterTest extends TestCase {
 	/**
 	 * @test
 	 */
+	public function disable_ordering_registers_a_notice_in_the_header() {
+		$limiter = new OrderLimiter();
+		$limiter->disable_ordering();
+
+		$this->assertSame( 10, has_action( 'wp', [ $limiter, 'customer_notice' ] ) );
+	}
+
+	/**
+	 * @test
+	 */
+	public function disable_ordering_prevents_items_from_being_added_to_a_cart() {
+		$product = WC_Helper_Product::create_simple_product( true );
+
+		$this->assertTrue( false !== WC()->cart->add_to_cart( $product->get_id(), 1 ) );
+
+		( new OrderLimiter() )->disable_ordering();
+
+		$this->assertFalse(
+			WC()->cart->add_to_cart( $product->get_id(), 1 ),
+			'Customers should not be able to add items into their carts.'
+		);
+	}
+
+	/**
+	 * @test
+	 */
+	public function disable_ordering_prevents_customers_from_being_able_to_checkout() {
+		$this->assertNotWPError( $this->generate_order() );
+
+		( new OrderLimiter() )->disable_ordering();
+
+		$this->assertWPError( $this->generate_order() );
+	}
+
+	/**
+	 * @test
+	 */
+	public function customer_notice_should_register_a_new_WooCommerce_notice() {
+		add_filter( 'is_woocommerce', '__return_true' );
+
+		$this->assertSame( 0, wc_notice_count( 'notice' ) );
+
+		( new OrderLimiter() )->customer_notice();
+
+		$this->assertSame( 1, wc_notice_count( 'notice' ) );
+	}
+
+	/**
+	 * @test
+	 */
+	public function customer_notice_should_not_register_duplicate_messages() {
+		add_filter( 'is_woocommerce', '__return_true' );
+
+		$limiter = new OrderLimiter();
+
+		$limiter->customer_notice();
+		$limiter->customer_notice();
+		$limiter->customer_notice();
+
+		$this->assertSame( 1, wc_notice_count( 'notice' ) );
+	}
+
+	/**
+	 * @test
+	 */
+	public function customer_notice_should_not_add_a_notice_on_non_WooCommerce_pages() {
+		add_filter( 'is_woocommerce', '__return_false' );
+
+		( new OrderLimiter() )->customer_notice();
+
+		$this->assertSame( 0, wc_notice_count( 'notice' ) );
+	}
+
+	/**
+	 * @test
+	 */
+	public function disable_ordering_makes_items_unpurchasable() {
+		$product = WC_Helper_Product::create_simple_product( true );
+
+		$this->assertTrue( $product->is_purchasable() );
+
+		( new OrderLimiter() )->disable_ordering();
+
+		$this->assertFalse( $product->is_purchasable() );
+	}
+
+	/**
+	 * @test
+	 */
 	public function regenerate_transient_should_create_the_site_transient() {
 		update_option( OrderLimiter::OPTION_KEY, [
 			'enabled'  => true,
@@ -426,7 +523,7 @@ class OrderLimiterTest extends TestCase {
 	/**
 	 * Create a new order by emulating the checkout process.
 	 */
-	public function generate_order() {
+	protected function generate_order() {
 		$product = WC_Helper_Product::create_simple_product( true );
 
 		WC()->cart->add_to_cart( $product->get_id(), 1 );

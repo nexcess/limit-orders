@@ -7,6 +7,8 @@
 
 namespace Nexcess\WooCommerceLimitOrders;
 
+use Nexcess\WooCommerceLimitOrders\Exceptions\OrdersNotAcceptedException;
+
 class OrderLimiter {
 
 	/**
@@ -191,11 +193,35 @@ class OrderLimiter {
 
 	/**
 	 * Disable ordering for a WooCommerce store.
-	 *
-	 * @todo Make the magic happen!
 	 */
 	public function disable_ordering() {
+		add_action( 'wp', [ $this, 'customer_notice' ] );
 
+		// Prevent items from being added to the cart.
+		add_filter( 'woocommerce_is_purchasable', '__return_false' );
+
+		// Cause checkouts to fail upon submission.
+		add_action( 'woocommerce_checkout_create_order', [ $this, 'abort_checkout' ] );
+	}
+
+	/**
+	 * Abort the checkout process.
+	 *
+	 * @throws \Nexcess\WooCommerceLimitOrders\Exceptions\OrdersNotAcceptedException
+	 */
+	public function abort_checkout() {
+		throw new OrdersNotAcceptedException( __( 'Ordering is currently disabled for this store.', 'woocommerce-limit-orders' ) );
+	}
+
+	/**
+	 * Display a notice on the front-end of the site.
+	 */
+	public function customer_notice() {
+		$message = 'Ordering is currently disabled.';
+
+		if ( is_woocommerce() && ! wc_has_notice( $message, 'notice' ) ) {
+			wc_add_notice( $message, 'notice' );
+		}
 	}
 
 	/**
