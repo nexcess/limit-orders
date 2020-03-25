@@ -417,11 +417,20 @@ class OrderLimiterTest extends TestCase {
 	 * @test
 	 */
 	public function disable_ordering_prevents_customers_from_being_able_to_checkout() {
-		$this->assertNotWPError( $this->generate_order() );
+		$this->assertIsNumeric( $this->generate_order() );
 
 		( new OrderLimiter() )->disable_ordering();
 
 		$this->assertWPError( $this->generate_order() );
+	}
+
+	/**
+	 * @test
+	 */
+	public function store_owners_should_still_be_able_to_create_orders_through_WP_Admin() {
+		( new OrderLimiter() )->disable_ordering();
+
+		$this->assertGreaterThan( 0, wc_create_order()->get_id() );
 	}
 
 	/**
