@@ -80,30 +80,26 @@ class UI {
 
 	/**
 	 * Display an admin notice when ordering is disabled.
-	 *
-	 * @todo Get an actual value for $restart.
 	 */
 	public function admin_notice() {
 		if ( ! $this->limiter->has_reached_limit() ) {
 			return;
 		}
 
-		$restart = 'reactivated';
-
 		echo '<div class="notice notice-warning"><p>';
 
 		if ( current_user_can( 'manage_options' ) ) {
 			echo wp_kses_post( sprintf(
 				/* Translators: %1$s is the settings page URL, %2$s is the reset date for order limiting. */
-				__( '<a href="%1$s">Based on your store\'s configuration</a>, new orders have been put on hold until %2%s.', 'woocommerce-limit-orders' ),
+				__( '<a href="%1$s">Based on your store\'s configuration</a>, new orders have been put on hold until %2$s.', 'woocommerce-limit-orders' ),
 				admin_url( 'admin.php?page=wc-settings&tab=general' ),
-				$restart
+				$this->limiter->get_next_interval_start()->format( get_option( 'date_format' ) )
 			) );
 		} else {
 			echo esc_html( sprintf(
 				/* Translators: %1$s is the reset date for order limiting. */
-				__( 'Based on your store\'s configuration, new orders have been put on hold until %1%s.', 'woocommerce-limit-orders' ),
-				$restart
+				__( 'Based on your store\'s configuration, new orders have been put on hold until %1$s.', 'woocommerce-limit-orders' ),
+				$this->limiter->get_next_interval_start()->format( get_option( 'date_format' ) )
 			) );
 		}
 		echo '</p></div>';
