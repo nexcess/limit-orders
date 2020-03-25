@@ -213,7 +213,7 @@ class OrderLimiter {
 	 * @throws \Nexcess\WooCommerceLimitOrders\Exceptions\OrdersNotAcceptedException
 	 */
 	public function abort_checkout() {
-		throw new OrdersNotAcceptedException( __( 'Ordering is currently disabled for this store.', 'woocommerce-limit-orders' ) );
+		throw new OrdersNotAcceptedException( $this->get_message( 'checkout_error' ) );
 	}
 
 	/**
@@ -222,7 +222,7 @@ class OrderLimiter {
 	 * @return string
 	 */
 	public function order_button_html() {
-		return '<p>' . esc_html__( 'Ordering is currently disabled for this store.', 'woocommerce-limit-orders' ) . '</p>';
+		return '<p>' . wp_kses_post( $this->get_message( 'order_button' ) ) . '</p>';
 	}
 
 	/**
@@ -234,7 +234,7 @@ class OrderLimiter {
 			return;
 		}
 
-		$message = 'Ordering is currently disabled.';
+		$message = $this->get_message( 'customer_notice' );
 
 		// Prevent the same message from appearing multiple times.
 		if ( ! wc_has_notice( $message, 'notice' ) ) {
@@ -288,5 +288,22 @@ class OrderLimiter {
 		}
 
 		return isset( $this->settings[ $setting ] ) ? $this->settings[ $setting ] : null;
+	}
+
+	/**
+	 * Retrieve a user-provided string and apply any transformations.
+	 *
+	 * @param string $setting The message's setting key.
+	 *
+	 * @return string The user-provided setting, or a generic default if nothing is available.
+	 */
+	protected function get_message( string $setting ) {
+		$message = $this->get_setting( $setting );
+
+		if ( null === $message ) {
+			$message = __( 'Ordering is currently disabled for this store.', 'woocommerce-limit-orders' );
+		}
+
+		return $message;
 	}
 }

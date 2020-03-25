@@ -51,8 +51,8 @@ class Settings extends WC_Settings_Page {
 			],
 			[
 				'id'                => OrderLimiter::OPTION_KEY . '[limit]',
-				'name'              => __( 'Order threshold', 'woocommerce-limit-orders' ),
-				'desc'              => __( 'Customers will be unable to checkout after this number of orders are made.', 'woocommerce-limit-orders' ),
+				'name'              => __( 'Maximum # of orders', 'woocommerce-limit-orders' ),
+				'desc_tip'          => __( 'Customers will be unable to checkout after this number of orders are made.', 'woocommerce-limit-orders' ),
 				'type'              => 'number',
 				'css'               => 'width: 150px;',
 				'custom_attributes' => [
@@ -61,14 +61,45 @@ class Settings extends WC_Settings_Page {
 				],
 			],
 			[
-				'id'      => OrderLimiter::OPTION_KEY . '[interval]',
-				'name'    => __( 'Reset Limits', 'woocommerce-limit-orders' ),
-				'desc'    => __( 'How frequently the limit will be reset.', 'woocommerce-limit-orders' ),
-				'type'    => 'select',
-				'options' => $this->get_intervals(),
+				'id'       => OrderLimiter::OPTION_KEY . '[interval]',
+				'name'     => __( 'Interval', 'woocommerce-limit-orders' ),
+				'desc_tip' => __( 'How frequently the limit will be reset.', 'woocommerce-limit-orders' ),
+				'type'     => 'select',
+				'options'  => $this->get_intervals(),
 			],
 			[
 				'id'   => 'woocommerce-limit-orders-general',
+				'type' => 'sectionend',
+			],
+			[
+				'id'   => 'woocommerce-limit-orders-messaging',
+				'type' => 'title',
+				'name' => _x( 'Customer messaging', 'settings section title', 'woocommerce-limit-orders' ),
+				'desc' => __( 'Customize the messages shown to customers once ordering is disabled.', 'woocommerce-limit-orders' ),
+			],
+			[
+				'id'       => OrderLimiter::OPTION_KEY . '[customer_notice]',
+				'name'     => __( 'Customer notice', 'woocommerce-limit-orders' ),
+				'desc_tip' => __( 'This message will appear on shop pages on the front-end of your site.', 'woocommerce-limit-orders' ),
+				'type'     => 'text',
+				'default'  => __( 'Due to increased demand, new orders will be temporarily suspended until %NEXT_INTERVAL%.', 'woocommerce-limit-orders' ),
+			],
+			[
+				'id'       => OrderLimiter::OPTION_KEY . '[order_button]',
+				'name'     => __( '"Place Order" button', 'woocommerce-limit-orders' ),
+				'desc_tip' => __( 'This text will replace the "Place Order" button on the checkout screen.', 'woocommerce-limit-orders' ),
+				'type'     => 'text',
+				'default'  => __( 'Ordering is temporarily disabled for this store.', 'woocommerce-limit-orders' ),
+			],
+			[
+				'id'       => OrderLimiter::OPTION_KEY . '[checkout_error]',
+				'name'     => __( 'Checkout error message', 'woocommerce-limit-orders' ),
+				'desc_tip' => __( 'This error message will be displayed if a customer attempts to checkout once ordering is disabled.', 'woocommerce-limit-orders' ),
+				'type'     => 'text',
+				'default'  => __( 'Ordering is temporarily disabled for this store.', 'woocommerce-limit-orders' ),
+			],
+			[
+				'id'   => 'woocommerce-limit-orders-messaging',
 				'type' => 'sectionend',
 			],
 		] );
@@ -85,13 +116,13 @@ class Settings extends WC_Settings_Page {
 		global $wp_locale;
 
 		$intervals = [
-			'daily'   => _x( 'Every day', 'order threshold interval', 'woocommerce-limit-orders' ),
+			'daily'   => _x( 'Daily (resets every day)', 'order threshold interval', 'woocommerce-limit-orders' ),
 			'weekly'  => sprintf(
 				/* Translators: %1$s is the first day of the week, based on site configuration. */
-				_x( 'Every %1$s', 'order threshold interval', 'woocommerce-limit-orders' ),
+				_x( 'Weekly (resets every %1$s)', 'order threshold interval', 'woocommerce-limit-orders' ),
 				$wp_locale->get_weekday( get_option( 'start_of_week' ) )
 			),
-			'monthly' => _x( 'The first day of each month', 'order threshold interval', 'woocommerce-limit-orders' ),
+			'monthly' => _x( 'Monthly (resets on the first of the month)', 'order threshold interval', 'woocommerce-limit-orders' ),
 		];
 
 		/**
