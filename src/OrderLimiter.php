@@ -138,11 +138,11 @@ class OrderLimiter {
 	}
 
 	/**
-	 * Retrieve the number of seconds until the next interval starts.
+	 * Get a DateTime object representing the start of the next interval.
 	 *
-	 * @return int The number of seconds until the limiting interval resets.
+	 * @return \DateTime
 	 */
-	public function get_seconds_until_next_interval() {
+	public function get_next_interval_start() {
 		$interval = $this->get_setting( 'interval' );
 		$current  = $this->get_interval_start();
 		$start    = clone $current;
@@ -168,9 +168,16 @@ class OrderLimiter {
 		 * @param \DateTime $current  A DateTime representing the beginning of the current interval.
 		 * @param string    $interval The specified interval.
 		 */
-		$start = apply_filters( 'woocommerce_limit_orders_next_interval', $start, $current, $interval );
+		return apply_filters( 'woocommerce_limit_orders_next_interval', $start, $current, $interval );
+	}
 
-		return $start->getTimestamp() - $this->now->getTimestamp();
+	/**
+	 * Retrieve the number of seconds until the next interval starts.
+	 *
+	 * @return int The number of seconds until the limiting interval resets.
+	 */
+	public function get_seconds_until_next_interval() {
+		return $this->get_next_interval_start()->getTimestamp() - $this->now->getTimestamp();
 	}
 
 	/**
