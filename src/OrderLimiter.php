@@ -101,7 +101,9 @@ class OrderLimiter {
 		// Perform simple placeholder replacements.
 		$date_format  = get_option( 'date_format' );
 		$placeholders = [
-			'%NEXT_INTERVAL%' => $this->get_next_interval_start()->format( $date_format ),
+			'{current_interval}' => $this->get_interval_start()->format( $date_format ),
+			'{limit}'            => $this->get_limit(),
+			'{next_interval}'    => $this->get_next_interval_start()->format( $date_format ),
 		];
 
 		/**

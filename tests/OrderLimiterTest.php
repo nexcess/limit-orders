@@ -95,12 +95,50 @@ class OrderLimiterTest extends TestCase {
 
 	/**
 	 * @test
+	 * @testdox get_message() should replace the {current_interval} placeholder
 	 */
-	public function get_message_should_replace_placeholders() {
+	public function get_message_should_replace_current_interval_placeholder() {
 		update_option( 'date_format', 'F j, Y' );
 		update_option( OrderLimiter::OPTION_KEY, [
 			'interval'        => 'weekly',
-			'customer_notice' => 'Check back on %NEXT_INTERVAL%',
+			'customer_notice' => 'This started on {current_interval}',
+		] );
+
+		$now     = new \DateTimeImmutable( 'now', wp_timezone() );
+		$limiter = new OrderLimiter( $now );
+
+		$this->assertSame(
+			'This started on ' . $limiter->get_interval_start()->format( 'F j, Y' ),
+			$limiter->get_message( 'customer_notice' )
+		);
+	}
+
+	/**
+	 * @test
+	 * @testdox get_message() should replace the {limit} placeholder
+	 */
+	public function get_message_should_replace_limit_placeholder() {
+		update_option( OrderLimiter::OPTION_KEY, [
+			'customer_notice' => 'We can accept {limit} orders.',
+		] );
+
+		$limiter = new OrderLimiter();
+
+		$this->assertSame(
+			'We can accept ' . $limiter->get_limit() . ' orders.',
+			$limiter->get_message( 'customer_notice' )
+		);
+	}
+
+	/**
+	 * @test
+	 * @testdox get_message() should replace the {next_interval} placeholder
+	 */
+	public function get_message_should_replace_next_interval_placeholder() {
+		update_option( 'date_format', 'F j, Y' );
+		update_option( OrderLimiter::OPTION_KEY, [
+			'interval'        => 'weekly',
+			'customer_notice' => 'Check back on {next_interval}',
 		] );
 
 		$now     = new \DateTimeImmutable( 'now', wp_timezone() );

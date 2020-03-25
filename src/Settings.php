@@ -72,17 +72,17 @@ class Settings extends WC_Settings_Page {
 				'type' => 'sectionend',
 			],
 			[
-				'id'   => 'woocommerce-limit-orders-messaging',
-				'type' => 'title',
-				'name' => _x( 'Customer messaging', 'settings section title', 'woocommerce-limit-orders' ),
-				'desc' => __( 'Customize the messages shown to customers once ordering is disabled.', 'woocommerce-limit-orders' ),
+				'id'       => 'woocommerce-limit-orders-messaging',
+				'type'     => 'title',
+				'name'     => _x( 'Customer messaging', 'settings section title', 'woocommerce-limit-orders' ),
+				'desc'     => '<p>' . __( 'Customize the messages shown to customers once ordering is disabled.', 'woocommerce-limit-orders' ) . '</p><p>' . __( 'Available placeholders: <var>{limit}</var>, <var>{current_interval}</var>, <var>{next_interval}</var>.', 'woocommerce-limit-orders' ) . '</p>',
 			],
 			[
 				'id'       => OrderLimiter::OPTION_KEY . '[customer_notice]',
 				'name'     => __( 'Customer notice', 'woocommerce-limit-orders' ),
 				'desc_tip' => __( 'This message will appear on shop pages on the front-end of your site.', 'woocommerce-limit-orders' ),
 				'type'     => 'text',
-				'default'  => __( 'Due to increased demand, new orders will be temporarily suspended until %NEXT_INTERVAL%.', 'woocommerce-limit-orders' ),
+				'default'  => __( 'Due to increased demand, new orders will be temporarily suspended until {next_interval}.', 'woocommerce-limit-orders' ),
 			],
 			[
 				'id'       => OrderLimiter::OPTION_KEY . '[order_button]',
