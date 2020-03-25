@@ -39,7 +39,7 @@ class Admin {
 	 * @return array The filtered $pages array.
 	 */
 	public function register_settings_page( $pages ) {
-		$pages[] = new Settings();
+		$pages[] = new Settings( $this->limiter );
 
 		return $pages;
 	}

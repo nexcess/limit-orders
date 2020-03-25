@@ -22,7 +22,7 @@ class SettingsTest extends TestCase {
 	 * @test
 	 */
 	public function the_options_should_be_added_to_the_general_WooCommerce_settings() {
-		$settings = ( new Settings() )->get_settings();
+		$settings = ( new Settings( new OrderLimiter() ) )->get_settings();
 
 		$this->assertSame( 'title', $settings[0]['type'] );
 		$this->assertSame( 'woocommerce-limit-orders-general', $settings[0]['id'] );
@@ -41,7 +41,7 @@ class SettingsTest extends TestCase {
 		} );
 
 		// Find the interval setting and inspect its options.
-		foreach ( ( new Settings() )->get_settings() as $setting ) {
+		foreach ( ( new Settings( new OrderLimiter() ) )->get_settings() as $setting ) {
 			if ( OrderLimiter::OPTION_KEY . '[interval]' !== $setting['id'] ) {
 				continue;
 			}

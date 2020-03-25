@@ -12,11 +12,19 @@ use WC_Settings_Page;
 class Settings extends WC_Settings_Page {
 
 	/**
+	 * The current limiter instance.
+	 *
+	 * @var \Nexcess\WooCommerceLimitOrders\OrderLimiter
+	 */
+	private $limiter;
+
+	/**
 	 * Construct the settings page.
 	 */
-	public function __construct() {
-		$this->id    = 'woocommerce-limit-orders';
-		$this->label = __( 'Order Limiting', 'woocommerce' );
+	public function __construct( OrderLimiter $limiter ) {
+		$this->id      = 'woocommerce-limit-orders';
+		$this->label   = __( 'Order Limiting', 'woocommerce' );
+		$this->limiter = $limiter;
 
 		parent::__construct();
 	}
