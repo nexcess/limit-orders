@@ -72,6 +72,48 @@ class OrderLimiterTest extends TestCase {
 
 	/**
 	 * @test
+	 * @testWith ["checkout_error"]
+	 *           ["customer_notice"]
+	 *           ["order_button"]
+	 */
+	public function get_message_should_return_user_provided_messages( string $key ) {
+		$message = 'Some message ' . uniqid();
+
+		update_option( OrderLimiter::OPTION_KEY, [
+			$key => $message,
+		] );
+
+		$this->assertSame( $message, ( new OrderLimiter() )->get_message( $key ) );
+	}
+
+	/**
+	 * @test
+	 */
+	public function get_message_should_not_expose_other_settings() {
+		$this->assertEmpty( ( new OrderLimiter() )->get_message( 'interval' ) );
+	}
+
+	/**
+	 * @test
+	 */
+	public function get_message_should_replace_placeholders() {
+		update_option( 'date_format', 'F j, Y' );
+		update_option( OrderLimiter::OPTION_KEY, [
+			'interval'        => 'weekly',
+			'customer_notice' => 'Check back on %NEXT_INTERVAL%',
+		] );
+
+		$now     = new \DateTimeImmutable( 'now', wp_timezone() );
+		$limiter = new OrderLimiter( $now );
+
+		$this->assertSame(
+			'Check back on ' . $limiter->get_next_interval_start()->format( 'F j, Y' ),
+			$limiter->get_message( 'customer_notice' )
+		);
+	}
+
+	/**
+	 * @test
 	 * @testdox get_remaining_orders() should return the number of orders left for the interval
 	 */
 	public function get_remaining_orders_should_return_the_number_of_orders_left_for_the_interval() {

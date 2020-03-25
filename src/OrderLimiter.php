@@ -73,6 +73,50 @@ class OrderLimiter {
 	}
 
 	/**
+	 * Retrieve a user-provided string and apply any transformations.
+	 *
+	 * @param string $setting The message's setting key. Must be one of "checkout_error",
+	 *                        "customer_notice", or "order_button".
+	 *
+	 * @return string The user-provided setting, or a generic default if nothing is available.
+	 */
+	public function get_message( string $setting ) {
+		$settings = [
+			'checkout_error',
+			'customer_notice',
+			'order_button',
+		];
+
+		// Don't risk exposing any/all settings.
+		if ( ! in_array( $setting, $settings, true ) ) {
+			return '';
+		}
+
+		$message = $this->get_setting( $setting );
+
+		if ( null === $message ) {
+			$message = __( 'Ordering is currently disabled for this store.', 'woocommerce-limit-orders' );
+		}
+
+		// Perform simple placeholder replacements.
+		$date_format  = get_option( 'date_format' );
+		$placeholders = [
+			'%NEXT_INTERVAL%' => $this->get_next_interval_start()->format( $date_format ),
+		];
+
+		/**
+		 * Filter the available placeholders for customer-facing messages.
+		 *
+		 * @param array  $placeholders The currently-defined placeholders.
+		 * @param string $setting      The current message's setting key.
+		 * @param string $message      The current message to display.
+		 */
+		$placeholders = apply_filters( 'woocommerce_limit_orders_message_placeholders', $placeholders, $setting, $message );
+
+		return str_replace( array_keys( $placeholders ), array_values( $placeholders ), $message );
+	}
+
+	/**
 	 * Retrieve the number of remaining for this interval.
 	 *
 	 * @return int The maximum number of that may still be accepted, or -1 if there is no limit.
@@ -288,22 +332,5 @@ class OrderLimiter {
 		}
 
 		return isset( $this->settings[ $setting ] ) ? $this->settings[ $setting ] : null;
-	}
-
-	/**
-	 * Retrieve a user-provided string and apply any transformations.
-	 *
-	 * @param string $setting The message's setting key.
-	 *
-	 * @return string The user-provided setting, or a generic default if nothing is available.
-	 */
-	protected function get_message( string $setting ) {
-		$message = $this->get_setting( $setting );
-
-		if ( null === $message ) {
-			$message = __( 'Ordering is currently disabled for this store.', 'woocommerce-limit-orders' );
-		}
-
-		return $message;
 	}
 }
