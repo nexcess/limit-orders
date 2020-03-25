@@ -222,7 +222,7 @@ class OrderLimiter {
 	 * @return string
 	 */
 	public function order_button_html() {
-		return '<p>' . __( 'Ordering is currently disabled for this store.', 'woocommerce-limit-orders' ) . '</p>';
+		return '<p>' . esc_html__( 'Ordering is currently disabled for this store.', 'woocommerce-limit-orders' ) . '</p>';
 	}
 
 	/**

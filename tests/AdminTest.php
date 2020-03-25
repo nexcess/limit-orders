@@ -7,60 +7,17 @@
 
 namespace Tests;
 
+use Nexcess\WooCommerceLimitOrders\Admin;
 use Nexcess\WooCommerceLimitOrders\OrderLimiter;
-use Nexcess\WooCommerceLimitOrders\UI;
 use WC_Admin;
 use WC_Settings_General;
 use WP_UnitTestCase as TestCase;
 
 /**
- * @covers Nexcess\WooCommerceLimitOrders\UI
- * @group UI
+ * @covers Nexcess\WooCommerceLimitOrders\Admin
+ * @group Admin
  */
-class UITest extends TestCase {
-
-	/**
-	 * @test
-	 */
-	public function the_options_should_be_added_to_the_general_WooCommerce_settings() {
-		( new UI( new OrderLimiter() ) )->init();
-
-		$settings = apply_filters( 'woocommerce_get_settings_general', [] );
-
-		// The first entry should be the title.
-		$opening = array_shift( $settings );
-
-		$this->assertSame( 'title', $opening['type'] );
-		$this->assertSame( 'woocommerce-limit-orders', $opening['id'] );
-	}
-
-	/**
-	 * @test
-	 */
-	public function available_intervals_should_be_filterable() {
-		( new UI( new OrderLimiter() ) )->init();
-
-		$intervals = [
-			YEAR_IN_SECONDS => uniqid(),
-		];
-
-		add_filter( 'woocommerce_limit_orders_interval_select', function () use ( $intervals ) {
-			return $intervals;
-		} );
-
-		$settings = apply_filters( 'woocommerce_get_settings_general', [] );
-
-		foreach ( $settings as $setting ) {
-			if ( OrderLimiter::OPTION_KEY . '[interval]' !== $setting['id'] ) {
-				continue;
-			}
-
-			$this->assertSame( $intervals, $setting['options'] );
-			return;
-		}
-
-		$this->fail( 'Did not find setting with ID "'. OrderLimiter::OPTION_KEY . '[interval]".' );
-	}
+class AdminTest extends TestCase {
 
 	/**
 	 * @test
@@ -74,7 +31,7 @@ class UITest extends TestCase {
 			->willReturn( false );
 
 		ob_start();
-		( new UI( $limiter ) )->admin_notice();
+		( new Admin( $limiter ) )->admin_notice();
 		$output = ob_get_clean();
 
 		$this->assertEmpty( $output );
@@ -96,7 +53,7 @@ class UITest extends TestCase {
 			->willReturn( true );
 
 		ob_start();
-		( new UI( $limiter ) )->admin_notice();
+		( new Admin( $limiter ) )->admin_notice();
 		$output = ob_get_clean();
 
 		$this->assertStringContainsString( admin_url( 'admin.php?page=wc-settings' ), $output );
@@ -119,7 +76,7 @@ class UITest extends TestCase {
 			->willReturn( true );
 
 		ob_start();
-		( new UI( $limiter ) )->admin_notice();
+		( new Admin( $limiter ) )->admin_notice();
 		$output = ob_get_clean();
 
 		$this->assertStringNotContainsString( admin_url( 'admin.php?page=wc-settings' ), $output );

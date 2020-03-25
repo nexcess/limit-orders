@@ -1,49 +1,37 @@
 <?php
 /**
- * Define the UI for configuring order limits.
+ * Define the WooCommerce settings page for the plugin.
  *
  * @package Nexcess\WooCommerceLimitOrders
  */
 
 namespace Nexcess\WooCommerceLimitOrders;
 
-class UI {
+use WC_Settings_Page;
+
+class Settings extends WC_Settings_Page {
 
 	/**
-	 * @var \Nexcess\WooCommerceLimitOrders\OrderLimiter
+	 * Construct the settings page.
 	 */
-	protected $limiter;
+	public function __construct() {
+		$this->id    = 'woocommerce-limit-orders';
+		$this->label = __( 'Order Limiting', 'woocommerce' );
 
-	/**
-	 * Create a new instance of the UI, built around the passed $limiter.
-	 *
-	 * @param \Nexcess\WooCommerceLimitOrders\OrderLimiter $limiter
-	 */
-	public function __construct( OrderLimiter $limiter ) {
-		$this->limiter = $limiter;
+		parent::__construct();
 	}
 
 	/**
-	 * Add the necessary hooks.
-	 */
-	public function init() {
-		add_filter( 'woocommerce_get_settings_general', [ $this, 'get_settings' ] );
-		add_filter( 'admin_notices', [ $this, 'admin_notice' ] );
-	}
-
-	/**
-	 * Append our settings section to WooCommerce > Settings > General.
+	 * Get settings array.
 	 *
-	 * @param array $settings The general settings section.
-	 *
-	 * @return array The filtered array, including our settings.
+	 * @return array
 	 */
-	public function get_settings( array $settings ) {
-		return array_merge( $settings, [
+	public function get_settings() {
+		return apply_filters( 'woocommerce_get_settings_' . $this->id, [
 			[
-				'id'   => 'woocommerce-limit-orders',
+				'id'   => 'woocommerce-limit-orders-general',
 				'type' => 'title',
-				'name' => __( 'Limit orders', 'woocommerce-limit-orders' ),
+				'name' => _x( 'Order Limiting', 'settings section title', 'woocommerce-limit-orders' ),
 				'desc' => __( 'Automatically turn off new orders once the store\'s limit has been met.', 'woocommerce-limit-orders' ),
 			],
 			[
@@ -72,37 +60,10 @@ class UI {
 				'options' => $this->get_intervals(),
 			],
 			[
-				'id'   => 'woocommerce-limit-orders',
+				'id'   => 'woocommerce-limit-orders-general',
 				'type' => 'sectionend',
 			],
 		] );
-	}
-
-	/**
-	 * Display an admin notice when ordering is disabled.
-	 */
-	public function admin_notice() {
-		if ( ! $this->limiter->has_reached_limit() ) {
-			return;
-		}
-
-		echo '<div class="notice notice-warning"><p>';
-
-		if ( current_user_can( 'manage_options' ) ) {
-			echo wp_kses_post( sprintf(
-				/* Translators: %1$s is the settings page URL, %2$s is the reset date for order limiting. */
-				__( '<a href="%1$s">Based on your store\'s configuration</a>, new orders have been put on hold until %2$s.', 'woocommerce-limit-orders' ),
-				admin_url( 'admin.php?page=wc-settings&tab=general' ),
-				$this->limiter->get_next_interval_start()->format( get_option( 'date_format' ) )
-			) );
-		} else {
-			echo esc_html( sprintf(
-				/* Translators: %1$s is the reset date for order limiting. */
-				__( 'Based on your store\'s configuration, new orders have been put on hold until %1$s.', 'woocommerce-limit-orders' ),
-				$this->limiter->get_next_interval_start()->format( get_option( 'date_format' ) )
-			) );
-		}
-		echo '</p></div>';
 	}
 
 	/**
