@@ -202,6 +202,9 @@ class OrderLimiter {
 
 		// Cause checkouts to fail upon submission.
 		add_action( 'woocommerce_checkout_create_order', [ $this, 'abort_checkout' ] );
+
+		// Replace the "place order" button on the checkout screen.
+		add_filter( 'woocommerce_order_button_html', [ $this, 'order_button_html' ] );
 	}
 
 	/**
@@ -214,12 +217,27 @@ class OrderLimiter {
 	}
 
 	/**
+	 * Replace the "place order" button on the checkout screen.
+	 *
+	 * @return string
+	 */
+	public function order_button_html() {
+		return '<p>' . __( 'Ordering is currently disabled for this store.', 'woocommerce-limit-orders' ) . '</p>';
+	}
+
+	/**
 	 * Display a notice on the front-end of the site.
 	 */
 	public function customer_notice() {
+		// Only display on WooCommerce pages.
+		if ( ! is_woocommerce() && ! is_cart() && ! is_checkout() ) {
+			return;
+		}
+
 		$message = 'Ordering is currently disabled.';
 
-		if ( is_woocommerce() && ! wc_has_notice( $message, 'notice' ) ) {
+		// Prevent the same message from appearing multiple times.
+		if ( ! wc_has_notice( $message, 'notice' ) ) {
 			wc_add_notice( $message, 'notice' );
 		}
 	}
