@@ -10,6 +10,13 @@ namespace Nexcess\WooCommerceLimitOrders;
 class OrderLimiter {
 
 	/**
+	 * Holds the current DateTime.
+	 *
+	 * @param \DateTimeImmutable
+	 */
+	private $now;
+
+	/**
 	 * The cached value of the wp_options array.
 	 *
 	 * @param array
@@ -25,6 +32,23 @@ class OrderLimiter {
 	 * The transient that holds the current order count per period.
 	 */
 	const TRANSIENT_NAME = 'woocommerce_limit_orders_order_count';
+
+	/**
+	 * Create a new instance of the OrderLimiter.
+	 *
+	 * @param \DateTimeImmutable $now Optional. A DateTimeImmutable object to use as the basis for
+	 *                                all calculations. Default is current_datetime().
+	 */
+	public function __construct( \DateTimeImmutable $now = null ) {
+		$this->now = $now ? $now : current_datetime();
+	}
+
+	/**
+	 * Initialize hooks used by the limiter.
+	 */
+	public function init() {
+		add_action( 'woocommerce_new_order', [ $this, 'regenerate_transient' ] );
+	}
 
 	/**
 	 * Is limiting currently enabled for this store?
@@ -77,7 +101,7 @@ class OrderLimiter {
 	 */
 	public function get_interval_start() {
 		$interval = $this->get_setting( 'interval' );
-		$start    = new \DateTime( 'now', wp_timezone() );
+		$start    = $this->now;
 
 		switch ( $interval ) {
 			case 'weekly':
@@ -86,18 +110,23 @@ class OrderLimiter {
 
 				// If today isn't the start of the week, get a DateTime representing that day.
 				if ( $current_dow !== $start_of_week ) {
-					$days  = [ 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday' ];
-					$start = new \DateTime( 'last ' . $days[ $start_of_week ], wp_timezone() );
+					if ( $current_dow > $start_of_week ) {
+						$diff = $current_dow - $start_of_week;
+					} elseif ( $current_dow < $start_of_week ) {
+						$diff = $current_dow + 7 - $start_of_week;
+					}
+
+					$start = $start->sub( new \DateInterval( 'P' . $diff . 'D' ) );
 				}
 				break;
 
 			case 'monthly':
-				$start->setDate( $start->format( 'Y' ), $start->format( 'm' ), 1 );
+				$start = $start->setDate( $start->format( 'Y' ), $start->format( 'm' ), 1 );
 				break;
 		}
 
 		// Start everything at midnight.
-		$start->setTime( 0, 0, 0 );
+		$start = $start->setTime( 0, 0, 0 );
 
 		/**
 		 * Filter the DateTime object representing the start of the current interval.
@@ -115,19 +144,20 @@ class OrderLimiter {
 	 */
 	public function get_seconds_until_next_interval() {
 		$interval = $this->get_setting( 'interval' );
-		$current  = $start = $this->get_interval_start();
+		$current  = $this->get_interval_start();
+		$start    = clone $current;
 
 		switch ( $interval ) {
 			case 'daily':
-				$start->add( new \DateInterval( 'P1D' ) );
+				$start = $start->add( new \DateInterval( 'P1D' ) );
 				break;
 
 			case 'weekly':
-				$start->add( new \DateInterval( 'P7D' ) );
+				$start = $start->add( new \DateInterval( 'P7D' ) );
 				break;
 
 			case 'monthly':
-				$start->add( new \DateInterval( 'P1M' ) );
+				$start = $start->add( new \DateInterval( 'P1M' ) );
 				break;
 		}
 
@@ -140,7 +170,7 @@ class OrderLimiter {
 		 */
 		$start = apply_filters( 'woocommerce_limit_orders_next_interval', $start, $current, $interval );
 
-		return max( $start->getTimestamp() - current_datetime()->getTimestamp(), 0 );
+		return $start->getTimestamp() - $this->now->getTimestamp();
 	}
 
 	/**

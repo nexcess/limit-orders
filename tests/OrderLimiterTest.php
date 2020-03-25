@@ -112,11 +112,12 @@ class OrderLimiterTest extends TestCase {
 			'interval' => 'daily',
 		] );
 
-		$today = new \DateTime( 'now', wp_timezone() );
+		$now   = new \DateTimeImmutable( '2020-03-03 12:01:00', wp_timezone() );
+		$start = new \DateTimeImmutable( '2020-03-03 00:00:00', wp_timezone() );
 
 		$this->assertSame(
-			$today->setTime( 0, 0, 0 )->format( 'r' ),
-			( new OrderLimiter() )->get_interval_start()->format( 'r' ),
+			$start->format( 'r' ),
+			( new OrderLimiter( $now ) )->get_interval_start()->format( 'r' ),
 			'Daily intervals should start at midnight local time.'
 		);
 	}
@@ -130,45 +131,53 @@ class OrderLimiterTest extends TestCase {
 			'interval' => 'weekly',
 		] );
 
+		// Tuesday, March 3 and Monday, March 2.
+		$now   = new \DateTimeImmutable( '2020-03-03 12:01:00', wp_timezone() );
+		$start = new \DateTimeImmutable( '2020-03-02 00:00:00', wp_timezone() );
+
 		$this->assertSame(
-			( new \DateTime( 'Monday', wp_timezone() ) )->format( 'r' ),
-			( new OrderLimiter() )->get_interval_start()->format( 'r' ),
+			$start->format( 'r' ),
+			( new OrderLimiter( $now ) )->get_interval_start()->format( 'r' ),
 			'Weekly intervals should start at midnight on the first day of the week.'
 		);
 	}
 
 	/**
 	 * @test
-	 * @depends get_interval_start_for_weekly
 	 */
 	public function get_interval_start_for_weekly_with_a_non_standard_day() {
-		update_option( 'week_starts_on', 3 );
+		update_option( 'week_starts_on', 6 );
 		update_option( OrderLimiter::OPTION_KEY, [
 			'interval' => 'weekly',
 		] );
 
+		// Tuesday, March 10 and Saturday, March 7.
+		$now   = new \DateTimeImmutable( '2020-03-10 12:01:00', wp_timezone() );
+		$start = new \DateTimeImmutable( '2020-03-07 00:00:00', wp_timezone() );
+
 		$this->assertSame(
-			( new \DateTime( 'last Wednesday' ) )->format( 'r' ),
-			( new OrderLimiter() )->get_interval_start()->format( 'r' ),
+			$start->format( 'r' ),
+			( new OrderLimiter( $now ) )->get_interval_start()->format( 'r' ),
 			'Weekly intervals should adjust to the week_starts_on option.'
 		);
 	}
 
 	/**
 	 * @test
-	 * @depends get_interval_start_for_weekly
 	 */
 	public function get_interval_start_for_weekly_when_today_is_the_first_day_of_the_week() {
-		$today = new \DateTime( 'now', wp_timezone() );
-
-		update_option( 'week_starts_on', $today->format( 'w' ) );
+		update_option( 'week_starts_on', 1 );
 		update_option( OrderLimiter::OPTION_KEY, [
 			'interval' => 'weekly',
 		] );
 
+		// Monday, March 2.
+		$now   = new \DateTimeImmutable( '2020-03-02 12:01:00', wp_timezone() );
+		$start = new \DateTimeImmutable( '2020-03-02 00:00:00', wp_timezone() );
+
 		$this->assertSame(
-			$today->setTime( 0, 0, 0 )->format( 'r' ),
-			( new OrderLimiter() )->get_interval_start()->format( 'r' ),
+			$start->format( 'r' ),
+			( new OrderLimiter( $now ) )->get_interval_start()->format( 'r' ),
 			'If today is the first day of a weekly interval, the time should be this morning at midnight.'
 		);
 	}
@@ -177,17 +186,36 @@ class OrderLimiterTest extends TestCase {
 	 * @test
 	 */
 	public function get_interval_start_for_monthly() {
-		$today = new \DateTime( 'now', wp_timezone() );
+		$today = new \DateTimeImmutable( 'now', wp_timezone() );
 
 		update_option( OrderLimiter::OPTION_KEY, [
 			'interval' => 'monthly',
 		] );
 
 		$this->assertSame(
-			( new \DateTime( $today->format( 'F' ) . ' 1', wp_timezone() ) )->format( 'r' ),
+			( new \DateTimeImmutable( $today->format( 'F' ) . ' 1', wp_timezone() ) )->format( 'r' ),
 			( new OrderLimiter() )->get_interval_start()->format( 'r' ),
 			'Monthly intervals should start at midnight on the first day of the month.'
 		);
+	}
+
+	/**
+	 * @test
+	 */
+	public function get_interval_start_should_be_idempotent() {
+		$now     = new \DateTimeImmutable( '00:00:00', wp_timezone() );
+		$limiter = new OrderLimiter( $now );
+
+		update_option( OrderLimiter::OPTION_KEY, [
+			'interval' => 'daily',
+		] );
+
+		for ( $i = 0; $i < 3; $i++ ) {
+			$this->assertSame(
+				$now->format( 'r' ),
+				$limiter->get_interval_start()->format( 'r' )
+			);
+		}
 	}
 
 	/**
@@ -198,12 +226,13 @@ class OrderLimiterTest extends TestCase {
 			'interval' => 'daily',
 		] );
 
-		$current = new \DateTime( 'now', wp_timezone() );
-		$next    = new \DateTime( 'tomorrow', wp_timezone() );
+		// Tuesday, March 3 and Wednesday, March 4.
+		$now  = new \DateTimeImmutable( '2020-03-03 12:01:00', wp_timezone() );
+		$next = new \DateTimeImmutable( '2020-03-04 00:00:00', wp_timezone() );
 
 		$this->assertSame(
-			$next->getTimestamp() - $current->getTimestamp(),
-			( new OrderLimiter() )->get_seconds_until_next_interval(),
+			$next->getTimestamp() - $now->getTimestamp(),
+			( new OrderLimiter( $now ) )->get_seconds_until_next_interval(),
 			'It should return the number of seconds until midnight.'
 		);
 	}
@@ -212,17 +241,18 @@ class OrderLimiterTest extends TestCase {
 	 * @test
 	 */
 	public function get_seconds_until_next_interval_for_weekly() {
-		update_option( 'week_starts_on', 2 );
+		update_option( 'week_starts_on', 1 );
 		update_option( OrderLimiter::OPTION_KEY, [
-			'interval' => 'daily',
+			'interval' => 'weekly',
 		] );
 
-		$current = new \DateTime( 'now', wp_timezone() );
-		$next    = new \DateTime( 'Next Tuesday', wp_timezone() );
+		// Tuesday, March 3 and Monday, March 9.
+		$now  = new \DateTimeImmutable( '2020-03-03 12:01:00', wp_timezone() );
+		$next = new \DateTimeImmutable( '2020-03-09 00:00:00', wp_timezone() );
 
 		$this->assertSame(
-			$next->getTimestamp() - $current->getTimestamp(),
-			( new OrderLimiter() )->get_seconds_until_next_interval(),
+			$next->getTimestamp() - $now->getTimestamp(),
+			( new OrderLimiter( $now ) )->get_seconds_until_next_interval(),
 			'It should return the number of seconds until midnight next Monday.'
 		);
 	}
@@ -235,12 +265,13 @@ class OrderLimiterTest extends TestCase {
 			'interval' => 'monthly',
 		] );
 
-		$current = new \DateTime( 'now', wp_timezone() );
-		$next    = ( new \DateTime( 'First day of next Month', wp_timezone() ) )->setTime( 0, 0, 0 );
+		// March 3 and April 1.
+		$now  = new \DateTimeImmutable( '2020-03-03 12:01:00', wp_timezone() );
+		$next = new \DateTimeImmutable( '2020-04-01 00:00:00', wp_timezone() );
 
 		$this->assertSame(
-			$next->getTimestamp() - $current->getTimestamp(),
-			( new OrderLimiter() )->get_seconds_until_next_interval(),
+			$next->getTimestamp() - $now->getTimestamp(),
+			( new OrderLimiter( $now ) )->get_seconds_until_next_interval(),
 			'It should return the number of seconds until midnight on the first of the month.'
 		);
 	}
@@ -296,6 +327,7 @@ class OrderLimiterTest extends TestCase {
 	public function regenerate_transient_should_create_the_site_transient() {
 		update_option( OrderLimiter::OPTION_KEY, [
 			'enabled'  => true,
+			'interval' => 'daily',
 			'limit'    => 5,
 		] );
 
@@ -317,8 +349,9 @@ class OrderLimiterTest extends TestCase {
 	 */
 	public function the_transient_should_be_updated_each_time_an_order_is_placed() {
 		update_option( OrderLimiter::OPTION_KEY, [
-			'enabled' => true,
-			'limit'   => 5,
+			'enabled'  => true,
+			'interval' => 'daily',
+			'limit'    => 5,
 		] );
 
 		( new OrderLimiter() )->init();
