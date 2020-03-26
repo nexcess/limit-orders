@@ -12,7 +12,7 @@ parameters:
 		- %currentWorkingDirectory%/vendor/woocommerce/woocommerce-src-latest/src/Autoloader.php
 	paths:
 		- %currentWorkingDirectory%/src/
-		- %currentWorkingDirectory%/woocommerce-limit-orders.php
+		- %currentWorkingDirectory%/limit-orders.php
 	ignoreErrors:
 		# Let a closure be used for the autoloader.
 		- '#^Parameter \#1 \$autoload_function of function spl_autoload_register expects callable\(string\): void,#'

@@ -48,7 +48,8 @@
     "scripts": {
         "test": [
             "vendor/bin/phpunit --testdox --color=always",
-            "vendor/bin/phpcs"
+            "vendor/bin/phpcs",
+            "vendor/bin/phpstan analyze"
         ]
     },
     "scripts-descriptions": {
