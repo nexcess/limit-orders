@@ -2,19 +2,19 @@
 /**
  * Tests for the order limiting functionality.
  *
- * @package Nexcess\WooCommerceLimitOrders
+ * @package Nexcess\LimitOrders
  */
 
 namespace Tests;
 
-use Nexcess\WooCommerceLimitOrders\OrderLimiter;
+use Nexcess\LimitOrders\OrderLimiter;
 use WC_Checkout;
 use WC_Form_Handler;
 use WC_Helper_Product;
 use WP_UnitTestCase as TestCase;
 
 /**
- * @covers Nexcess\WooCommerceLimitOrders\OrderLimiter
+ * @covers Nexcess\LimitOrders\OrderLimiter
  * @group Limiting
  */
 class OrderLimiterTest extends TestCase {
@@ -497,7 +497,7 @@ class OrderLimiterTest extends TestCase {
 	 * @test
 	 */
 	public function disable_ordering_prevents_customers_from_being_able_to_checkout() {
-		$this->assertIsNumeric( $this->generate_order() );
+		$this->assertTrue( is_int( $this->generate_order() ) );
 
 		( new OrderLimiter() )->disable_ordering();
 

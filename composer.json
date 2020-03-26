@@ -1,16 +1,17 @@
 {
-    "name": "nexcess/woocommerce-limit-orders",
-    "description": "Set a maximum number of orders that can be made in a given timeframe for a WooCommerce store.",
+    "name": "nexcess/limit-orders-for-woocommerce",
+    "description": "Automatically disable WooCommerce's checkout process after reaching a maximum number of orders.",
     "type": "wordpress-plugin",
     "license": "MIT",
-    "tags": [
+    "keywords": [
         "woocommerce",
         "woocommerce-extension"
     ],
     "support": {
-        "issues": "https://github.com/nexcess/woocommerce-limit-orders/issues",
-        "source": "https://github.com/nexcess/woocommerce-limit-orders"
+        "issues": "https://github.com/nexcess/limit-orders-for-woocommerce/issues",
+        "source": "https://github.com/nexcess/limit-orders-for-woocommerce"
     },
+    "readme": "README.md",
     "authors": [
         {
             "name": "Nexcess",
@@ -26,7 +27,7 @@
         "php": ">=7.0"
     },
     "require-dev": {
-        "assertwell/wp-core-test-framework": "^0.1.0",
+        "assertwell/wp-core-test-framework": "^0.1.1",
         "dealerdirect/phpcodesniffer-composer-installer": "^0.6",
         "php-stubs/woocommerce-stubs": "^4.0",
         "phpcompatibility/phpcompatibility-wp": "*",
@@ -36,13 +37,22 @@
     },
     "autoload": {
         "psr-4": {
-            "Nexcess\\WooCommerceLimitOrders\\": ["src/"]
+            "Nexcess\\LimitOrders\\": ["src/"]
         }
     },
     "autoload-dev": {
         "psr-4": {
             "Tests\\": ["tests/"]
         }
+    },
+    "scripts": {
+        "test": [
+            "vendor/bin/phpunit --testdox --color=always",
+            "vendor/bin/phpcs"
+        ]
+    },
+    "scripts-descriptions": {
+        "test": "Run all automated tests for the plugin."
     },
     "config": {
         "platform": {

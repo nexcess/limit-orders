@@ -11,7 +11,6 @@ notifications:
 
 cache:
   directories:
-    - vendor
     - $HOME/.composer/cache
 
 php:
@@ -24,8 +23,6 @@ php:
 env:
   - WP_VERSION=5.3 WC_VERSION=4.0
   - WP_VERSION=5.3 WC_VERSION=3.9
-  - WP_VERSION=5.2 WC_VERSION=4.0
-  - WP_VERSION=5.2 WC_VERSION=3.9
 
 matrix:
   fast_finish: true
@@ -36,12 +33,6 @@ matrix:
     - name: Bleeding Edge
       php: 7.4
       env: WP_VERSION=trunk WC_VERSION=latest
-  exclude:
-    # WordPRess 5.2 doesn't fully support PHP 7.4.
-    - php: 7.4
-      env: WP_VERSION=5.2 WC_VERSION=4.0
-    - php: 7.4
-      env: WP_VERSION=5.2 WC_VERSION=3.9
   allow_failures:
     - name: Bleeding Edge
 
@@ -50,15 +41,16 @@ before_install:
   - phpenv config-rm xdebug.ini || true
 
 install:
-    if [[ -z ${RUN_PHPCS} ]]; then
-        bash vendor/bin/install-wp-tests.sh woocommerce_test root '' localhost $WP_VERSION
-        bash tests/bin/install-woocommerce.sh $WC_VERSION
-    fi
   - |
     if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.0" ]]; then
       composer update --prefer-source --prefer-lowest --no-interaction --no-ansi
     else
       composer install --prefer-source --no-interaction --no-ansi
+    fi
+  - |
+    if [[ -z ${RUN_PHPCS} ]]; then
+        bash vendor/bin/install-wp-tests.sh wordpress_test root '' localhost $WP_VERSION
+        bash tests/bin/install-woocommerce.sh $WC_VERSION
     fi
 
 script:

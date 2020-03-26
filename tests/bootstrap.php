@@ -2,7 +2,7 @@
 /**
  * Bootstrap the PHPUnit test suite(s).
  *
- * @package Nexcess\WooCommerceLimitOrders
+ * @package Nexcess\LimitOrders
  */
 
 $_tests_dir = getenv( 'WP_TESTS_DIR' ) ?: rtrim( sys_get_temp_dir(), '/\\' ) . '/wordpress-tests-lib';
@@ -50,6 +50,6 @@ require_once $_bootstrap;
 
 echo esc_html( sprintf(
 	/* Translators: %1$s is the WooCommerce release being loaded. */
-	__( 'Using WooCommerce %1$s.', 'woocommerce-limit-orders' ),
+	__( 'Using WooCommerce %1$s.', 'limit-orders' ),
 	WC_VERSION
 ) ) . PHP_EOL;
