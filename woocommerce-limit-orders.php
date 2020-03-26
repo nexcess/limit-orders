@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: WooCommerce Limit Orders
- * Description: Set a maximum number of orders that can be made in a given timeframe for a WooCommerce store.
+ * Description: Automatically disable WooCommerce's checkout process after reaching a maximum number of orders.
  * Author:      Nexcess
  * Author URI:  https://nexcess.net
  * Text Domain: woocommerce-limit-orders
