@@ -29,10 +29,10 @@ matrix:
   include:
     - name: Coding Standards
       php: 7.3
-      env: WP_TRAVIS=phpcs
+      env: WP_TRAVISCI=phpcs
     - name: Static Code Analysis
       php: 7.3
-      env: WP_TRAVIS=phpstan
+      env: WP_TRAVISCI=phpstan
     - name: Bleeding Edge
       php: 7.4
       env: WP_VERSION=trunk WC_VERSION=latest
@@ -46,21 +46,22 @@ before_install:
 install:
   - |
     if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.0" ]]; then
+      composer remove --dev szepeviktor/phpstan-wordpress --no-update
       composer update --prefer-source --prefer-lowest --no-interaction --no-ansi
     else
       composer install --prefer-source --no-interaction --no-ansi
     fi
   - |
-    if [[ $WP_TRAVIS != 'phpcs' && $WP_TRAVIS != 'phpstan' ]]; then
+    if [[ $WP_TRAVISCI != 'phpcs' && $WP_TRAVISCI != 'phpstan' ]]; then
         bash vendor/bin/install-wp-tests.sh wordpress_test root '' localhost $WP_VERSION
         bash tests/bin/install-woocommerce.sh $WC_VERSION
     fi
 
 script:
   - |
-    if [ $WP_TRAVIS = 'phpcs' ]; then
+    if [ $WP_TRAVISCI = 'phpcs' ]; then
         ./vendor/bin/phpcs
-    elif [ $WP_TRAVIS = 'phpstan' ]; then
+    elif [ $WP_TRAVISCI = 'phpstan' ]; then
         ./vendor/bin/phpstan analyze
     else
       ./vendor/bin/phpunit
