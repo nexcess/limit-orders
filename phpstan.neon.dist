@@ -9,7 +9,6 @@ parameters:
 	autoload_files:
 		- %rootDir%/../../php-stubs/wordpress-stubs/wordpress-stubs.php
 		- %rootDir%/../../php-stubs/woocommerce-stubs/woocommerce-stubs.php
-		- %currentWorkingDirectory%/vendor/woocommerce/woocommerce-src-latest/src/Autoloader.php
 	paths:
 		- %currentWorkingDirectory%/src/
 		- %currentWorkingDirectory%/limit-orders.php
