@@ -50,6 +50,7 @@ before_install:
   - phpenv config-rm xdebug.ini || true
 
 install:
+  - |
     if [[ -z ${RUN_PHPCS} ]]; then
         bash vendor/bin/install-wp-tests.sh woocommerce_test root '' localhost $WP_VERSION
         bash tests/bin/install-woocommerce.sh $WC_VERSION
