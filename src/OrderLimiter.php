@@ -155,15 +155,15 @@ class OrderLimiter {
 			case 'weekly':
 				$start_of_week = (int) get_option( 'week_starts_on' );
 				$current_dow   = (int) $start->format( 'w' );
+				$diff          = $current_dow - $start_of_week;
 
-				// If today isn't the start of the week, get a DateTime representing that day.
-				if ( $current_dow !== $start_of_week ) {
-					if ( $current_dow > $start_of_week ) {
-						$diff = $current_dow - $start_of_week;
-					} elseif ( $current_dow < $start_of_week ) {
-						$diff = $current_dow + 7 - $start_of_week;
-					}
+				// Compensate for values outside of 0-6.
+				if ( 0 > $diff ) {
+					$diff += 7;
+				}
 
+				// A difference of 0 means today is the start; anything else and we need to change $start.
+				if ( 0 !== $diff ) {
 					$start = $start->sub( new \DateInterval( 'P' . $diff . 'D' ) );
 				}
 				break;
