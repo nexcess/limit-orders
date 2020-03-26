@@ -43,6 +43,15 @@
             "Tests\\": ["tests/"]
         }
     },
+    "scripts": {
+        "test": [
+            "vendor/bin/phpunit --testdox --color=always",
+            "vendor/bin/phpcs"
+        ]
+    },
+    "scripts-descriptions": {
+        "test": "Run all automated tests for the plugin."
+    },
     "config": {
         "platform": {
             "php": "7.4"
