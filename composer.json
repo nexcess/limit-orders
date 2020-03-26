@@ -28,8 +28,10 @@
     "require-dev": {
         "assertwell/wp-core-test-framework": "^0.1.0",
         "dealerdirect/phpcodesniffer-composer-installer": "^0.6",
+        "php-stubs/woocommerce-stubs": "^4.0",
         "phpcompatibility/phpcompatibility-wp": "*",
         "phpunit/phpunit": "^7.5",
+        "szepeviktor/phpstan-wordpress": "^0.6.0",
         "wp-coding-standards/wpcs": "^2.2"
     },
     "autoload": {
