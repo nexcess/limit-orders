@@ -2,7 +2,7 @@
 /**
  * An example test.
  *
- * @package Nexcess\WooCommerceLimitOrders
+ * @package Nexcess\LimitOrders
  */
 
 namespace Tests;

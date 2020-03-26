@@ -1,5 +1,5 @@
 {
-    "name": "nexcess/woocommerce-limit-orders",
+    "name": "nexcess/limit-orders-for-woocommerce",
     "description": "Automatically disable WooCommerce's checkout process after reaching a maximum number of orders.",
     "type": "wordpress-plugin",
     "license": "MIT",
@@ -8,8 +8,8 @@
         "woocommerce-extension"
     ],
     "support": {
-        "issues": "https://github.com/nexcess/woocommerce-limit-orders/issues",
-        "source": "https://github.com/nexcess/woocommerce-limit-orders"
+        "issues": "https://github.com/nexcess/limit-orders-for-woocommerce/issues",
+        "source": "https://github.com/nexcess/limit-orders-for-woocommerce"
     },
     "readme": "README.md",
     "authors": [
@@ -35,7 +35,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Nexcess\\WooCommerceLimitOrders\\": ["src/"]
+            "Nexcess\\LimitOrders\\": ["src/"]
         }
     },
     "autoload-dev": {

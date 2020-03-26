@@ -2,19 +2,19 @@
 /**
  * Tests for the admin UI.
  *
- * @package Nexcess\WooCommerceLimitOrders
+ * @package Nexcess\LimitOrders
  */
 
 namespace Tests;
 
-use Nexcess\WooCommerceLimitOrders\Admin;
-use Nexcess\WooCommerceLimitOrders\OrderLimiter;
+use Nexcess\LimitOrders\Admin;
+use Nexcess\LimitOrders\OrderLimiter;
 use WC_Admin;
 use WC_Settings_General;
 use WP_UnitTestCase as TestCase;
 
 /**
- * @covers Nexcess\WooCommerceLimitOrders\Admin
+ * @covers Nexcess\LimitOrders\Admin
  * @group Admin
  */
 class AdminTest extends TestCase {
@@ -56,7 +56,7 @@ class AdminTest extends TestCase {
 		( new Admin( $limiter ) )->admin_notice();
 		$output = ob_get_clean();
 
-		$this->assertContains( esc_attr( admin_url( 'admin.php?page=wc-settings&tab=woocommerce-limit-orders' ) ), $output );
+		$this->assertContains( esc_attr( admin_url( 'admin.php?page=wc-settings&tab=limit-orders' ) ), $output );
 	}
 
 	/**

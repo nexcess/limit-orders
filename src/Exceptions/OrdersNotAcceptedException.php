@@ -2,10 +2,10 @@
 /**
  * Thrown when attempting to check out while ordering is disabled.
  *
- * @package Nexcess\WooCommerceLimitOrders
+ * @package Nexcess\LimitOrders
  */
 
-namespace Nexcess\WooCommerceLimitOrders\Exceptions;
+namespace Nexcess\LimitOrders\Exceptions;
 
 class OrdersNotAcceptedException extends \Exception {
 

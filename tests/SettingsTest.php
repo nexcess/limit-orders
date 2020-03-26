@@ -2,17 +2,17 @@
 /**
  * Tests for the settings page.
  *
- * @package Nexcess\WooCommerceLimitOrders
+ * @package Nexcess\LimitOrders
  */
 
 namespace Tests;
 
-use Nexcess\WooCommerceLimitOrders\OrderLimiter;
-use Nexcess\WooCommerceLimitOrders\Settings;
+use Nexcess\LimitOrders\OrderLimiter;
+use Nexcess\LimitOrders\Settings;
 use WP_UnitTestCase as TestCase;
 
 /**
- * @covers Nexcess\WooCommerceLimitOrders\Settings
+ * @covers Nexcess\LimitOrders\Settings
  * @group Admin
  * @group Settings
  */
@@ -21,11 +21,11 @@ class SettingsTest extends TestCase {
 	/**
 	 * @test
 	 */
-	public function the_options_should_be_added_to_the_general_WooCommerce_settings() {
+	public function the_options_should_be_added_to_their_own_page() {
 		$settings = ( new Settings( new OrderLimiter() ) )->get_settings();
 
 		$this->assertSame( 'title', $settings[0]['type'] );
-		$this->assertSame( 'woocommerce-limit-orders-general', $settings[0]['id'] );
+		$this->assertSame( 'limit-orders-general', $settings[0]['id'] );
 	}
 
 	/**
@@ -36,7 +36,7 @@ class SettingsTest extends TestCase {
 			YEAR_IN_SECONDS => uniqid(),
 		];
 
-		add_filter( 'woocommerce_limit_orders_interval_select', function () use ( $intervals ) {
+		add_filter( 'limit_orders_interval_select', function () use ( $intervals ) {
 			return $intervals;
 		} );
 

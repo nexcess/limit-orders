@@ -2,22 +2,22 @@
 /**
  * Define the WP Admin integration.
  *
- * @package Nexcess\WooCommerceLimitOrders
+ * @package Nexcess\LimitOrders
  */
 
-namespace Nexcess\WooCommerceLimitOrders;
+namespace Nexcess\LimitOrders;
 
 class Admin {
 
 	/**
-	 * @var \Nexcess\WooCommerceLimitOrders\OrderLimiter
+	 * @var \Nexcess\LimitOrders\OrderLimiter
 	 */
 	protected $limiter;
 
 	/**
 	 * Create a new instance of the UI, built around the passed $limiter.
 	 *
-	 * @param \Nexcess\WooCommerceLimitOrders\OrderLimiter $limiter
+	 * @param \Nexcess\LimitOrders\OrderLimiter $limiter
 	 */
 	public function __construct( OrderLimiter $limiter ) {
 		$this->limiter = $limiter;
@@ -57,14 +57,14 @@ class Admin {
 		if ( current_user_can( 'manage_options' ) ) {
 			echo wp_kses_post( sprintf(
 				/* Translators: %1$s is the settings page URL, %2$s is the reset date for order limiting. */
-				__( '<a href="%1$s">Based on your store\'s configuration</a>, new orders have been put on hold until %2$s.', 'woocommerce-limit-orders' ),
-				admin_url( 'admin.php?page=wc-settings&tab=woocommerce-limit-orders' ),
+				__( '<a href="%1$s">Based on your store\'s configuration</a>, new orders have been put on hold until %2$s.', 'limit-orders' ),
+				admin_url( 'admin.php?page=wc-settings&tab=limit-orders' ),
 				$this->limiter->get_next_interval_start()->format( get_option( 'date_format' ) )
 			) );
 		} else {
 			echo esc_html( sprintf(
 				/* Translators: %1$s is the reset date for order limiting. */
-				__( 'Based on your store\'s configuration, new orders have been put on hold until %1$s.', 'woocommerce-limit-orders' ),
+				__( 'Based on your store\'s configuration, new orders have been put on hold until %1$s.', 'limit-orders' ),
 				$this->limiter->get_next_interval_start()->format( get_option( 'date_format' ) )
 			) );
 		}

@@ -2,12 +2,12 @@
 /**
  * Responsible for limiting orders on a WooCommerce site.
  *
- * @package Nexcess\WooCommerceLimitOrders
+ * @package Nexcess\LimitOrders
  */
 
-namespace Nexcess\WooCommerceLimitOrders;
+namespace Nexcess\LimitOrders;
 
-use Nexcess\WooCommerceLimitOrders\Exceptions\OrdersNotAcceptedException;
+use Nexcess\LimitOrders\Exceptions\OrdersNotAcceptedException;
 
 class OrderLimiter {
 
@@ -28,12 +28,12 @@ class OrderLimiter {
 	/**
 	 * The key used for the settings stored in wp_options.
 	 */
-	const OPTION_KEY = 'woocommerce_limit_orders';
+	const OPTION_KEY = 'limit_orders';
 
 	/**
 	 * The transient that holds the current order count per period.
 	 */
-	const TRANSIENT_NAME = 'woocommerce_limit_orders_order_count';
+	const TRANSIENT_NAME = 'limit_orders_order_count';
 
 	/**
 	 * Create a new instance of the OrderLimiter.
@@ -95,7 +95,7 @@ class OrderLimiter {
 		$message = $this->get_setting( $setting );
 
 		if ( null === $message ) {
-			$message = __( 'Ordering is currently disabled for this store.', 'woocommerce-limit-orders' );
+			$message = __( 'Ordering is currently disabled for this store.', 'limit-orders' );
 		}
 
 		// Perform simple placeholder replacements.
@@ -113,7 +113,7 @@ class OrderLimiter {
 		 * @param string $setting      The current message's setting key.
 		 * @param string $message      The current message to display.
 		 */
-		$placeholders = apply_filters( 'woocommerce_limit_orders_message_placeholders', $placeholders, $setting, $message );
+		$placeholders = apply_filters( 'limit_orders_message_placeholders', $placeholders, $setting, $message );
 
 		return str_replace( array_keys( $placeholders ), array_values( $placeholders ), $message );
 	}
@@ -182,7 +182,7 @@ class OrderLimiter {
 		 * @param \DateTime $start    The DateTime representing the start of the current interval.
 		 * @param string    $interval The type of interval being calculated.
 		 */
-		return apply_filters( 'woocommerce_limit_orders_interval_start', $start, $interval );
+		return apply_filters( 'limit_orders_interval_start', $start, $interval );
 	}
 
 	/**
@@ -216,7 +216,7 @@ class OrderLimiter {
 		 * @param \DateTime $current  A DateTime representing the beginning of the current interval.
 		 * @param string    $interval The specified interval.
 		 */
-		return apply_filters( 'woocommerce_limit_orders_next_interval', $start, $current, $interval );
+		return apply_filters( 'limit_orders_next_interval', $start, $current, $interval );
 	}
 
 	/**
@@ -256,7 +256,7 @@ class OrderLimiter {
 	/**
 	 * Abort the checkout process.
 	 *
-	 * @throws \Nexcess\WooCommerceLimitOrders\Exceptions\OrdersNotAcceptedException
+	 * @throws \Nexcess\LimitOrders\Exceptions\OrdersNotAcceptedException
 	 */
 	public function abort_checkout() {
 		throw new OrdersNotAcceptedException( $this->get_message( 'checkout_error' ) );

@@ -8,4 +8,4 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 Initial plugin release.
 
 
-[Unreleased]: https://github.com/nexcess/woocommerce-limit-orders/compare/master...develop
+[Unreleased]: https://github.com/nexcess/limit-orders/compare/master...develop

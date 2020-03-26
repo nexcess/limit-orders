@@ -1,10 +1,10 @@
-# WooCommerce Limit Orders
+# Limit Orders for WooCommerce
 
-[![Build Status](https://travis-ci.org/nexcess/woocommerce-limit-orders.svg?branch=develop)](https://travis-ci.org/nexcess/woocommerce-limit-orders)
+[![Build Status](https://travis-ci.org/nexcess/limit-orders.svg?branch=develop)](https://travis-ci.org/nexcess/limit-orders)
 
 While many stores would be thrilled to have a never-ending order queue, some store owners are faced with the opposite problem: how can I make sure I don't get overwhelmed by _too many_ orders?
 
-WooCommerce Limit Orders lets you limit the number of orders your store will accept per day, week, or month, while giving you full control over the messaging shown to your customers when orders are no longer being accepted. Once limiting is in effect, "Add to Cart" buttons and the checkout screens will automatically be disabled.
+Limit Orders for WooCommerce lets you limit the number of orders your store will accept per day, week, or month, while giving you full control over the messaging shown to your customers when orders are no longer being accepted. Once limiting is in effect, "Add to Cart" buttons and the checkout screens will automatically be disabled.
 
 ![A notice at the top of a WooCommerce catalog with the message "Due to increased demand, new orders will be temporarily suspended until March 27, 2020."](.wordpress-org/screenshot-2.png)
 
@@ -22,9 +22,9 @@ WooCommerce Limit Orders lets you limit the number of orders your store will acc
 
 ## Configuration
 
-Configuration for WooCommerce Limit Orders is available through WooCommerce &rsaquo; Settings &rsaquo; Order Limiting:
+Configuration for Limit Orders for WooCommerce is available through WooCommerce &rsaquo; Settings &rsaquo; Order Limiting:
 
-![The settings screen for WooCommerce Limit Orders](.wordpress-org/screenshot-1.png)
+![The settings screen for Limit Orders for WooCommerce](.wordpress-org/screenshot-1.png)
 
 <dl>
 	<dt>Enable Order Limiting</dt>
@@ -40,7 +40,7 @@ Configuration for WooCommerce Limit Orders is available through WooCommerce &rsa
 
 ### Messaging
 
-WooCommerce Limit Orders lets you customize the messages shown on the front-end of your store:
+Limit Orders for WooCommerce lets you customize the messages shown on the front-end of your store:
 
 <dl>
 	<dt>Customer notice</dt>
