@@ -5,7 +5,7 @@ includes:
 	- phar://phpstan.phar/conf/bleedingEdge.neon
 	- vendor/szepeviktor/phpstan-wordpress/extension.neon
 parameters:
-	level: max
+	level: 5
 	autoload_files:
 		- %rootDir%/../../php-stubs/wordpress-stubs/wordpress-stubs.php
 		- %rootDir%/../../php-stubs/woocommerce-stubs/woocommerce-stubs.php
@@ -13,3 +13,9 @@ parameters:
 	paths:
 		- %currentWorkingDirectory%/src/
 		- %currentWorkingDirectory%/woocommerce-limit-orders.php
+	ignoreErrors:
+		# Let a closure be used for the autoloader.
+		- '#^Parameter \#1 \$autoload_function of function spl_autoload_register expects callable\(string\): void,#'
+
+		# Apply filters can be called with any number of parameters.
+		- '#^Function apply_filters invoked with \d parameters, 2 required#'

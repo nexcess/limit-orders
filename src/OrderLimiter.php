@@ -14,14 +14,14 @@ class OrderLimiter {
 	/**
 	 * Holds the current DateTime.
 	 *
-	 * @param \DateTimeImmutable
+	 * @var \DateTimeImmutable
 	 */
 	private $now;
 
 	/**
 	 * The cached value of the wp_options array.
 	 *
-	 * @param array
+	 * @var array
 	 */
 	private $settings;
 
@@ -169,7 +169,7 @@ class OrderLimiter {
 				break;
 
 			case 'monthly':
-				$start = $start->setDate( $start->format( 'Y' ), $start->format( 'm' ), 1 );
+				$start = $start->setDate( (int) $start->format( 'Y' ), (int) $start->format( 'm' ), 1 );
 				break;
 		}
 
