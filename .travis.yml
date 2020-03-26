@@ -37,7 +37,7 @@ matrix:
       php: 7.4
       env: WP_VERSION=trunk WC_VERSION=latest
   exclude:
-    # WordPRess 5.2 doesn't fully support PHP 7.4.
+    # WordPress 5.2 doesn't fully support PHP 7.4.
     - php: 7.4
       env: WP_VERSION=5.2 WC_VERSION=4.0
     - php: 7.4
