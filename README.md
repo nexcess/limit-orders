@@ -16,7 +16,7 @@ Limit Orders for WooCommerce lets you limit the number of orders your store will
 
 ## Installation
 
-1. [Download and extract a .zip archive of the plugin]() (or clone this repository) into your site's plugins directory (`wp-content/plugins/` by default).
+1. [Download and extract a .zip archive of the plugin](https://github.com/nexcess/limit-orders/archive/master.zip) (or clone this repository) into your site's plugins directory (`wp-content/plugins/` by default).
 2. Activate the plugin through the Plugins screen in WP Admin.
 3. [Configure the plugin](#Configuration).
 
