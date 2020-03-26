@@ -60,7 +60,7 @@ script:
   - |
     if [ $WP_TRAVIS = 'phpcs' ]; then
         ./vendor/bin/phpcs
-    elsif [ $WP_TRAVIS = 'phpstan' ]; then
+    elif [ $WP_TRAVIS = 'phpstan' ]; then
         ./vendor/bin/phpstan analyze
     else
       ./vendor/bin/phpunit
