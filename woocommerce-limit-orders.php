@@ -8,7 +8,10 @@
  * Domain Path: /languages
  * Version:     0.1.0
  *
- * @package     Nexcess\WooCommerceLimitOrders
+ * WC requires at least: 3.9
+ * WC tested up to:      4.0
+ *
+ * @package Nexcess\WooCommerceLimitOrders
  */
 
 namespace Nexcess\WooCommerceLimitOrders;
