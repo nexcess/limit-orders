@@ -51,15 +51,15 @@ before_install:
 
 install:
   - |
-    if [[ -z ${RUN_PHPCS} ]]; then
-        bash vendor/bin/install-wp-tests.sh woocommerce_test root '' localhost $WP_VERSION
-        bash tests/bin/install-woocommerce.sh $WC_VERSION
-    fi
-  - |
     if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.0" ]]; then
       composer update --prefer-source --prefer-lowest --no-interaction --no-ansi
     else
       composer install --prefer-source --no-interaction --no-ansi
+    fi
+  - |
+    if [[ -z ${RUN_PHPCS} ]]; then
+        bash vendor/bin/install-wp-tests.sh woocommerce_test root '' localhost $WP_VERSION
+        bash tests/bin/install-woocommerce.sh $WC_VERSION
     fi
 
 script:
