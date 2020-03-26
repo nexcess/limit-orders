@@ -1,0 +1,7 @@
+/.* export-ignore
+composer.* export-ignore
+CHANGELOG.md export-ignore
+phpstan.* export-ignore
+phpunit.* export-ignore
+README.md export-ignore
+tests export-ignore
