@@ -59,9 +59,9 @@ install:
 
 script:
   - |
-    if [ $WP_TRAVISCI = 'phpcs' ]; then
+    if [[ $WP_TRAVISCI = 'phpcs' ]]; then
         ./vendor/bin/phpcs
-    elif [ $WP_TRAVISCI = 'phpstan' ]; then
+    elif [[ $WP_TRAVISCI = 'phpstan' ]]; then
         ./vendor/bin/phpstan analyze
     else
       ./vendor/bin/phpunit
