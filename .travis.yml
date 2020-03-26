@@ -21,10 +21,10 @@ php:
   - 7.0
 
 env:
+  - WP_VERSION=5.4 WC_VERSION=4.0
+  - WP_VERSION=5.4 WC_VERSION=3.9
   - WP_VERSION=5.3 WC_VERSION=4.0
   - WP_VERSION=5.3 WC_VERSION=3.9
-  - WP_VERSION=5.2 WC_VERSION=4.0
-  - WP_VERSION=5.2 WC_VERSION=3.9
 
 matrix:
   fast_finish: true
@@ -35,12 +35,6 @@ matrix:
     - name: Bleeding Edge
       php: 7.4
       env: WP_VERSION=trunk WC_VERSION=latest
-  exclude:
-    # WordPress 5.2 doesn't fully support PHP 7.4.
-    - php: 7.4
-      env: WP_VERSION=5.2 WC_VERSION=4.0
-    - php: 7.4
-      env: WP_VERSION=5.2 WC_VERSION=3.9
   allow_failures:
     - name: Bleeding Edge
 
