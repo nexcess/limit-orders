@@ -497,7 +497,7 @@ class OrderLimiterTest extends TestCase {
 	 * @test
 	 */
 	public function disable_ordering_prevents_customers_from_being_able_to_checkout() {
-		$this->assertIsNumeric( $this->generate_order() );
+		$this->assertTrue( is_int( $this->generate_order() ) );
 
 		( new OrderLimiter() )->disable_ordering();
 

@@ -56,7 +56,7 @@ class AdminTest extends TestCase {
 		( new Admin( $limiter ) )->admin_notice();
 		$output = ob_get_clean();
 
-		$this->assertStringContainsString( esc_attr( admin_url( 'admin.php?page=wc-settings&tab=woocommerce-limit-orders' ) ), $output );
+		$this->assertContains( esc_attr( admin_url( 'admin.php?page=wc-settings&tab=woocommerce-limit-orders' ) ), $output );
 	}
 
 	/**
@@ -79,6 +79,6 @@ class AdminTest extends TestCase {
 		( new Admin( $limiter ) )->admin_notice();
 		$output = ob_get_clean();
 
-		$this->assertStringNotContainsString( admin_url( 'admin.php?page=wc-settings' ), $output );
+		$this->assertNotContains( admin_url( 'admin.php?page=wc-settings' ), $output );
 	}
 }
