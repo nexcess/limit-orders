@@ -27,7 +27,7 @@
         "php": ">=7.0"
     },
     "require-dev": {
-        "assertwell/wp-core-test-framework": "^0.1.0",
+        "assertwell/wp-core-test-framework": "^0.1.1",
         "dealerdirect/phpcodesniffer-composer-installer": "^0.6",
         "phpcompatibility/phpcompatibility-wp": "*",
         "phpunit/phpunit": "^7.5",
