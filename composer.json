@@ -29,8 +29,10 @@
     "require-dev": {
         "assertwell/wp-core-test-framework": "^0.1.1",
         "dealerdirect/phpcodesniffer-composer-installer": "^0.6",
+        "php-stubs/woocommerce-stubs": "^4.0",
         "phpcompatibility/phpcompatibility-wp": "*",
         "phpunit/phpunit": "^6.5",
+        "szepeviktor/phpstan-wordpress": "^0.6.0",
         "wp-coding-standards/wpcs": "^2.2"
     },
     "autoload": {
@@ -46,7 +48,8 @@
     "scripts": {
         "test": [
             "vendor/bin/phpunit --testdox --color=always",
-            "vendor/bin/phpcs"
+            "vendor/bin/phpcs",
+            "vendor/bin/phpstan analyze"
         ]
     },
     "scripts-descriptions": {
