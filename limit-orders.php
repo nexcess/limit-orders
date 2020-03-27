@@ -6,7 +6,7 @@
  * Author URI:  https://nexcess.net
  * Text Domain: limit-orders
  * Domain Path: /languages
- * Version:     0.1.0
+ * Version:     1.0.0
  *
  * WC requires at least: 3.9
  * WC tested up to:      4.0
