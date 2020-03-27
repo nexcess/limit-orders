@@ -47,13 +47,19 @@
     },
     "scripts": {
         "test": [
-            "vendor/bin/phpunit --testdox --color=always",
-            "vendor/bin/phpcs",
-            "vendor/bin/phpstan analyze"
-        ]
+            "@test:unit",
+            "@test:standards",
+            "@test:analysis"
+        ],
+        "test:analysis": "vendor/bin/phpstan analyze",
+        "test:coding-standards": "vendor/bin/phpcs",
+        "test:unit": "vendor/bin/phpunit --testdox --color=always"
     },
     "scripts-descriptions": {
-        "test": "Run all automated tests for the plugin."
+        "test": "Run all automated tests for the plugin.",
+        "test:analysis": "Perform static code analysis on the plugin.",
+        "test:coding-standards": "Check the codebase against coding standards.",
+        "test:unit": "Run unit tests for the plugin."
     },
     "config": {
         "platform": {
