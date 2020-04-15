@@ -28,6 +28,18 @@ class OrderLimiterTest extends TestCase {
 
 	/**
 	 * @test
+	 * @testdox get_interval() should return the interval setting
+	 */
+	public function get_interval_should_return_the_interval_setting() {
+		update_option( OrderLimiter::OPTION_KEY, [
+			'interval' => 'daily',
+		] );
+
+		$this->assertSame( 'daily', ( new OrderLimiter )->get_interval() );
+	}
+
+	/**
+	 * @test
 	 * @testdox get_limit() should return the set limit
 	 */
 	public function get_limit_should_return_the_set_limit() {
