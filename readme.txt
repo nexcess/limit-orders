@@ -45,5 +45,8 @@ Yes, the order creation process through WP Admin is unaffected.
 
 For a complete list of changes, please [see the plugin's changelog on GitHub](https://github.com/nexcess/limit-orders/blob/master/CHANGELOG.md).
 
+= 1.1.0 (2020-04-15) =
+* Include a "Limit Orders" section in the WooCommerce System Status Report
+
 = 1.0.0 (2020-03-27) =
 Initial release of the plugin.
