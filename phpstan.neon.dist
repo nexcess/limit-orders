@@ -18,3 +18,8 @@ parameters:
 
 		# Apply filters can be called with any number of parameters.
 		- '#^Function apply_filters invoked with \d parameters, 2 required#'
+
+		# PHPStan doesn't care for variables being scoped into template includes.
+		-
+			message: '#Undefined variable: \$limiter$#'
+			path: %currentWorkingDirectory%/src/Views/
