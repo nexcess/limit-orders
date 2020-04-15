@@ -32,6 +32,7 @@ class Admin {
 		add_filter( 'woocommerce_get_settings_pages', [ $this, 'register_settings_page' ] );
 		add_filter( 'admin_notices', [ $this, 'admin_notice' ] );
 		add_filter( 'plugin_action_links_' . $basename, [ $this, 'action_links' ] );
+		add_action( 'woocommerce_system_status_report', [ $this, 'system_status_report' ] );
 	}
 
 	/**
@@ -90,11 +91,41 @@ class Admin {
 	}
 
 	/**
+	 * Render the system status report.
+	 */
+	public function system_status_report() {
+		$this->render_view( 'SystemStatusReport', [
+			'limiter' => $this->limiter,
+		] );
+	}
+
+	/**
 	 * Retrieve a link to the plugin's settings page.
 	 *
 	 * @return string An absolute URL to the settings page.
 	 */
 	protected function get_settings_url() {
 		return admin_url( 'admin.php?page=wc-settings&tab=limit-orders' );
+	}
+
+	/**
+	 * Render a view from within the Views/ directory.
+	 *
+	 * @param string $view The view name.
+	 * @param array  $vars Variables that should be exposed to the view.
+	 */
+	protected function render_view( $view, $vars = [] ) {
+		$template = sprintf( '%1$s/Views/%2$s.php', untrailingslashit( __DIR__ ), $view );
+
+		// We don't have enough of these yet to justify needing heavy error handling.
+		if ( ! file_exists( $template ) ) {
+			return;
+		}
+
+		// Extract the $vars so they're available within the template.
+		extract( $vars ); // phpcs:ignore WordPress.PHP.DontExtract.extract_extract
+
+		// Finally, include the template.
+		include $template;
 	}
 }

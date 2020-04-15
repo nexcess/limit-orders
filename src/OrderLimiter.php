@@ -62,6 +62,15 @@ class OrderLimiter {
 	}
 
 	/**
+	 * Retrieve the interval setting.
+	 *
+	 * @return string The order limiter's interval.
+	 */
+	public function get_interval() {
+		return $this->get_setting( 'interval' );
+	}
+
+	/**
 	 * Retrieve the number of orders permitted per interval.
 	 *
 	 * @return int The maximum number of orders, or -1 if there is no limit.

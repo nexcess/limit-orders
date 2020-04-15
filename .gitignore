@@ -1,11 +1,18 @@
+node_modules/
+tests/coverage/
+vendor/
+
+# Hidden files
 .DS_Store
+Thumbs.db
+
+# Local overrides
+.phpcs.xml
 phpcs.xml
 phpunit.xml
-Thumbs.db
 wp-cli.local.yml
-node_modules/
+
+# Archives and backups
 *.sql
 *.tar.gz
 *.zip
-
-/vendor/
