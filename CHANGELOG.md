@@ -9,6 +9,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 * Don't attempt to display customer-facing notices in WP Admin ([#10]).
 
+### Updated
+
+* Updated PHPUnit to 7.x for all but PHP 7.0
+
 
 ## [Version 1.1.0] — 2020-04-15
 
