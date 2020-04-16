@@ -285,7 +285,7 @@ class OrderLimiter {
 	 */
 	public function customer_notice() {
 		// Only display on WooCommerce pages.
-		if ( ! is_woocommerce() && ! is_cart() && ! is_checkout() ) {
+		if ( is_admin() || ( ! is_woocommerce() && ! is_cart() && ! is_checkout() ) ) {
 			return;
 		}
 
