@@ -566,6 +566,24 @@ class OrderLimiterTest extends TestCase {
 
 	/**
 	 * @test
+	 * @ticket https://wordpress.org/support/topic/php-call-to-undefined-function
+	 */
+	public function customer_notice_should_not_display_in_wp_admin() {
+		set_current_screen( 'edit-product' );
+		add_filter( 'is_woocommerce', '__return_true' );
+
+		$limiter = $this->getMockBuilder( OrderLimiter::class )
+			->setMethods( [ 'get_message' ] )
+			->getMock();
+		$limiter->expects( $this->never() )
+			->method( 'get_message' );
+
+		$this->assertNull( $limiter->customer_notice() );
+		$this->assertSame( 0, wc_notice_count( 'notice' ), 'No notices should have been added.' );
+	}
+
+	/**
+	 * @test
 	 */
 	public function disable_ordering_makes_items_unpurchasable() {
 		$product = WC_Helper_Product::create_simple_product( true );
