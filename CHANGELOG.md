@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [Version 1.1.1] — 2020-04-16
 
 ### Fixed
 
@@ -30,6 +30,7 @@ Initial plugin release.
 [Unreleased]: https://github.com/nexcess/limit-orders/compare/master...develop
 [Version 1.0.0]: https://github.com/nexcess/limit-orders/releases/tag/v1.0.0
 [Version 1.1.0]: https://github.com/nexcess/limit-orders/releases/tag/v1.1.0
+[Version 1.1.1]: https://github.com/nexcess/limit-orders/releases/tag/v1.1.1
 [#5]: https://github.com/nexcess/limit-orders/pull/5
 [#6]: https://github.com/nexcess/limit-orders/pull/6
 [#8]: https://github.com/nexcess/limit-orders/pull/8
