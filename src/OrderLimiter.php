@@ -323,6 +323,7 @@ class OrderLimiter {
 			'type'         => wc_get_order_types( 'order-count' ),
 			'date_created' => '>=' . $this->get_interval_start()->getTimestamp(),
 			'return'       => 'ids',
+			'limit'        => max( $this->get_limit(), 1000 ),
 		] );
 
 		return count( $orders );

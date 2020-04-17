@@ -640,6 +640,21 @@ class OrderLimiterTest extends TestCase {
 	}
 
 	/**
+	 * @test
+	 */
+	public function count_qualifying_orders_should_not_limit_results() {
+		for ( $i = 0; $i < 24; $i++ ) {
+			$this->generate_order();
+		}
+
+		$instance = new OrderLimiter();
+		$method   = new \ReflectionMethod( $instance, 'count_qualifying_orders' );
+		$method->setAccessible( true );
+
+		$this->assertSame( 24, $method->invoke( $instance ) );
+	}
+
+	/**
 	 * Create a new order by emulating the checkout process.
 	 */
 	protected function generate_order() {
