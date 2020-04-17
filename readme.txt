@@ -4,7 +4,7 @@ Tags: WooCommerce, ordering, limits, throttle
 Requires at least: 5.3
 Tested up to: 5.4
 Requires PHP: 7.0
-Stable tag: 1.1.1
+Stable tag: 1.1.2
 License: MIT
 License URI: https://github.com/nexcess/limit-orders/blob/master/LICENSE.txt
 
@@ -45,6 +45,9 @@ Yes, the order creation process through WP Admin is unaffected.
 
 For a complete list of changes, please [see the plugin's changelog on GitHub](https://github.com/nexcess/limit-orders/blob/master/CHANGELOG.md).
 
+= 1.1.2 (2020-04-17) =
+* Override WordPress' default "LIMIT" on queries, which was preventing stores with limits > 10 from stopping orders
+
 = 1.1.1 (2020-04-16) =
 * Prevent errors from occurring in WP Admin due to the customer-facing notice
 
@@ -55,6 +58,9 @@ For a complete list of changes, please [see the plugin's changelog on GitHub](ht
 Initial release of the plugin.
 
 == Upgrade Notice ==
+
+= 1.1.2 =
+Fixes error that was preventing order limiting from working on stores with limits higher than 10.
 
 = 1.1.1 =
 Fixes errors in WP Admin after a store's order limit has been reached.
