@@ -21,8 +21,16 @@ namespace Nexcess\LimitOrders;
  *
  * @param string $class The classname we're attempting to load.
  */
-spl_autoload_register( function ( string $class ) {
-	$filepath = str_replace( __NAMESPACE__ . '\\', '', $class );
+spl_autoload_register( function ( $class ) {
+	$namespace = __NAMESPACE__ . '\\';
+	$class     = (string) $class;
+
+	// Move onto the next registered autoloader if the class is outside of our namespace.
+	if ( 0 !== strncmp( $namespace, $class, strlen( $namespace ) ) ) {
+		return;
+	}
+
+	$filepath = str_replace( $namespace, '', $class );
 	$filepath = __DIR__ . '/src/' . str_replace( '\\', '/', $filepath ) . '.php';
 
 	if ( is_readable( $filepath ) ) {
