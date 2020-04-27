@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 	- `{current_interval:time}`
 	- `{next_interval:date}` (alias of `{next_interval}`)
 	- `{next_interval:time}`
+* Added documentation for adding custom intervals, placeholders ([#23]).
 
 ### Updated
 
@@ -60,3 +61,4 @@ Initial plugin release.
 [#10]: https://github.com/nexcess/limit-orders/pull/10
 [#13]: https://github.com/nexcess/limit-orders/pull/13
 [#20]: https://github.com/nexcess/limit-orders/pull/20
+[#23]: https://github.com/nexcess/limit-orders/pull/23

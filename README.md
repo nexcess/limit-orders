@@ -74,3 +74,119 @@ In any of these messages, you may also use the following variables:
 </dl>
 
 Dates and times will be formatted [according to the "date format" and "time format" settings for your store](https://wordpress.org/support/article/settings-general-screen/#date-format), respectively.
+
+If you would like to add custom placeholders, see [Adding Custom Placeholders](#adding-custom-placeholders) below.
+
+## Customizing plugin behavior
+
+Limit Orders for WooCommerce includes [a number of actions and filters](https://codex.wordpress.org/Plugin_API) that enable store owners to modify the plugin's behavior.
+
+Examples of common customizations are included below.
+
+### Adding custom intervals
+
+The plugin includes a few intervals by default:
+
+1. Hourly (resets at the top of every hour)
+1. Daily (resets every day)
+1. Weekly (resets every week, respecting the store's "Week Starts On" setting)
+1. Monthly (resets on the first of the month)
+
+If your store needs a custom interval, you may add them using filters built into the plugin.
+
+#### Example: Reset Limits Annually
+
+Let's say your store can only accept a certain number of orders in a year.
+
+You may accomplish this by adding the following code into your theme's `functions.php` file or (preferably) by saving it as a custom plugin:
+
+```php
+<?php
+/**
+ * Plugin Name: Limit Orders for WooCommerce - Annual Intervals
+ * Description: Add a "Annually" option to Limit Orders for WooCommerce.
+ * Author:      Nexcess
+ * Author URI:  https://nexcess.net
+ */
+
+/**
+ * Add "fortnightly" to the list of intervals.
+ *
+ * @param array $intervals Available time intervals.
+ *
+ * @return array The filtered array of intervals.
+ */
+add_filter( 'limit_orders_interval_select', function ( $intervals ) {
+	// Return early if it already exists.
+	if ( isset( $intervals['annually'] ) ) {
+		return $intervals;
+	}
+
+	$intervals['annually'] = __( 'Annually (Resets on the first of the year)', 'limit-orders' );
+
+	return $intervals;
+} );
+
+/**
+ * Get a DateTime object representing the beginning of the current year.
+ *
+ * @param \DateTime $start    The DateTime representing the start of the current interval.
+ * @param string    $interval The type of interval being calculated.
+ *
+ * @return \DateTime A DateTime object representing the top of the current hour or $start, if the
+ *                   current $interval is not "annually".
+ */
+add_filter( 'limit_orders_interval_start', function ( $start, $interval ) {
+	if ( 'annually' !== $interval ) {
+		return $start;
+	}
+
+	// Happy New Year!
+	return ( new \DateTime( 'now' ) )
+		->setDate( (int) $start->format( 'Y' ), 1, 1 )
+		->setTime( 0, 0, 0 );
+}, 10, 2 );
+
+/**
+ * Filter the DateTime at which the next interval should begin.
+ *
+ * @param \DateTime $start    A DateTime representing the start time for the next interval.
+ * @param \DateTime $current  A DateTime representing the beginning of the current interval.
+ * @param string    $interval The specified interval.
+ *
+ * @return \DateTime The DateTime at which the next interval should begin, or $start if the
+ *                   current $interval is not "annually".
+ */
+add_filter( 'limit_orders_next_interval', function ( $start, $current, $interval ) {
+	if ( 'annually' !== 'interval' ) {
+		return $start;
+	}
+
+	return $current->add( new \DateInterval( 'P1Y' ) );
+}, 10, 3 );
+```
+
+### Adding Custom Placeholders
+
+The placeholders used for customer-facing messaging are editable via the `limit_orders_message_placeholders` filter.
+
+For example, imagine we wanted to add a placeholder for the WooCommerce store name. The code to accomplish this may look like:
+
+```php
+/**
+ * Append a {store_name} placeholder.
+ *
+ * @param array $placeholders The currently-defined placeholders.
+ *
+ * @return array The filtered array of placeholders.
+ */
+add_filter( 'limit_orders_message_placeholders', function ( $placeholders ) {
+	$placeholders['{store_name}'] = get_option( 'blogname' );
+
+	return $placeholders;
+} );
+```
+
+Now, we can create customer-facing notices like:
+
+> {store_name} is a little overwhelmed right now, but we'll be able to take more orders on {next_interval:date}. Please check back then!
