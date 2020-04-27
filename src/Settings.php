@@ -35,6 +35,16 @@ class Settings extends WC_Settings_Page {
 	 * @return array
 	 */
 	public function get_settings() {
+		$placeholders           = (array) $this->limiter->get_placeholders();
+		$available_placeholders = '';
+
+		// Build a list of available placeholders.
+		if ( ! empty( $placeholders ) ) {
+			$available_placeholders  = __( 'Available placeholders:', 'limit-orders' ) . ' <var>';
+			$available_placeholders .= implode( '</var>, <var>', array_keys( $placeholders ) );
+			$available_placeholders .= '</var>';
+		}
+
 		return apply_filters( 'woocommerce_get_settings_' . $this->id, [
 			[
 				'id'   => 'limit-orders-general',
@@ -75,7 +85,7 @@ class Settings extends WC_Settings_Page {
 				'id'   => 'limit-orders-messaging',
 				'type' => 'title',
 				'name' => _x( 'Customer messaging', 'settings section title', 'limit-orders' ),
-				'desc' => '<p>' . __( 'Customize the messages shown to customers once ordering is disabled.', 'limit-orders' ) . '</p><p>' . __( 'Available placeholders: <var>{limit}</var>, <var>{current_interval}</var>, <var>{next_interval}</var>.', 'limit-orders' ) . '</p>',
+				'desc' => '<p>' . __( 'Customize the messages shown to customers once ordering is disabled.', 'limit-orders' ) . '</p>' . $available_placeholders ? '<p>' . $available_placeholders . '</p>' : '',
 			],
 			[
 				'id'       => OrderLimiter::OPTION_KEY . '[customer_notice]',

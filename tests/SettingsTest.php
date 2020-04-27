@@ -70,4 +70,23 @@ class SettingsTest extends TestCase {
 
 		$this->fail( 'Did not find setting with ID "'. OrderLimiter::OPTION_KEY . '[interval]".' );
 	}
+
+	/**
+	 * @test
+	 * @group Placeholders
+	 */
+	public function available_placeholders_should_be_shown_in_the_messages_section() {
+		$limiter  = new OrderLimiter();
+		$sections = array_filter( ( new Settings( new OrderLimiter() ) )->get_settings(), function ( $section ) {
+			return 'limit-orders-messaging' === $section['id'] && 'title' === $section['type'];
+		} );
+
+		$this->assertCount( 1, $sections, 'Expected to see only one instance of "limit-orders-messaging".' );
+
+		$description = current( $sections )['desc'];
+
+		foreach ( $limiter->get_placeholders() as $placeholder => $value ) {
+			$this->assertContains( '<var>' . $placeholder . '</var>', $description );
+		}
+	}
 }
