@@ -35,7 +35,7 @@ Configuration for Limit Orders for WooCommerce is available through WooCommerce 
 	<dd>Customers will be unable to checkout after this number of orders are received.</dd>
 	<dd>Shop owners will still be able to create orders via WP Admin, even after the limit has been reached.</dd>
 	<dt>Interval</dt>
-	<dd>How often the limit is reset. By default, this can be "daily", "weekly", or "monthly".</dd>
+	<dd>How often the limit is reset. By default, this can be "hourly", daily", "weekly", or "monthly".</dd>
 	<dd>When choosing "weekly", the plugin will respect the value of <a href="https://wordpress.org/support/article/settings-general-screen/#week-starts-on">the store's "week starts on" setting</a>.</dd>
 </dl>
 
