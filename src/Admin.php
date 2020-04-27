@@ -75,9 +75,10 @@ class Admin {
 		$next_interval = $this->limiter->get_next_interval_start();
 		$midnight      = current_datetime()->setTime( 24, 0, 0 );
 
+		// phpcs:ignore WordPress.PHP.StrictComparisons.LooseComparison
 		if ( $next_interval == $midnight ) {
 			$next = _x( 'midnight', 'beginning of the next day/interval', 'limit-orders' );
-		} else if ( $next_interval < $midnight ) {
+		} elseif ( $next_interval < $midnight ) {
 			$next = $next_interval->format( get_option( 'time_format' ) );
 		} else {
 			$next = $next_interval->format( get_option( 'date_format' ) );
