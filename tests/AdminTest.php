@@ -26,7 +26,6 @@ class AdminTest extends TestCase {
 		$limiter = $this->getMockBuilder( OrderLimiter::class )
 			->setMethods( [ 'has_reached_limit' ] )
 			->getMock();
-
 		$limiter->method( 'has_reached_limit' )
 			->willReturn( false );
 
@@ -48,7 +47,6 @@ class AdminTest extends TestCase {
 		$limiter = $this->getMockBuilder( OrderLimiter::class )
 			->setMethods( [ 'has_reached_limit' ] )
 			->getMock();
-
 		$limiter->method( 'has_reached_limit' )
 			->willReturn( true );
 
@@ -71,7 +69,6 @@ class AdminTest extends TestCase {
 		$limiter = $this->getMockBuilder( OrderLimiter::class )
 			->setMethods( [ 'has_reached_limit' ] )
 			->getMock();
-
 		$limiter->method( 'has_reached_limit' )
 			->willReturn( true );
 
@@ -80,5 +77,56 @@ class AdminTest extends TestCase {
 		$output = ob_get_clean();
 
 		$this->assertNotContains( admin_url( 'admin.php?page=wc-settings' ), $output );
+	}
+
+	/**
+	 * @test
+	 * @group Intervals
+	 * @ticket https://github.com/nexcess/limit-orders/issues/18
+	 */
+	public function intervals_of_less_than_a_day_should_use_time_instead_of_date_in_the_admin_notice() {
+		wp_set_current_user( $this->factory->user->create( [
+			'role' => 'editor',
+		] ) );
+
+		$next    = ( new \DateTime( 'now' ) )->setTime( 7, 0, 0 );
+		$limiter = $this->getMockBuilder( OrderLimiter::class )
+			->setMethods( [ 'has_reached_limit', 'get_next_interval_start' ] )
+			->getMock();
+		$limiter->method( 'has_reached_limit' )
+			->willReturn( true );
+		$limiter->method( 'get_next_interval_start' )
+			->willReturn( $next );
+
+		ob_start();
+		( new Admin( $limiter ) )->admin_notice();
+		$output = ob_get_clean();
+
+		$this->assertContains( $next->format( get_option( 'time_format' ) ), $output );
+	}
+
+	/**
+	 * @test
+	 * @group Intervals
+	 */
+	public function admin_notices_should_use_midnight_instead_of_dates_for_daily_interval() {
+		wp_set_current_user( $this->factory->user->create( [
+			'role' => 'editor',
+		] ) );
+
+		$next    = ( new \DateTime( 'now' ) )->setTime( 24, 0, 0 ); // Midnight.
+		$limiter = $this->getMockBuilder( OrderLimiter::class )
+			->setMethods( [ 'has_reached_limit', 'get_next_interval_start' ] )
+			->getMock();
+		$limiter->method( 'has_reached_limit' )
+			->willReturn( true );
+		$limiter->method( 'get_next_interval_start' )
+			->willReturn( $next );
+
+		ob_start();
+		( new Admin( $limiter ) )->admin_notice();
+		$output = ob_get_clean();
+
+		$this->assertContains( __( 'midnight' ), $output );
 	}
 }

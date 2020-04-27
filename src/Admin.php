@@ -71,6 +71,18 @@ class Admin {
 			return;
 		}
 
+		// Change what text we show based on how far off it is.
+		$next_interval = $this->limiter->get_next_interval_start();
+		$midnight      = current_datetime()->setTime( 24, 0, 0 );
+
+		if ( $next_interval == $midnight ) {
+			$next = _x( 'midnight', 'beginning of the next day/interval', 'limit-orders' );
+		} else if ( $next_interval < $midnight ) {
+			$next = $next_interval->format( get_option( 'time_format' ) );
+		} else {
+			$next = $next_interval->format( get_option( 'date_format' ) );
+		}
+
 		echo '<div class="notice notice-warning"><p>';
 
 		if ( current_user_can( 'manage_options' ) ) {
@@ -78,13 +90,13 @@ class Admin {
 				/* Translators: %1$s is the settings page URL, %2$s is the reset date for order limiting. */
 				__( '<a href="%1$s">Based on your store\'s configuration</a>, new orders have been put on hold until %2$s.', 'limit-orders' ),
 				$this->get_settings_url(),
-				$this->limiter->get_next_interval_start()->format( get_option( 'date_format' ) )
+				$next
 			) );
 		} else {
 			echo esc_html( sprintf(
 				/* Translators: %1$s is the reset date for order limiting. */
 				__( 'Based on your store\'s configuration, new orders have been put on hold until %1$s.', 'limit-orders' ),
-				$this->limiter->get_next_interval_start()->format( get_option( 'date_format' ) )
+				$next
 			) );
 		}
 		echo '</p></div>';
