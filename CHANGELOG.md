@@ -19,6 +19,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Updated
 
 * The settings screen will now show custom placeholders that have been registered via the "limit_orders_message_placeholders" filter ([#20]).
+* Improve autoloader performance and remove type-hint from PSR-4 autoloader ([#17]).
 
 ## [Version 1.1.2] - 2020-04-17
 
@@ -62,6 +63,7 @@ Initial plugin release.
 [#8]: https://github.com/nexcess/limit-orders/pull/8
 [#10]: https://github.com/nexcess/limit-orders/pull/10
 [#13]: https://github.com/nexcess/limit-orders/pull/13
+[#17]: https://github.com/nexcess/limit-orders/pull/17
 [#20]: https://github.com/nexcess/limit-orders/pull/20
 [#23]: https://github.com/nexcess/limit-orders/pull/23
 [#26]: https://github.com/nexcess/limit-orders/pull/26
