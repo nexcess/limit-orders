@@ -161,6 +161,16 @@ class OrderLimiter {
 		$start    = $this->now;
 
 		switch ( $interval ) {
+			case 'hourly':
+				// Start at the top of the current hour.
+				$start = $start->setTime( (int) $start->format( 'h' ), 0, 0 );
+				break;
+
+			case 'daily':
+				// Start at midnight.
+				$start = $start->setTime( 0, 0, 0 );
+				break;
+
 			case 'weekly':
 				$start_of_week = (int) get_option( 'week_starts_on' );
 				$current_dow   = (int) $start->format( 'w' );
@@ -175,15 +185,15 @@ class OrderLimiter {
 				if ( 0 !== $diff ) {
 					$start = $start->sub( new \DateInterval( 'P' . $diff . 'D' ) );
 				}
+
+				$start = $start->setTime( 0, 0, 0 );
 				break;
 
 			case 'monthly':
-				$start = $start->setDate( (int) $start->format( 'Y' ), (int) $start->format( 'm' ), 1 );
+				$start = $start->setDate( (int) $start->format( 'Y' ), (int) $start->format( 'm' ), 1 )
+					->setTime( 0, 0, 0 );
 				break;
 		}
-
-		// Start everything at midnight.
-		$start = $start->setTime( 0, 0, 0 );
 
 		/**
 		 * Filter the DateTime object representing the start of the current interval.
@@ -205,6 +215,10 @@ class OrderLimiter {
 		$start    = clone $current;
 
 		switch ( $interval ) {
+			case 'hourly':
+				$start = $start->add( new \DateInterval( 'PT1H' ) );
+				break;
+
 			case 'daily':
 				$start = $start->add( new \DateInterval( 'P1D' ) );
 				break;

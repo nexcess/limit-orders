@@ -31,6 +31,23 @@ class SettingsTest extends TestCase {
 	/**
 	 * @test
 	 * @group Intervals
+	 * @ticket https://github.com/nexcess/limit-orders/issues/18
+	 */
+	public function it_should_include_default_intervals() {
+		$method = new \ReflectionMethod( Settings::class, 'get_intervals' );
+		$method->setAccessible( true );
+
+		$intervals = $method->invoke( new Settings( new OrderLimiter() ) );
+
+		$this->assertArrayHasKey( 'daily', $intervals );
+		$this->assertArrayHasKey( 'weekly', $intervals );
+		$this->assertArrayHasKey( 'monthly', $intervals );
+		$this->assertArrayHasKey( 'hourly', $intervals, 'Hourly was added in https://github.com/nexcess/limit-orders/issues/18' );
+	}
+
+	/**
+	 * @test
+	 * @group Intervals
 	 */
 	public function available_intervals_should_be_filterable() {
 		$intervals = [

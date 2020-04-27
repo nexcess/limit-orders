@@ -208,6 +208,26 @@ class OrderLimiterTest extends TestCase {
 	/**
 	 * @test
 	 * @group Intervals
+	 * @ticket https://github.com/nexcess/limit-orders/issues/18
+	 */
+	public function get_interval_start_for_hourly() {
+		update_option( OrderLimiter::OPTION_KEY, [
+			'interval' => 'hourly',
+		] );
+
+		$now   = new \DateTimeImmutable( '2020-04-27 12:05:00', wp_timezone() );
+		$start = new \DateTimeImmutable( '2020-04-27 12:00:00', wp_timezone() );
+
+		$this->assertSame(
+			$start->format( 'r' ),
+			( new OrderLimiter( $now ) )->get_interval_start()->format( 'r' ),
+			'Hourly intervals should start at the top of the hour.'
+		);
+	}
+
+	/**
+	 * @test
+	 * @group Intervals
 	 */
 	public function get_interval_start_for_daily() {
 		update_option( OrderLimiter::OPTION_KEY, [
@@ -328,6 +348,26 @@ class OrderLimiterTest extends TestCase {
 	/**
 	 * @test
 	 * @group Intervals
+	 * @ticket https://github.com/nexcess/limit-orders/issues/18
+	 */
+	public function get_next_interval_start_for_hourly() {
+		update_option( OrderLimiter::OPTION_KEY, [
+			'interval' => 'hourly',
+		] );
+
+		$now  = new \DateTimeImmutable( '2020-04-27 12:05:00', wp_timezone() );
+		$next = new \DateTimeImmutable( '2020-04-27 13:00:00', wp_timezone() );
+
+		$this->assertSame(
+			$next->format( 'r' ),
+			( new OrderLimiter( $now ) )->get_next_interval_start()->format( 'r' ),
+			'The next hourly interval should begin at the top of the next hour.'
+		);
+	}
+
+	/**
+	 * @test
+	 * @group Intervals
 	 */
 	public function get_next_interval_start_for_daily() {
 		update_option( OrderLimiter::OPTION_KEY, [
@@ -383,6 +423,26 @@ class OrderLimiterTest extends TestCase {
 			$next->format( 'r' ),
 			( new OrderLimiter( $now ) )->get_next_interval_start()->format( 'r' ),
 			'The next monthly interval should begin at midnight on April 1.'
+		);
+	}
+
+	/**
+	 * @test
+	 * @group Intervals
+	 * @ticket https://github.com/nexcess/limit-orders/issues/18
+	 */
+	public function get_seconds_until_next_interval_for_hourly() {
+		update_option( OrderLimiter::OPTION_KEY, [
+			'interval' => 'hourly',
+		] );
+
+		$now  = new \DateTimeImmutable( '2020-04-27 12:05:00', wp_timezone() );
+		$next = new \DateTimeImmutable( '2020-04-27 13:00:00', wp_timezone() );
+
+		$this->assertSame(
+			$next->getTimestamp() - $now->getTimestamp(),
+			( new OrderLimiter( $now ) )->get_seconds_until_next_interval(),
+			'It should return the number of seconds until the next hour begins.'
 		);
 	}
 
