@@ -30,6 +30,7 @@ class SettingsTest extends TestCase {
 
 	/**
 	 * @test
+	 * @group Intervals
 	 */
 	public function available_intervals_should_be_filterable() {
 		$intervals = [

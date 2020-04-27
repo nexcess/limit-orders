@@ -29,6 +29,7 @@ class OrderLimiterTest extends TestCase {
 	/**
 	 * @test
 	 * @testdox get_interval() should return the interval setting
+	 * @group Intervals
 	 */
 	public function get_interval_should_return_the_interval_setting() {
 		update_option( OrderLimiter::OPTION_KEY, [
@@ -206,6 +207,7 @@ class OrderLimiterTest extends TestCase {
 
 	/**
 	 * @test
+	 * @group Intervals
 	 */
 	public function get_interval_start_for_daily() {
 		update_option( OrderLimiter::OPTION_KEY, [
@@ -224,6 +226,7 @@ class OrderLimiterTest extends TestCase {
 
 	/**
 	 * @test
+	 * @group Intervals
 	 */
 	public function get_interval_start_for_weekly() {
 		update_option( 'week_starts_on', 1 );
@@ -244,6 +247,7 @@ class OrderLimiterTest extends TestCase {
 
 	/**
 	 * @test
+	 * @group Intervals
 	 */
 	public function get_interval_start_for_weekly_with_a_non_standard_day() {
 		update_option( 'week_starts_on', 6 );
@@ -264,6 +268,7 @@ class OrderLimiterTest extends TestCase {
 
 	/**
 	 * @test
+	 * @group Intervals
 	 */
 	public function get_interval_start_for_weekly_when_today_is_the_first_day_of_the_week() {
 		update_option( 'week_starts_on', 1 );
@@ -284,6 +289,7 @@ class OrderLimiterTest extends TestCase {
 
 	/**
 	 * @test
+	 * @group Intervals
 	 */
 	public function get_interval_start_for_monthly() {
 		$today = new \DateTimeImmutable( 'now', wp_timezone() );
@@ -301,6 +307,7 @@ class OrderLimiterTest extends TestCase {
 
 	/**
 	 * @test
+	 * @group Intervals
 	 */
 	public function get_interval_start_should_be_idempotent() {
 		$now     = new \DateTimeImmutable( '00:00:00', wp_timezone() );
@@ -320,6 +327,7 @@ class OrderLimiterTest extends TestCase {
 
 	/**
 	 * @test
+	 * @group Intervals
 	 */
 	public function get_next_interval_start_for_daily() {
 		update_option( OrderLimiter::OPTION_KEY, [
@@ -339,6 +347,7 @@ class OrderLimiterTest extends TestCase {
 
 	/**
 	 * @test
+	 * @group Intervals
 	 */
 	public function get_next_interval_start_for_weekly() {
 		update_option( 'week_starts_on', 1 );
@@ -359,6 +368,7 @@ class OrderLimiterTest extends TestCase {
 
 	/**
 	 * @test
+	 * @group Intervals
 	 */
 	public function get_next_interval_start_for_monthly() {
 		update_option( OrderLimiter::OPTION_KEY, [
@@ -378,6 +388,7 @@ class OrderLimiterTest extends TestCase {
 
 	/**
 	 * @test
+	 * @group Intervals
 	 */
 	public function get_seconds_until_next_interval_for_daily() {
 		update_option( OrderLimiter::OPTION_KEY, [
@@ -397,6 +408,7 @@ class OrderLimiterTest extends TestCase {
 
 	/**
 	 * @test
+	 * @group Intervals
 	 */
 	public function get_seconds_until_next_interval_for_weekly() {
 		update_option( 'week_starts_on', 1 );
@@ -417,6 +429,7 @@ class OrderLimiterTest extends TestCase {
 
 	/**
 	 * @test
+	 * @group Intervals
 	 */
 	public function get_seconds_until_next_interval_for_monthly() {
 		update_option( OrderLimiter::OPTION_KEY, [
