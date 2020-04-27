@@ -118,12 +118,15 @@ class OrderLimiterTest extends TestCase {
 	/**
 	 * @test
 	 * @testdox get_message() should replace the {current_interval} placeholder
+	 * @testWith ["{current_interval}"]
+	 *           ["{current_interval:date}"]
+	 * @group Placeholders
 	 */
-	public function get_message_should_replace_current_interval_placeholder() {
+	public function get_message_should_replace_current_interval_placeholder( $placeholder ) {
 		update_option( 'date_format', 'F j, Y' );
 		update_option( OrderLimiter::OPTION_KEY, [
 			'interval'        => 'weekly',
-			'customer_notice' => 'This started on {current_interval}',
+			'customer_notice' => "This started on {$placeholder}",
 		] );
 
 		$now     = new \DateTimeImmutable( 'now', wp_timezone() );
@@ -137,7 +140,29 @@ class OrderLimiterTest extends TestCase {
 
 	/**
 	 * @test
+	 * @testdox get_message() should replace the {current_interval:time} placeholder
+	 * @group Placeholders
+	 */
+	public function get_message_should_replace_current_interval_time_placeholder() {
+		update_option( 'time_format', 'g:ia' );
+		update_option( OrderLimiter::OPTION_KEY, [
+			'interval'        => 'hourly',
+			'customer_notice' => "This started at {current_interval:time}",
+		] );
+
+		$now     = new \DateTimeImmutable( 'now', wp_timezone() );
+		$limiter = new OrderLimiter( $now );
+
+		$this->assertSame(
+			'This started at ' . $limiter->get_interval_start()->format( 'g:ia' ),
+			$limiter->get_message( 'customer_notice' )
+		);
+	}
+
+	/**
+	 * @test
 	 * @testdox get_message() should replace the {limit} placeholder
+	 * @group Placeholders
 	 */
 	public function get_message_should_replace_limit_placeholder() {
 		update_option( OrderLimiter::OPTION_KEY, [
@@ -155,12 +180,15 @@ class OrderLimiterTest extends TestCase {
 	/**
 	 * @test
 	 * @testdox get_message() should replace the {next_interval} placeholder
+	 * @testWith ["{next_interval}"]
+	 *           ["{next_interval:date}"]
+	 * @group Placeholders
 	 */
-	public function get_message_should_replace_next_interval_placeholder() {
+	public function get_message_should_replace_next_interval_placeholder( $placeholder ) {
 		update_option( 'date_format', 'F j, Y' );
 		update_option( OrderLimiter::OPTION_KEY, [
 			'interval'        => 'weekly',
-			'customer_notice' => 'Check back on {next_interval}',
+			'customer_notice' => "Check back on {$placeholder}",
 		] );
 
 		$now     = new \DateTimeImmutable( 'now', wp_timezone() );
@@ -170,6 +198,87 @@ class OrderLimiterTest extends TestCase {
 			'Check back on ' . $limiter->get_next_interval_start()->format( 'F j, Y' ),
 			$limiter->get_message( 'customer_notice' )
 		);
+	}
+
+	/**
+	 * @test
+	 * @testdox get_message() should replace the {next_interval:time} placeholder
+	 * @group Placeholders
+	 */
+	public function get_message_should_replace_next_interval_time_placeholder() {
+		update_option( 'time_format', 'g:ia' );
+		update_option( OrderLimiter::OPTION_KEY, [
+			'interval'        => 'hourly',
+			'customer_notice' => "Check back at {next_interval:time}",
+		] );
+
+		$now     = new \DateTimeImmutable( 'now', wp_timezone() );
+		$limiter = new OrderLimiter( $now );
+
+		$this->assertSame(
+			'Check back at ' . $limiter->get_next_interval_start()->format( 'g:ia' ),
+			$limiter->get_message( 'customer_notice' )
+		);
+	}
+
+	/**
+	 * @test
+	 * @group Placeholders
+	 */
+	public function get_placeholders_should_return_an_array_of_default_placeholders() {
+		update_option( 'date_format', 'F j, Y' );
+		update_option( 'time_format', 'g:ia' );
+		update_option( OrderLimiter::OPTION_KEY, [
+			'interval' => 'hourly',
+		] );
+
+		$now          = new \DateTimeImmutable( '2020-04-27 12:15:00', wp_timezone() );
+		$current      = new \DateTimeImmutable( '2020-04-27 12:00:00', wp_timezone() );
+		$next         = new \DateTimeImmutable( '2020-04-27 13:00:00', wp_timezone() );
+		$placeholders = ( new OrderLimiter( $now ) )->get_placeholders();
+
+		$this->assertSame( $current->format( 'F j, Y' ), $placeholders['{current_interval}'] );
+		$this->assertSame( $current->format( 'F j, Y' ), $placeholders['{current_interval:date}'] );
+		$this->assertSame( $current->format( 'g:ia' ), $placeholders['{current_interval:time}'] );
+		$this->assertSame( $next->format( 'F j, Y' ), $placeholders['{next_interval}'] );
+		$this->assertSame( $next->format( 'F j, Y' ), $placeholders['{next_interval:date}'] );
+		$this->assertSame( $next->format( 'g:ia' ), $placeholders['{next_interval:time}'] );
+	}
+
+	/**
+	 * @test
+	 * @group Placeholders
+	 */
+	public function time_placeholders_should_replace_00_with_midnight() {
+		$this->markTestIncomplete( 'https://github.com/nexcess/limit-orders/issues/21' );
+
+		update_option( OrderLimiter::OPTION_KEY, [
+			'interval' => 'daily',
+		] );
+
+		$now          = new \DateTimeImmutable( '2020-04-27 12:15:00', wp_timezone() );
+		$current      = new \DateTimeImmutable( '2020-04-27 00:00:00', wp_timezone() );
+		$next         = new \DateTimeImmutable( '2020-04-28 00:00:00', wp_timezone() );
+		$placeholders = ( new OrderLimiter( $now ) )->get_placeholders();
+
+		$this->assertSame( __( 'midnight', 'limit-orders' ), $placeholders['{current_interval:time}'] );
+		$this->assertSame( __( 'midnight', 'limit-orders' ), $placeholders['{next_interval:time}'] );
+	}
+
+	/**
+	 * @test
+	 * @group Placeholders
+	 */
+	public function get_placeholders_should_filter_placeholders() {
+		add_filter( 'limit_orders_message_placeholders', function ( $placeholders ) {
+			$placeholders['{test}'] = 'Test value';
+
+			return $placeholders;
+		} );
+
+		$placeholders = ( new OrderLimiter() )->get_placeholders();
+
+		$this->assertSame( 'Test value', $placeholders['{test}'] );
 	}
 
 	/**

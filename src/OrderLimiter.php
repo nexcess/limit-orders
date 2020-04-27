@@ -108,11 +108,34 @@ class OrderLimiter {
 		}
 
 		// Perform simple placeholder replacements.
+		$placeholders = $this->get_placeholders( $setting, $message );
+
+		return str_replace( array_keys( $placeholders ), array_values( $placeholders ), $message );
+	}
+
+	/**
+	 * Retrieve eligible placeholders for front-end messaging.
+	 *
+	 * Note that the parameters are only included for the sake of the filter.
+	 *
+	 * @param string $setting Optional. The current setting that's being retrieved. Default is empty.
+	 * @param string $message Optional. The current message being constructed. Default is empty.
+	 *
+	 * @return array An array of placeholder => replacements.
+	 */
+	public function get_placeholders( $setting = '', $message = '' ) {
 		$date_format  = get_option( 'date_format' );
+		$time_format  = get_option( 'time_format' );
+		$current      = $this->get_interval_start();
+		$next         = $this->get_next_interval_start();
 		$placeholders = [
-			'{current_interval}' => $this->get_interval_start()->format( $date_format ),
-			'{limit}'            => $this->get_limit(),
-			'{next_interval}'    => $this->get_next_interval_start()->format( $date_format ),
+			'{current_interval}'      => $current->format( $date_format ),
+			'{current_interval:date}' => $current->format( $date_format ),
+			'{current_interval:time}' => $current->format( $time_format ),
+			'{limit}'                 => $this->get_limit(),
+			'{next_interval}'         => $next->format( $date_format ),
+			'{next_interval:date}'    => $next->format( $date_format ),
+			'{next_interval:time}'    => $next->format( $time_format ),
 		];
 
 		/**
@@ -122,9 +145,7 @@ class OrderLimiter {
 		 * @param string $setting      The current message's setting key.
 		 * @param string $message      The current message to display.
 		 */
-		$placeholders = apply_filters( 'limit_orders_message_placeholders', $placeholders, $setting, $message );
-
-		return str_replace( array_keys( $placeholders ), array_values( $placeholders ), $message );
+		return apply_filters( 'limit_orders_message_placeholders', $placeholders, $setting, $message );
 	}
 
 	/**
