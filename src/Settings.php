@@ -126,7 +126,7 @@ class Settings extends WC_Settings_Page {
 		global $wp_locale;
 
 		$intervals = [
-			'hourly'  => _x( 'Hourly (resets at the top of every hour)', 'order threshold interval', 'limit orders' ),
+			'hourly'  => _x( 'Hourly (resets at the top of every hour)', 'order threshold interval', 'limit-orders' ),
 			'daily'   => _x( 'Daily (resets every day)', 'order threshold interval', 'limit-orders' ),
 			'weekly'  => sprintf(
 				/* Translators: %1$s is the first day of the week, based on site configuration. */
