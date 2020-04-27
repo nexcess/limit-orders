@@ -58,7 +58,7 @@ class OrderLimiter {
 	 * @return bool
 	 */
 	public function is_enabled() {
-		return (bool) $this->get_setting( 'enabled' );
+		return (bool) $this->get_setting( 'enabled', false );
 	}
 
 	/**
@@ -67,7 +67,7 @@ class OrderLimiter {
 	 * @return string The order limiter's interval.
 	 */
 	public function get_interval() {
-		return $this->get_setting( 'interval' );
+		return $this->get_setting( 'interval', 'daily' );
 	}
 
 	/**
@@ -108,11 +108,34 @@ class OrderLimiter {
 		}
 
 		// Perform simple placeholder replacements.
+		$placeholders = $this->get_placeholders( $setting, $message );
+
+		return str_replace( array_keys( $placeholders ), array_values( $placeholders ), $message );
+	}
+
+	/**
+	 * Retrieve eligible placeholders for front-end messaging.
+	 *
+	 * Note that the parameters are only included for the sake of the filter.
+	 *
+	 * @param string $setting Optional. The current setting that's being retrieved. Default is empty.
+	 * @param string $message Optional. The current message being constructed. Default is empty.
+	 *
+	 * @return array An array of placeholder => replacements.
+	 */
+	public function get_placeholders( $setting = '', $message = '' ) {
 		$date_format  = get_option( 'date_format' );
+		$time_format  = get_option( 'time_format' );
+		$current      = $this->get_interval_start();
+		$next         = $this->get_next_interval_start();
 		$placeholders = [
-			'{current_interval}' => $this->get_interval_start()->format( $date_format ),
-			'{limit}'            => $this->get_limit(),
-			'{next_interval}'    => $this->get_next_interval_start()->format( $date_format ),
+			'{current_interval}'      => $current->format( $date_format ),
+			'{current_interval:date}' => $current->format( $date_format ),
+			'{current_interval:time}' => $current->format( $time_format ),
+			'{limit}'                 => $this->get_limit(),
+			'{next_interval}'         => $next->format( $date_format ),
+			'{next_interval:date}'    => $next->format( $date_format ),
+			'{next_interval:time}'    => $next->format( $time_format ),
 		];
 
 		/**
@@ -122,9 +145,7 @@ class OrderLimiter {
 		 * @param string $setting      The current message's setting key.
 		 * @param string $message      The current message to display.
 		 */
-		$placeholders = apply_filters( 'limit_orders_message_placeholders', $placeholders, $setting, $message );
-
-		return str_replace( array_keys( $placeholders ), array_values( $placeholders ), $message );
+		return apply_filters( 'limit_orders_message_placeholders', $placeholders, $setting, $message );
 	}
 
 	/**
@@ -161,6 +182,16 @@ class OrderLimiter {
 		$start    = $this->now;
 
 		switch ( $interval ) {
+			case 'hourly':
+				// Start at the top of the current hour.
+				$start = $start->setTime( (int) $start->format( 'h' ), 0, 0 );
+				break;
+
+			case 'daily':
+				// Start at midnight.
+				$start = $start->setTime( 0, 0, 0 );
+				break;
+
 			case 'weekly':
 				$start_of_week = (int) get_option( 'week_starts_on' );
 				$current_dow   = (int) $start->format( 'w' );
@@ -175,15 +206,15 @@ class OrderLimiter {
 				if ( 0 !== $diff ) {
 					$start = $start->sub( new \DateInterval( 'P' . $diff . 'D' ) );
 				}
+
+				$start = $start->setTime( 0, 0, 0 );
 				break;
 
 			case 'monthly':
-				$start = $start->setDate( (int) $start->format( 'Y' ), (int) $start->format( 'm' ), 1 );
+				$start = $start->setDate( (int) $start->format( 'Y' ), (int) $start->format( 'm' ), 1 )
+					->setTime( 0, 0, 0 );
 				break;
 		}
-
-		// Start everything at midnight.
-		$start = $start->setTime( 0, 0, 0 );
 
 		/**
 		 * Filter the DateTime object representing the start of the current interval.
@@ -205,6 +236,10 @@ class OrderLimiter {
 		$start    = clone $current;
 
 		switch ( $interval ) {
+			case 'hourly':
+				$start = $start->add( new \DateInterval( 'PT1H' ) );
+				break;
+
 			case 'daily':
 				$start = $start->add( new \DateInterval( 'P1D' ) );
 				break;
@@ -338,11 +373,11 @@ class OrderLimiter {
 	 *
 	 * @return mixed The value of $setting, or null $setting is undefined.
 	 */
-	protected function get_setting( string $setting ) {
+	protected function get_setting( string $setting, $default = null ) {
 		if ( null === $this->settings ) {
 			$this->settings = get_option( self::OPTION_KEY, [] );
 		}
 
-		return isset( $this->settings[ $setting ] ) ? $this->settings[ $setting ] : null;
+		return isset( $this->settings[ $setting ] ) ? $this->settings[ $setting ] : $default;
 	}
 }

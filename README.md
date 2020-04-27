@@ -35,7 +35,7 @@ Configuration for Limit Orders for WooCommerce is available through WooCommerce 
 	<dd>Customers will be unable to checkout after this number of orders are received.</dd>
 	<dd>Shop owners will still be able to create orders via WP Admin, even after the limit has been reached.</dd>
 	<dt>Interval</dt>
-	<dd>How often the limit is reset. By default, this can be "daily", "weekly", or "monthly".</dd>
+	<dd>How often the limit is reset. By default, this can be "hourly", daily", "weekly", or "monthly".</dd>
 	<dd>When choosing "weekly", the plugin will respect the value of <a href="https://wordpress.org/support/article/settings-general-screen/#week-starts-on">the store's "week starts on" setting</a>.</dd>
 </dl>
 
@@ -61,8 +61,16 @@ In any of these messages, you may also use the following variables:
 	<dd>The maximum number of orders accepted.</dd>
 	<dt>{current_interval}</dt>
 	<dd>The date the current interval started.</dd>
+	<dt>{current_interval:date}</dt>
+	<dd>An alias of <var>{current_interval}</var></dd>
+	<dt>{current_interval:time}</dt>
+	<dd>The time the current interval started.</dd>
 	<dt>{next_interval}</dt>
 	<dd>The date the next interval will begin (e.g. when orders will be accepted again).</dd>
+	<dt>{next_interval:date}</dt>
+	<dd>An alias of <var>{next_interval}</var></dd>
+	<dt>{next_interval:time}</dt>
+	<dd>The time the next interval will begin.</dd>
 </dl>
 
-Both `{current_interval}` and `{next_interval}` will be formatted [according to the "date format" setting for your store](https://wordpress.org/support/article/settings-general-screen/#date-format).
+Dates and times will be formatted [according to the "date format" and "time format" settings for your store](https://wordpress.org/support/article/settings-general-screen/#date-format), respectively.
