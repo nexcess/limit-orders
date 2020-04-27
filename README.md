@@ -71,6 +71,8 @@ In any of these messages, you may also use the following variables:
 	<dd>An alias of <var>{next_interval}</var></dd>
 	<dt>{next_interval:time}</dt>
 	<dd>The time the next interval will begin.</dd>
+	<dt>{timezone}</dt>
+	<dd>The store's timezone, e.g. "PST", "EDT", etc. This will automatically update based on Daylight Saving Time.</dd>
 </dl>
 
 Dates and times will be formatted [according to the "date format" and "time format" settings for your store](https://wordpress.org/support/article/settings-general-screen/#date-format), respectively.

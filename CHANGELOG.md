@@ -8,11 +8,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Added
 
 * Added "hourly" as a default interval for stores ([#20]).
-* Added new placeholders to user-facing messaging ([#20]):
+* Added new placeholders to user-facing messaging ([#20], [#26]):
 	- `{current_interval:date}` (alias of `{current_interval}`)
 	- `{current_interval:time}`
 	- `{next_interval:date}` (alias of `{next_interval}`)
 	- `{next_interval:time}`
+	- `{timezone}`
 * Added documentation for adding custom intervals, placeholders ([#23]).
 
 ### Updated
@@ -62,3 +63,4 @@ Initial plugin release.
 [#13]: https://github.com/nexcess/limit-orders/pull/13
 [#20]: https://github.com/nexcess/limit-orders/pull/20
 [#23]: https://github.com/nexcess/limit-orders/pull/23
+[#26]: https://github.com/nexcess/limit-orders/pull/26

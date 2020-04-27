@@ -136,6 +136,7 @@ class OrderLimiter {
 			'{next_interval}'         => $next->format( $date_format ),
 			'{next_interval:date}'    => $next->format( $date_format ),
 			'{next_interval:time}'    => $next->format( $time_format ),
+			'{timezone}'              => $next->format( 'T' ),
 		];
 
 		/**

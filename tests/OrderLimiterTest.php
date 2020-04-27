@@ -224,6 +224,8 @@ class OrderLimiterTest extends TestCase {
 	/**
 	 * @test
 	 * @group Placeholders
+	 * @ticket https://github.com/nexcess/limit-orders/issues/18
+	 * @ticket https://github.com/nexcess/limit-orders/issues/22
 	 */
 	public function get_placeholders_should_return_an_array_of_default_placeholders() {
 		update_option( 'date_format', 'F j, Y' );
@@ -243,6 +245,7 @@ class OrderLimiterTest extends TestCase {
 		$this->assertSame( $next->format( 'F j, Y' ), $placeholders['{next_interval}'] );
 		$this->assertSame( $next->format( 'F j, Y' ), $placeholders['{next_interval:date}'] );
 		$this->assertSame( $next->format( 'g:ia' ), $placeholders['{next_interval:time}'] );
+		$this->assertSame( $next->format( 'T' ), $placeholders['{timezone}'] );
 	}
 
 	/**
