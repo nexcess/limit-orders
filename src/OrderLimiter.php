@@ -58,7 +58,7 @@ class OrderLimiter {
 	 * @return bool
 	 */
 	public function is_enabled() {
-		return (bool) $this->get_setting( 'enabled' );
+		return (bool) $this->get_setting( 'enabled', false );
 	}
 
 	/**
@@ -67,7 +67,7 @@ class OrderLimiter {
 	 * @return string The order limiter's interval.
 	 */
 	public function get_interval() {
-		return $this->get_setting( 'interval' );
+		return $this->get_setting( 'interval', 'daily' );
 	}
 
 	/**
@@ -352,11 +352,11 @@ class OrderLimiter {
 	 *
 	 * @return mixed The value of $setting, or null $setting is undefined.
 	 */
-	protected function get_setting( string $setting ) {
+	protected function get_setting( string $setting, $default = null ) {
 		if ( null === $this->settings ) {
 			$this->settings = get_option( self::OPTION_KEY, [] );
 		}
 
-		return isset( $this->settings[ $setting ] ) ? $this->settings[ $setting ] : null;
+		return isset( $this->settings[ $setting ] ) ? $this->settings[ $setting ] : $default;
 	}
 }

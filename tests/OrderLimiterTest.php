@@ -33,9 +33,18 @@ class OrderLimiterTest extends TestCase {
 	 */
 	public function get_interval_should_return_the_interval_setting() {
 		update_option( OrderLimiter::OPTION_KEY, [
-			'interval' => 'daily',
+			'interval' => 'weekly',
 		] );
 
+		$this->assertSame( 'weekly', ( new OrderLimiter )->get_interval() );
+	}
+
+	/**
+	 * @test
+	 * @testdox get_interval() should default to "daily"
+	 * @group Intervals
+	 */
+	public function get_interval_should_default_to_daily() {
 		$this->assertSame( 'daily', ( new OrderLimiter )->get_interval() );
 	}
 
