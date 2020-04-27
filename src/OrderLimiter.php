@@ -184,7 +184,7 @@ class OrderLimiter {
 		switch ( $interval ) {
 			case 'hourly':
 				// Start at the top of the current hour.
-				$start = $start->setTime( (int) $start->format( 'h' ), 0, 0 );
+				$start = $start->setTime( (int) $start->format( 'G' ), 0, 0 );
 				break;
 
 			case 'daily':
