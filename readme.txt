@@ -1,10 +1,10 @@
 === Limit Orders for WooCommerce ===
-Contributors: nexcess, liquidweb, stevegrunwell
+Contributors: nexcess, liquidweb, stevegrunwell, bswatson
 Tags: WooCommerce, ordering, limits, throttle
 Requires at least: 5.3
 Tested up to: 5.4
 Requires PHP: 7.0
-Stable tag: 1.1.2
+Stable tag: 1.2.0
 License: MIT
 License URI: https://github.com/nexcess/limit-orders/blob/master/LICENSE.txt
 
@@ -45,6 +45,10 @@ Yes, the order creation process through WP Admin is unaffected.
 
 For a complete list of changes, please [see the plugin's changelog on GitHub](https://github.com/nexcess/limit-orders/blob/master/CHANGELOG.md).
 
+= 1.2.0 (2020-04-27) =
+* Add a new "hourly" interval, enabling store owners to limit the number of orders per hour.
+* Added new placeholders for customer-facing messaging.
+
 = 1.1.2 (2020-04-17) =
 * Override WordPress' default "LIMIT" on queries, which was preventing stores with limits > 10 from stopping orders
 
@@ -58,6 +62,9 @@ For a complete list of changes, please [see the plugin's changelog on GitHub](ht
 Initial release of the plugin.
 
 == Upgrade Notice ==
+
+= 1.2.0 =
+Added the ability to limit the number of orders per hour a store can receive.
 
 = 1.1.2 =
 Fixes error that was preventing order limiting from working on stores with limits higher than 10.

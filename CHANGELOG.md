@@ -3,6 +3,24 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Version 1.2.0] — 2020-04-27
+
+### Added
+
+* Added "hourly" as a default interval for stores ([#20]).
+* Added new placeholders to user-facing messaging ([#20], [#26]):
+	- `{current_interval:date}` (alias of `{current_interval}`)
+	- `{current_interval:time}`
+	- `{next_interval:date}` (alias of `{next_interval}`)
+	- `{next_interval:time}`
+	- `{timezone}`
+* Added documentation for adding custom intervals, placeholders ([#23]).
+
+### Updated
+
+* The settings screen will now show custom placeholders that have been registered via the "limit_orders_message_placeholders" filter ([#20]).
+* Improve autoloader performance and remove type-hint from PSR-4 autoloader ([#17]).
+
 ## [Version 1.1.2] - 2020-04-17
 
 ### Fixed
@@ -39,8 +57,13 @@ Initial plugin release.
 [Version 1.1.0]: https://github.com/nexcess/limit-orders/releases/tag/v1.1.0
 [Version 1.1.1]: https://github.com/nexcess/limit-orders/releases/tag/v1.1.1
 [Version 1.1.2]: https://github.com/nexcess/limit-orders/releases/tag/v1.1.2
+[Version 1.2.0]: https://github.com/nexcess/limit-orders/releases/tag/v1.2.0
 [#5]: https://github.com/nexcess/limit-orders/pull/5
 [#6]: https://github.com/nexcess/limit-orders/pull/6
 [#8]: https://github.com/nexcess/limit-orders/pull/8
 [#10]: https://github.com/nexcess/limit-orders/pull/10
 [#13]: https://github.com/nexcess/limit-orders/pull/13
+[#17]: https://github.com/nexcess/limit-orders/pull/17
+[#20]: https://github.com/nexcess/limit-orders/pull/20
+[#23]: https://github.com/nexcess/limit-orders/pull/23
+[#26]: https://github.com/nexcess/limit-orders/pull/26
