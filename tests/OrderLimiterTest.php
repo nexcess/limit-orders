@@ -345,6 +345,26 @@ class OrderLimiterTest extends TestCase {
 
 	/**
 	 * @test
+	 * @depends get_interval_start_for_hourly
+	 * @group Intervals
+	 * @ticket https://github.com/nexcess/limit-orders/issues/24
+	 */
+	public function get_interval_start_should_use_24hr_time() {
+		update_option( OrderLimiter::OPTION_KEY, [
+			'interval' => 'hourly',
+		] );
+
+		$now   = new \DateTimeImmutable( '2020-04-27 18:05:00', wp_timezone() );
+		$start = new \DateTimeImmutable( '2020-04-27 18:00:00', wp_timezone() );
+
+		$this->assertSame(
+			$start->format( 'r' ),
+			( new OrderLimiter( $now ) )->get_interval_start()->format( 'r' )
+		);
+	}
+
+	/**
+	 * @test
 	 * @group Intervals
 	 */
 	public function get_interval_start_for_daily() {
