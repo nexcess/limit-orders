@@ -23,7 +23,7 @@ php:
 env:
   - WP_VERSION=5.3 WC_VERSION=4.1
   - WP_VERSION=5.3 WC_VERSION=4.0
-  - WP_VERSION=5.3 WC_VERSION=3.9
+  - WP_VERSION=5.3 WC_VERSION=3.9.3
 
 matrix:
   fast_finish: true
