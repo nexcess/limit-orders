@@ -9,7 +9,7 @@
  * Version:     1.2.0
  *
  * WC requires at least: 3.9
- * WC tested up to:      4.0
+ * WC tested up to:      4.1
  *
  * @package Nexcess\LimitOrders
  */
