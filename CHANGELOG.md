@@ -3,6 +3,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Version 1.2.1] — 2020-05-08
+
+### Updated
+
+* Bump "WC tested up to" to 4.1 ([#28]).
+
+
 ## [Version 1.2.0] — 2020-04-27
 
 ### Added
@@ -20,6 +27,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 * The settings screen will now show custom placeholders that have been registered via the "limit_orders_message_placeholders" filter ([#20]).
 * Improve autoloader performance and remove type-hint from PSR-4 autoloader ([#17]).
+
 
 ## [Version 1.1.2] - 2020-04-17
 
@@ -58,6 +66,7 @@ Initial plugin release.
 [Version 1.1.1]: https://github.com/nexcess/limit-orders/releases/tag/v1.1.1
 [Version 1.1.2]: https://github.com/nexcess/limit-orders/releases/tag/v1.1.2
 [Version 1.2.0]: https://github.com/nexcess/limit-orders/releases/tag/v1.2.0
+[Version 1.2.1]: https://github.com/nexcess/limit-orders/releases/tag/v1.2.1
 [#5]: https://github.com/nexcess/limit-orders/pull/5
 [#6]: https://github.com/nexcess/limit-orders/pull/6
 [#8]: https://github.com/nexcess/limit-orders/pull/8
@@ -67,3 +76,4 @@ Initial plugin release.
 [#20]: https://github.com/nexcess/limit-orders/pull/20
 [#23]: https://github.com/nexcess/limit-orders/pull/23
 [#26]: https://github.com/nexcess/limit-orders/pull/26
+[#28]: https://github.com/nexcess/limit-orders/issues/28

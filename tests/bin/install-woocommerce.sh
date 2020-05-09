@@ -34,7 +34,7 @@ error() {
 # Print a debugging message.
 debug() {
 	if [ -n "$DEBUG" ]; then
-		printf "\n\033[0;36m%s\033[0;0m\n" "$1"
+		printf "\033[0;36m%s\033[0;0m\n" "$1"
 	fi
 }
 
@@ -47,8 +47,6 @@ debug "Installing WooCommerce ${WC_VERSION} from source"
 
 # Determine which branch to use, if not master.
 if [ "latest" != "$WC_VERSION" ]; then
-	# Shorten it to the major/minor version.
-	WC_VERSION=$(cut -d . -f1,2 <<< "$WC_VERSION")
 	BRANCH="release/${WC_VERSION}"
 fi
 
@@ -61,8 +59,14 @@ if [[ -d "$TARGET_DIR" ]]; then
 fi
 
 debug "Cloning branch '${BRANCH}' from ${GIT_URL}"
-git clone --depth 1 --single-branch --branch "$BRANCH" "$GIT_URL" "$TARGET_DIR"\
-	|| error "Unable to clone branch ${BRANCH} from ${GIT_URL}"
+if git ls-remote --exit-code --heads "$GIT_URL" "$BRANCH" &>/dev/null; then
+	git clone --depth 1 --single-branch --branch "$BRANCH" "$GIT_URL" "$TARGET_DIR" \
+		|| error "Unable to clone branch ${BRANCH} from ${GIT_URL}"
+else
+	debug "Remote branch ${BRANCH} not found, attempting to clone from tag"
+	git clone --depth 1 --single-branch --branch "$WC_VERSION" "$GIT_URL" "$TARGET_DIR" \
+		|| error "Unable to clone tag ${WC_VERSION} from ${GIT_URL}"
+fi
 
 # Once we've cloned the branch, install any dependencies.
 #

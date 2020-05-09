@@ -6,10 +6,10 @@
  * Author URI:  https://nexcess.net
  * Text Domain: limit-orders
  * Domain Path: /languages
- * Version:     1.2.0
+ * Version:     1.2.1
  *
  * WC requires at least: 3.9
- * WC tested up to:      4.0
+ * WC tested up to:      4.1
  *
  * @package Nexcess\LimitOrders
  */
