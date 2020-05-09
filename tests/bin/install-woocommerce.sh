@@ -59,12 +59,12 @@ if [[ -d "$TARGET_DIR" ]]; then
 fi
 
 debug "Cloning branch '${BRANCH}' from ${GIT_URL}"
-if git ls-remote --exit-code --heads git@github.com:woocommerce/woocommerce.git "$BRANCH" &>/dev/null; then
-	git clone --depth 1 --single-branch --branch "$BRANCH" "$GIT_URL" "$TARGET_DIR"\
+if git ls-remote --exit-code --heads "$GIT_URL" "$BRANCH" &>/dev/null; then
+	git clone --depth 1 --single-branch --branch "$BRANCH" "$GIT_URL" "$TARGET_DIR" \
 		|| error "Unable to clone branch ${BRANCH} from ${GIT_URL}"
 else
 	debug "Remote branch ${BRANCH} not found, attempting to clone from tag"
-	git clone --depth 1 --single-branch --branch "$WC_VERSION" "$GIT_URL" "$TARGET_DIR"\
+	git clone --depth 1 --single-branch --branch "$WC_VERSION" "$GIT_URL" "$TARGET_DIR" \
 		|| error "Unable to clone tag ${WC_VERSION} from ${GIT_URL}"
 fi
 
