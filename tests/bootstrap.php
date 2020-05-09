@@ -9,7 +9,7 @@ $_tests_dir = getenv( 'WP_TESTS_DIR' ) ?: rtrim( sys_get_temp_dir(), '/\\' ) . '
 
 // Determine which version of WooCommerce we're testing against.
 $wc_version    = getenv('WC_VERSION') ?: 'latest';
-$target_suffix = preg_match( '/\d+\.\d+/', $wc_version, $match ) ? $match[0] : 'latest';
+$target_suffix = preg_match( '/\d+(\.\d+){1,2}/', $wc_version, $match ) ? $match[0] : 'latest';
 $target_dir    = dirname( __DIR__ ) . '/vendor/woocommerce/woocommerce-src-' . $target_suffix;
 
 // Attempt to install the given version of WooCommerce if it doesn't already exist.
