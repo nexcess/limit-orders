@@ -112,7 +112,7 @@ You may accomplish this by adding the following code into your theme's `function
  */
 
 /**
- * Add "fortnightly" to the list of intervals.
+ * Add "Annually" to the list of intervals.
  *
  * @param array $intervals Available time intervals.
  *
@@ -160,7 +160,7 @@ add_filter( 'limit_orders_interval_start', function ( $start, $interval ) {
  *                   current $interval is not "annually".
  */
 add_filter( 'limit_orders_next_interval', function ( $start, $current, $interval ) {
-	if ( 'annually' !== 'interval' ) {
+	if ( 'annually' !== $interval ) {
 		return $start;
 	}
 
