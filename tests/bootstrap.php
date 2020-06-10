@@ -5,7 +5,8 @@
  * @package Nexcess\LimitOrders
  */
 
-$_tests_dir = getenv( 'WP_TESTS_DIR' ) ?: rtrim( sys_get_temp_dir(), '/\\' ) . '/wordpress-tests-lib';
+$tests_dir = getenv( 'WP_TESTS_DIR' ) ?: rtrim( sys_get_temp_dir(), '/\\' ) . '/wordpress-tests-lib';
+$bootstrap = '';
 
 // Determine which version of WooCommerce we're testing against.
 $wc_version    = getenv('WC_VERSION') ?: 'latest';
@@ -37,16 +38,26 @@ if ( ! is_dir( $target_dir ) ) {
 }
 
 // Locate the WooCommerce test bootstrap file for this release.
-$_bootstrap = $target_dir . '/tests/bootstrap.php';
+$paths = [
+	$target_dir . '/tests/legacy/bootstrap.php',
+	$target_dir . '/tests/bootstrap.php',
+];
 
-if ( ! file_exists( $_bootstrap ) ) {
+foreach ( $paths as $path ) {
+	if ( file_exists( $path ) ) {
+		$bootstrap = $path;
+		break;
+	}
+}
+
+if ( empty( $bootstrap ) ) {
 	echo "\033[0;31mUnable to find the the test bootstrap file for WooCommerce@{$wc_version}, aborting.\033[0;m\n";
 	exit( 1 );
 }
 
 // Finally, Start up the WP testing environment.
 require_once dirname( __DIR__ ) . '/vendor/autoload.php';
-require_once $_bootstrap;
+require_once $bootstrap;
 
 echo esc_html( sprintf(
 	/* Translators: %1$s is the WooCommerce release being loaded. */
