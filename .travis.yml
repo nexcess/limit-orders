@@ -20,10 +20,13 @@ php:
   - 7.1
   - 7.0
 
+# To keep the test matrix from exploding over time, we'll actively test against the latest three
+# releases, then cherry-pick what to test across older ones.
 env:
-  - WP_VERSION=5.3 WC_VERSION=4.1
-  - WP_VERSION=5.3 WC_VERSION=4.0
-  - WP_VERSION=5.3 WC_VERSION=3.9.3
+  - WP_VERSION=latest WC_VERSION=4.2
+  - WP_VERSION=latest WC_VERSION=4.1
+  - WP_VERSION=latest WC_VERSION=4.0
+  - WP_VERSION=latest WC_VERSION=3.9.3
 
 matrix:
   fast_finish: true
@@ -34,6 +37,9 @@ matrix:
     - name: Static Code Analysis
       php: 7.3
       env: WP_TRAVISCI=phpstan
+    - name: Minimum requirements
+      php: 7.0
+      env: WP_VERSION=5.2 WC_VERSION=3.9.3
     - name: Bleeding Edge
       php: 7.4
       env: WP_VERSION=trunk WC_VERSION=latest
