@@ -918,13 +918,14 @@ class OrderLimiterTest extends TestCase {
 	 * @ticket https://github.com/nexcess/limit-orders/pull/13
 	 */
 	public function count_qualifying_orders_should_not_limit_results() {
+		update_option( 'posts_per_page', 2 ); // Lower the default to improve test performance.
 		update_option( OrderLimiter::OPTION_KEY, [
 			'enabled'  => true,
 			'interval' => 'daily',
 			'limit'    => 100,
 		] );
 
-		for ( $i = 0; $i < 24; $i++ ) {
+		for ( $i = 0; $i < 5; $i++ ) {
 			$this->generate_order();
 		}
 
@@ -932,6 +933,6 @@ class OrderLimiterTest extends TestCase {
 		$method   = new \ReflectionMethod( $instance, 'count_qualifying_orders' );
 		$method->setAccessible( true );
 
-		$this->assertSame( 24, $method->invoke( $instance ) );
+		$this->assertSame( 5, $method->invoke( $instance ) );
 	}
 }
