@@ -27,6 +27,14 @@ Configuration for Limit Orders for WooCommerce is available through WooCommerce 
 
 ![The settings screen for Limit Orders for WooCommerce](.wordpress-org/screenshot-1.png)
 
+⚠️ **Please be aware** that any changes made to the settings will take effect immediately.
+
+For example, if you're using an hourly interval and switch it to daily, the plugin will re-calculate whether or not to disable ordering based on the number of orders received since the start of the current day (midnight, by default).
+
+### General settings
+
+These settings determine how and when order limiting should take effect.
+
 <dl>
 	<dt>Enable Order Limiting</dt>
 	<dd>Check this box to enable order limiting.</dd>
