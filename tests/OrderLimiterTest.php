@@ -650,6 +650,25 @@ class OrderLimiterTest extends TestCase {
 
 	/**
 	 * @test
+	 */
+	public function has_orders_in_current_interval_should_compare_the_limit_to_remaining_order() {
+		update_option( OrderLimiter::OPTION_KEY, [
+			'enabled' => true,
+			'limit'   => 5,
+		] );
+
+		$limiter = new OrderLimiter();
+		$limiter->init();
+
+		$this->assertFalse( $limiter->has_orders_in_current_interval() );
+
+		$this->generate_order();
+
+		$this->assertTrue( $limiter->has_orders_in_current_interval() );
+	}
+
+	/**
+	 * @test
 	 * @testdox has_reached_limit() should return false if the order count meets the limit
 	 */
 	public function has_reached_limit_should_return_true_if_orders_are_under_the_limit() {

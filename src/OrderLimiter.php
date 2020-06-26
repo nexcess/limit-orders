@@ -275,7 +275,16 @@ class OrderLimiter {
 	}
 
 	/**
-	 * Determine whether or not the given store has reached its limits.
+	 * Determine whether or not the store has any orders in the given interval.
+	 *
+	 * @return bool
+	 */
+	public function has_orders_in_current_interval() {
+		return $this->get_limit() > $this->get_remaining_orders();
+	}
+
+	/**
+	 * Determine whether or not the store has reached its limits.
 	 *
 	 * @return bool
 	 */
