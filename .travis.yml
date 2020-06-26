@@ -39,7 +39,7 @@ matrix:
       env: WP_TRAVISCI=phpstan
     - name: Minimum requirements
       php: 7.0
-      env: WP_VERSION=5.2 WC_VERSION=3.9.3
+      env: WP_VERSION=5.3 WC_VERSION=3.9.3
     - name: Bleeding Edge
       php: 7.4
       env: WP_VERSION=trunk WC_VERSION=latest
