@@ -11,7 +11,7 @@ Limit Orders for WooCommerce lets you limit the number of orders your store will
 
 ## Requirements
 
-* WordPress 5.2 or newer
+* WordPress 5.3 or newer
 * WooCommerce 3.9 or newer
 * PHP 7.0 or newer
 
