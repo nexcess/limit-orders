@@ -8,10 +8,7 @@
 namespace Tests;
 
 use Nexcess\LimitOrders\OrderLimiter;
-use WC_Checkout;
-use WC_Form_Handler;
 use WC_Helper_Product;
-use WP_UnitTestCase as TestCase;
 
 /**
  * @covers Nexcess\LimitOrders\OrderLimiter
@@ -936,19 +933,5 @@ class OrderLimiterTest extends TestCase {
 		$method->setAccessible( true );
 
 		$this->assertSame( 24, $method->invoke( $instance ) );
-	}
-
-	/**
-	 * Create a new order by emulating the checkout process.
-	 */
-	protected function generate_order() {
-		$product = WC_Helper_Product::create_simple_product( true );
-
-		WC()->cart->add_to_cart( $product->get_id(), 1 );
-
-		return WC_Checkout::instance()->create_order( [
-			'billing_email'  => 'test_customer@example.com',
-			'payment_method' => 'dummy_payment_gateway',
-		] );
 	}
 }

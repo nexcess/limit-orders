@@ -9,7 +9,6 @@ namespace Tests;
 
 use Nexcess\LimitOrders\OrderLimiter;
 use Nexcess\LimitOrders\Settings;
-use WP_UnitTestCase as TestCase;
 
 /**
  * @covers Nexcess\LimitOrders\Settings

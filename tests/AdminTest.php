@@ -9,9 +9,6 @@ namespace Tests;
 
 use Nexcess\LimitOrders\Admin;
 use Nexcess\LimitOrders\OrderLimiter;
-use WC_Admin;
-use WC_Settings_General;
-use WP_UnitTestCase as TestCase;
 
 /**
  * @covers Nexcess\LimitOrders\Admin
