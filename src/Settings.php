@@ -36,7 +36,15 @@ class Settings extends WC_Settings_Page {
 	 */
 	public function get_settings() {
 		$placeholders           = (array) $this->limiter->get_placeholders();
+		$update_warning         = '';
 		$available_placeholders = '';
+
+		// Warn users if changes will impact current limits.
+		if ( $this->limiter->has_orders_in_current_interval() ) {
+			$update_warning  = '<div class="notice notice-info"><p>';
+			$update_warning .= __( 'Please be aware that making changes to these settings will recalculate limits for the current interval.', 'limit-orders' );
+			$update_warning .= '</p></div>';
+		}
 
 		// Build a list of available placeholders.
 		if ( ! empty( $placeholders ) ) {
@@ -50,7 +58,7 @@ class Settings extends WC_Settings_Page {
 				'id'   => 'limit-orders-general',
 				'type' => 'title',
 				'name' => _x( 'Order Limiting', 'settings section title', 'limit-orders' ),
-				'desc' => __( 'Automatically turn off new orders once the store\'s limit has been met.', 'limit-orders' ),
+				'desc' => __( 'Automatically turn off new orders once the store\'s limit has been met.', 'limit-orders' ) . $update_warning,
 			],
 			[
 				'id'      => OrderLimiter::OPTION_KEY . '[enabled]',

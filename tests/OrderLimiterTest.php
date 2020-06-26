@@ -8,10 +8,7 @@
 namespace Tests;
 
 use Nexcess\LimitOrders\OrderLimiter;
-use WC_Checkout;
-use WC_Form_Handler;
 use WC_Helper_Product;
-use WP_UnitTestCase as TestCase;
 
 /**
  * @covers Nexcess\LimitOrders\OrderLimiter
@@ -650,6 +647,25 @@ class OrderLimiterTest extends TestCase {
 
 	/**
 	 * @test
+	 */
+	public function has_orders_in_current_interval_should_compare_the_limit_to_remaining_order() {
+		update_option( OrderLimiter::OPTION_KEY, [
+			'enabled' => true,
+			'limit'   => 5,
+		] );
+
+		$limiter = new OrderLimiter();
+		$limiter->init();
+
+		$this->assertFalse( $limiter->has_orders_in_current_interval() );
+
+		$this->generate_order();
+
+		$this->assertTrue( $limiter->has_orders_in_current_interval() );
+	}
+
+	/**
+	 * @test
 	 * @testdox has_reached_limit() should return false if the order count meets the limit
 	 */
 	public function has_reached_limit_should_return_true_if_orders_are_under_the_limit() {
@@ -855,16 +871,61 @@ class OrderLimiterTest extends TestCase {
 
 	/**
 	 * @test
+	 * @ticket https://github.com/nexcess/limit-orders/issues/36
+	 */
+	public function the_limiter_should_be_reset_when_settings_are_changed() {
+		set_transient( OrderLimiter::TRANSIENT_NAME, uniqid() );
+		update_option( OrderLimiter::OPTION_KEY, [
+			'enabled'  => true,
+			'interval' => 'daily',
+			'limit'    => 5,
+		] );
+
+		( new OrderLimiter() )->init();
+
+		update_option( OrderLimiter::OPTION_KEY, [
+			'enabled'  => true,
+			'interval' => 'hourly',
+			'limit'    => 2,
+		] );
+
+		$this->assertFalse( get_transient( OrderLimiter::TRANSIENT_NAME ) );
+	}
+
+	/**
+	 * @test
+	 * @ticket https://github.com/nexcess/limit-orders/issues/36
+	 */
+	public function the_limiter_should_be_not_reset_unless_settings_have_actually_been_updated() {
+		$transient = uniqid();
+
+		set_transient( OrderLimiter::TRANSIENT_NAME, $transient );
+		update_option( OrderLimiter::OPTION_KEY, [
+			'enabled'  => true,
+			'interval' => 'daily',
+			'limit'    => 5,
+		] );
+
+		( new OrderLimiter() )->init();
+
+		update_option( OrderLimiter::OPTION_KEY, get_option( OrderLimiter::OPTION_KEY ) );
+
+		$this->assertSame( $transient, get_transient( OrderLimiter::TRANSIENT_NAME ) );
+	}
+
+	/**
+	 * @test
 	 * @ticket https://github.com/nexcess/limit-orders/pull/13
 	 */
 	public function count_qualifying_orders_should_not_limit_results() {
+		update_option( 'posts_per_page', 2 ); // Lower the default to improve test performance.
 		update_option( OrderLimiter::OPTION_KEY, [
 			'enabled'  => true,
 			'interval' => 'daily',
 			'limit'    => 100,
 		] );
 
-		for ( $i = 0; $i < 24; $i++ ) {
+		for ( $i = 0; $i < 5; $i++ ) {
 			$this->generate_order();
 		}
 
@@ -872,20 +933,6 @@ class OrderLimiterTest extends TestCase {
 		$method   = new \ReflectionMethod( $instance, 'count_qualifying_orders' );
 		$method->setAccessible( true );
 
-		$this->assertSame( 24, $method->invoke( $instance ) );
-	}
-
-	/**
-	 * Create a new order by emulating the checkout process.
-	 */
-	protected function generate_order() {
-		$product = WC_Helper_Product::create_simple_product( true );
-
-		WC()->cart->add_to_cart( $product->get_id(), 1 );
-
-		return WC_Checkout::instance()->create_order( [
-			'billing_email'  => 'test_customer@example.com',
-			'payment_method' => 'dummy_payment_gateway',
-		] );
+		$this->assertSame( 5, $method->invoke( $instance ) );
 	}
 }
