@@ -96,6 +96,11 @@ The plugin includes a few intervals by default:
 
 If your store needs a custom interval, you may add them using filters built into the plugin.
 
+You may also use these gists, which define custom plugins that can be run alongside Limit Orders:
+
+* [Limit Orders for WooCommerce - 15min Intervals](https://gist.github.com/stevegrunwell/ab8a7a2036f993c3c09c6504acda96eb)
+* [Limit Orders for WooCommerce - Never-ending Interval](https://gist.github.com/stevegrunwell/f9cc978cd5c23f744142798b7b772ba6)
+
 #### Example: Reset Limits Annually
 
 Let's say your store can only accept a certain number of orders in a year.
