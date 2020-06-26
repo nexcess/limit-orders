@@ -855,6 +855,50 @@ class OrderLimiterTest extends TestCase {
 
 	/**
 	 * @test
+	 * @ticket https://github.com/nexcess/limit-orders/issues/36
+	 */
+	public function the_limiter_should_be_reset_when_settings_are_changed() {
+		set_transient( OrderLimiter::TRANSIENT_NAME, uniqid() );
+		update_option( OrderLimiter::OPTION_KEY, [
+			'enabled'  => true,
+			'interval' => 'daily',
+			'limit'    => 5,
+		] );
+
+		( new OrderLimiter() )->init();
+
+		update_option( OrderLimiter::OPTION_KEY, [
+			'enabled'  => true,
+			'interval' => 'hourly',
+			'limit'    => 2,
+		] );
+
+		$this->assertFalse( get_transient( OrderLimiter::TRANSIENT_NAME ) );
+	}
+
+	/**
+	 * @test
+	 * @ticket https://github.com/nexcess/limit-orders/issues/36
+	 */
+	public function the_limiter_should_be_not_reset_unless_settings_have_actually_been_updated() {
+		$transient = uniqid();
+
+		set_transient( OrderLimiter::TRANSIENT_NAME, $transient );
+		update_option( OrderLimiter::OPTION_KEY, [
+			'enabled'  => true,
+			'interval' => 'daily',
+			'limit'    => 5,
+		] );
+
+		( new OrderLimiter() )->init();
+
+		update_option( OrderLimiter::OPTION_KEY, get_option( OrderLimiter::OPTION_KEY ) );
+
+		$this->assertSame( $transient, get_transient( OrderLimiter::TRANSIENT_NAME ) );
+	}
+
+	/**
+	 * @test
 	 * @ticket https://github.com/nexcess/limit-orders/pull/13
 	 */
 	public function count_qualifying_orders_should_not_limit_results() {

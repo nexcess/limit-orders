@@ -50,6 +50,7 @@ class OrderLimiter {
 	 */
 	public function init() {
 		add_action( 'woocommerce_new_order', [ $this, 'regenerate_transient' ] );
+		add_action( 'update_option_' . self::OPTION_KEY, [ $this, 'reset_limiter' ], 10, 2 );
 	}
 
 	/**
@@ -347,6 +348,18 @@ class OrderLimiter {
 		set_transient( self::TRANSIENT_NAME, $count, $this->get_seconds_until_next_interval() );
 
 		return $count;
+	}
+
+	/**
+	 * Reset the limiter when its configuration changes.
+	 *
+	 * @param mixed $previous The previous value of the option.
+	 * @param mixed $new      The new option value.
+	 */
+	public function reset_limiter( $previous, $new ) {
+		if ( $previous !== $new ) {
+			delete_transient( self::TRANSIENT_NAME );
+		}
 	}
 
 	/**
