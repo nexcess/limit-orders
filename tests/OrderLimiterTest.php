@@ -9,6 +9,7 @@ namespace Tests;
 
 use Nexcess\LimitOrders\OrderLimiter;
 use WC_Helper_Product;
+use WC_Order;
 
 /**
  * @covers Nexcess\LimitOrders\OrderLimiter
@@ -911,6 +912,50 @@ class OrderLimiterTest extends TestCase {
 		update_option( OrderLimiter::OPTION_KEY, get_option( OrderLimiter::OPTION_KEY ) );
 
 		$this->assertSame( $transient, get_transient( OrderLimiter::TRANSIENT_NAME ) );
+	}
+
+	/**
+	 * @test
+	 */
+	public function count_qualifying_orders_should_focus_only_on_orders() {
+		$this->factory()->post->create();
+		$this->factory()->post->create( [
+			'post_type' => 'page',
+		] );
+		$this->generate_order();
+
+		$instance = new OrderLimiter();
+		$method   = new \ReflectionMethod( $instance, 'count_qualifying_orders' );
+		$method->setAccessible( true );
+
+		$this->assertSame( 1, $method->invoke( $instance ) );
+	}
+
+	/**
+	 * @test
+	 */
+	public function count_qualifying_orders_should_limit_based_on_interval() {
+		update_option( OrderLimiter::OPTION_KEY, [
+			'enabled'  => true,
+			'interval' => 'hourly',
+		] );
+
+		$instance = new OrderLimiter();
+		$this->generate_order();
+		$this->generate_order();
+
+		$previous = new WC_Order( $this->generate_order() );
+		$previous->set_date_created(
+			$instance->get_interval_start()
+				->sub( new \DateInterval( 'PT1M' ) ) // 1min before the current interval began.
+				->format( 'u' )
+		);
+		$previous->save();
+
+		$method = new \ReflectionMethod( $instance, 'count_qualifying_orders' );
+		$method->setAccessible( true );
+
+		$this->assertSame( 2, $method->invoke( $instance ) );
 	}
 
 	/**
