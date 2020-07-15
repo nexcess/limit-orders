@@ -158,6 +158,21 @@ class OrderLimiter {
 	public function get_remaining_orders() {
 		$limit = $this->get_limit();
 
+		/**
+		 * Filter the number of orders remaining for the current interval.
+		 *
+		 * @param bool         $preempt Whether or not the default logic should be preempted.
+		 *                              Returning anything besides FALSE will be treated as the
+		 *                              number of remaining orders that can be accepted.
+		 * @param OrderLimiter $limiter The current OrderLimiter object.
+		 */
+		$remaining = apply_filters( 'limit_orders_pre_get_remaining_orders', false, $this );
+
+		// Return early if a non-false value was returned from the filter.
+		if ( false !== $remaining ) {
+			return (int) $remaining;
+		}
+
 		// If there are no limits set, return -1.
 		if ( ! $this->is_enabled() || -1 === $limit ) {
 			return -1;
@@ -384,6 +399,19 @@ class OrderLimiter {
 	 * @return int The number of orders that have taken place within the defined interval.
 	 */
 	protected function count_qualifying_orders() {
+		/**
+		 * Replace the logic used to count qualified orders.
+		 *
+		 * @param bool $preempt         Whether the counting logic should be preempted. Returning
+		 *                              anything but FALSE will bypass the default logic.
+		 * @param OrderLimiter $limiter The current OrderLimiter instance.
+		 */
+		$count = apply_filters( 'limit_orders_pre_count_qualifying_orders', false, $this );
+
+		if ( false !== $count ) {
+			return (int) $count;
+		}
+
 		$orders = wc_get_orders( [
 			'type'         => wc_get_order_types( 'order-count' ),
 			'date_created' => '>=' . $this->get_interval_start()->getTimestamp(),
