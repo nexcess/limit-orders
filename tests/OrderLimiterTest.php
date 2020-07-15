@@ -851,6 +851,17 @@ class OrderLimiterTest extends TestCase {
 	/**
 	 * @test
 	 */
+	public function reset_should_delete_the_transient_cache() {
+		set_transient( OrderLimiter::TRANSIENT_NAME, 5 );
+
+		( new OrderLimiter() )->reset();
+
+		$this->assertFalse( get_transient( OrderLimiter::TRANSIENT_NAME ) );
+	}
+
+	/**
+	 * @test
+	 */
 	public function the_transient_should_be_updated_each_time_an_order_is_placed() {
 		update_option( OrderLimiter::OPTION_KEY, [
 			'enabled'  => true,

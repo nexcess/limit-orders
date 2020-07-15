@@ -31,6 +31,8 @@ Configuration for Limit Orders for WooCommerce is available through WooCommerce 
 
 For example, if you're using an hourly interval and switch it to daily, the plugin will re-calculate whether or not to disable ordering based on the number of orders received since the start of the current day (midnight, by default).
 
+If you need to clear the cached order count, you may do so via WooCommerce &rsaquo; Status &rsaquo; Tools &rsaquo; Reset Order Limiting within WP Admin.
+
 ### General settings
 
 These settings determine how and when order limiting should take effect.
