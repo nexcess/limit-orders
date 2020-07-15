@@ -136,7 +136,7 @@ class Admin {
 	 * Delete the order limiter transient.
 	 */
 	public function reset_limiter() {
-		$this->limiter->reset_limiter( 1, 2 );
+		$this->limiter->reset();
 	}
 
 	/**
