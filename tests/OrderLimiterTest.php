@@ -975,4 +975,50 @@ class OrderLimiterTest extends TestCase {
 
 		$this->assertSame( 5, $method->invoke( $instance ) );
 	}
+
+	/**
+	 * @test
+	 * @testdox count_qualifying_orders() should be filterable
+	 */
+	public function count_qualifying_orders_should_be_filterable() {
+		$instance = new OrderLimiter();
+		$called   = false;
+		$method   = new \ReflectionMethod( $instance, 'count_qualifying_orders' );
+		$method->setAccessible( true );
+
+		update_option( OrderLimiter::OPTION_KEY, [
+			'enabled' => true,
+			'limit'   => 1,
+		] );
+
+		add_filter( 'limit_orders_pre_count_qualifying_orders', function ( $preempt, $limiter ) use ( $instance, &$called ) {
+			$this->assertFalse( $preempt );
+			$this->assertSame( $instance, $limiter );
+			$called = true;
+
+			return 5;
+		}, 10, 2 );
+
+		$this->assertSame( 5, $method->invoke( $instance ) );
+		$this->assertTrue( $called );
+	}
+
+	/**
+	 * @test
+	 * @testdox Return values from the limit_orders_pre_count_qualifying_orders filter should be cast as integers
+	 */
+	public function return_values_from_pre_count_qualifying_orders_should_be_cast_as_int() {
+		$instance = new OrderLimiter();
+		$method   = new \ReflectionMethod( $instance, 'count_qualifying_orders' );
+		$method->setAccessible( true );
+
+		update_option( OrderLimiter::OPTION_KEY, [
+			'enabled' => true,
+			'limit'   => 1,
+		] );
+
+		add_filter( 'limit_orders_pre_count_qualifying_orders', '__return_true' );
+
+		$this->assertSame( 1, $method->invoke( $instance ) );
+	}
 }

@@ -392,6 +392,19 @@ class OrderLimiter {
 	 * @return int The number of orders that have taken place within the defined interval.
 	 */
 	protected function count_qualifying_orders() {
+		/**
+		 * Replace the logic used to count qualified orders.
+		 *
+		 * @param bool $preempt         Whether the counting logic should be preempted. Returning
+		 *                              anything but FALSE will bypass the default logic.
+		 * @param OrderLimiter $limiter The current OrderLimiter instance.
+		 */
+		$count = apply_filters( 'limit_orders_pre_count_qualifying_orders', false, $this );
+
+		if ( false !== $count ) {
+			return (int) $count;
+		}
+
 		$orders = wc_get_orders( [
 			'type'         => wc_get_order_types( 'order-count' ),
 			'date_created' => '>=' . $this->get_interval_start()->getTimestamp(),
