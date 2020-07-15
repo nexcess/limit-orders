@@ -32,6 +32,8 @@ class Admin {
 		add_filter( 'woocommerce_get_settings_pages', [ $this, 'register_settings_page' ] );
 		add_filter( 'admin_notices', [ $this, 'admin_notice' ] );
 		add_filter( 'plugin_action_links_' . $basename, [ $this, 'action_links' ] );
+		add_filter( 'woocommerce_debug_tools', [ $this, 'debug_tools' ] );
+		add_action( 'woocommerce_delete_shop_order_transients', [ $this, 'reset_limiter' ] );
 		add_action( 'woocommerce_system_status_report', [ $this, 'system_status_report' ] );
 	}
 
@@ -110,6 +112,31 @@ class Admin {
 		$this->render_view( 'SystemStatusReport', [
 			'limiter' => $this->limiter,
 		] );
+	}
+
+	/**
+	 * Add additional debugging tools.
+	 *
+	 * @param array $tools Currently-registered tools.
+	 *
+	 * @return array The $tools array with our button included.
+	 */
+	public function debug_tools( $tools ) {
+		$tools['limit_orders'] = [
+			'name'     => __( 'Reset order limiting', 'limit-orders' ),
+			'button'   => __( 'Reset limiter', 'limit-orders' ),
+			'desc'     => __( 'Clear the cached order count. This may be needed if you\'ve changed your order limiting settings.', 'limit-orders' ),
+			'callback' => [ $this, 'reset_limiter' ],
+		];
+
+		return $tools;
+	}
+
+	/**
+	 * Delete the order limiter transient.
+	 */
+	public function reset_limiter() {
+		$this->limiter->reset_limiter( 1, 2 );
 	}
 
 	/**
