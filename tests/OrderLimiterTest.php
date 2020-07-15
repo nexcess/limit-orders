@@ -325,6 +325,46 @@ class OrderLimiterTest extends TestCase {
 
 	/**
 	 * @test
+	 * @testdox get_remaining_orders() should be filterable
+	 */
+	public function get_remaining_orders_should_be_filterable() {
+		$instance = new OrderLimiter();
+		$called   = false;
+
+		update_option( OrderLimiter::OPTION_KEY, [
+			'enabled' => true,
+			'limit'   => 5,
+		] );
+
+		add_filter( 'limit_orders_pre_get_remaining_orders', function ( $preempt, $limiter ) use ( $instance, &$called ) {
+			$this->assertFalse( $preempt, 'The $preempt argument should start as false.' );
+			$this->assertSame( $instance, $limiter );
+			$called = true;
+
+			return -1;
+		}, 10, 2 );
+
+		$this->assertSame( -1, $instance->get_remaining_orders() );
+		$this->assertTrue( $called );
+	}
+
+	/**
+	 * @test
+	 * @testdox get_remaining_orders() should be filterable
+	 */
+	public function get_remaining_orders_should_cast_the_return_values_as_integers() {
+		update_option( OrderLimiter::OPTION_KEY, [
+			'enabled' => true,
+			'limit'   => 5,
+		] );
+
+		add_filter( 'limit_orders_pre_get_remaining_orders', '__return_true' );
+
+		$this->assertSame( 1, ( new OrderLimiter() )->get_remaining_orders(), 'TRUE should be cast as 1.' );
+	}
+
+	/**
+	 * @test
 	 * @group Intervals
 	 * @ticket https://github.com/nexcess/limit-orders/issues/18
 	 */
