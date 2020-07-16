@@ -91,7 +91,7 @@ class SettingsTest extends TestCase {
 		$limiter = new OrderLimiter();
 		$limiter->init();
 
-		$this->assertStringContainsString(
+		$this->assertContains(
 			'<div class="notice notice-info">',
 			$this->get_setting_by_id( 'limit-orders-general', new Settings( $limiter ) )['desc'],
 			'Expected to see a notice about limits being recalculated.'
@@ -111,7 +111,7 @@ class SettingsTest extends TestCase {
 		$limiter = new OrderLimiter();
 		$limiter->init();
 
-		$this->assertStringNotContainsString(
+		$this->assertNotContains(
 			'<div class="notice notice-info">',
 			$this->get_setting_by_id( 'limit-orders-general', new Settings( $limiter ) )['desc'],
 			'Did not expect to see a notice about limits being recalculated.'
