@@ -36,6 +36,18 @@ Meanwhile, a fully-customizable message will be displayed on all WooCommerce sho
 
 Yes, the order creation process through WP Admin is unaffected.
 
+= Can the plugin limit orders based on some custom time interval? =
+
+The base plugin defines several common intervals: hourly, daily, weekly, and monthly.
+
+In the event that you require a custom interval, they may be registered with a few filters. [Several examples are available in the plugin's GitHub repository](https://github.com/nexcess/limit-orders#adding-custom-intervals).
+
+= Can the plugin limit orders based on category/amount/items/etc.? =
+
+The plugin is designed to work based on the total number of orders, but as of version 1.3.0 filters have been introduced that enable developers to specify which orders should be counted against the limit.
+
+[Documentation for these filters is available in the plugin's GitHub repository](https://github.com/nexcess/limit-orders#customizing-plugin-behavior).
+
 == Screenshots ==
 
 1. The settings screen for Limit Orders for WooCommerce
