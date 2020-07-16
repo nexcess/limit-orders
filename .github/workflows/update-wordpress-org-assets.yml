@@ -1,0 +1,18 @@
+name: Update assets on WordPress.org
+
+on:
+  push:
+    branches:
+    - master
+
+jobs:
+  master:
+    name: Send to WordPress.org
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Push readme.txt and/or asset changes
+      uses: 10up/action-wordpress-plugin-asset-update@master
+      env:
+        SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+        SVN_USERNAME: ${{ secrets.SVN_USERNAME }}

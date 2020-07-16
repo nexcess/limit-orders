@@ -4,7 +4,7 @@ Tags: WooCommerce, ordering, limits, throttle
 Requires at least: 5.3
 Tested up to: 5.4
 Requires PHP: 7.0
-Stable tag: 1.2.1
+Stable tag: 1.3.0
 License: MIT
 License URI: https://github.com/nexcess/limit-orders/blob/master/LICENSE.txt
 
@@ -36,6 +36,18 @@ Meanwhile, a fully-customizable message will be displayed on all WooCommerce sho
 
 Yes, the order creation process through WP Admin is unaffected.
 
+= Can the plugin limit orders based on some custom time interval? =
+
+The base plugin defines several common intervals: hourly, daily, weekly, and monthly.
+
+In the event that you require a custom interval, they may be registered with a few filters. [Several examples are available in the plugin's GitHub repository](https://github.com/nexcess/limit-orders#adding-custom-intervals).
+
+= Can the plugin limit orders based on category/amount/items/etc.? =
+
+The plugin is designed to work based on the total number of orders, but as of version 1.3.0 filters have been introduced that enable developers to specify which orders should be counted against the limit.
+
+[Documentation for these filters is available in the plugin's GitHub repository](https://github.com/nexcess/limit-orders#customizing-plugin-behavior).
+
 == Screenshots ==
 
 1. The settings screen for Limit Orders for WooCommerce
@@ -44,6 +56,12 @@ Yes, the order creation process through WP Admin is unaffected.
 == Changelog ==
 
 For a complete list of changes, please [see the plugin's changelog on GitHub](https://github.com/nexcess/limit-orders/blob/master/CHANGELOG.md).
+
+= 1.3.0 (2020-07-16) =
+* Added new "Reset order limiting" WooCommerce tool.
+* Introduce new filters for customizing order counting logic.
+* Automatically clear the cached order count when settings are updated or WooCommerce order transients are cleared.
+* Verify compatibility with WooCommerce 4.3.
 
 = 1.2.1 (2020-05-08) =
 * Verify compatibility with WooCommerce 4.1.

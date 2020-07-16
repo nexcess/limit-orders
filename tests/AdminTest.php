@@ -9,9 +9,8 @@ namespace Tests;
 
 use Nexcess\LimitOrders\Admin;
 use Nexcess\LimitOrders\OrderLimiter;
-use WC_Admin;
-use WC_Settings_General;
-use WP_UnitTestCase as TestCase;
+use WC_Admin_Status;
+use WC_REST_System_Status_Tools_V2_Controller;
 
 /**
  * @covers Nexcess\LimitOrders\Admin
@@ -128,5 +127,41 @@ class AdminTest extends TestCase {
 		$output = ob_get_clean();
 
 		$this->assertContains( __( 'midnight' ), $output );
+	}
+
+	/**
+	 * @test
+	 */
+	public function the_plugin_should_register_a_debug_tool() {
+		( new Admin( new OrderLimiter() ) )->init();
+
+		$this->assertArrayHasKey( 'limit_orders', WC_Admin_Status::get_tools() );
+	}
+
+	/**
+	 * @test
+	 */
+	public function the_debug_tool_should_clear_the_order_count_transient() {
+		set_transient( OrderLimiter::TRANSIENT_NAME, 5 );
+
+		( new Admin( new OrderLimiter() ) )->init();
+
+		$controller = new WC_REST_System_Status_Tools_V2_Controller();
+		$controller->execute_tool( 'limit_orders' );
+
+		$this->assertFalse( get_transient( OrderLimiter::TRANSIENT_NAME ) );
+	}
+
+	/**
+	 * @test
+	 */
+	public function clearing_order_transients_should_remove_the_order_count() {
+		set_transient( OrderLimiter::TRANSIENT_NAME, 5 );
+
+		( new Admin( new OrderLimiter() ) )->init();
+
+		wc_delete_shop_order_transients();
+
+		$this->assertFalse( get_transient( OrderLimiter::TRANSIENT_NAME ) );
 	}
 }

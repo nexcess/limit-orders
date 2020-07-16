@@ -11,7 +11,7 @@ Limit Orders for WooCommerce lets you limit the number of orders your store will
 
 ## Requirements
 
-* WordPress 5.2 or newer
+* WordPress 5.3 or newer
 * WooCommerce 3.9 or newer
 * PHP 7.0 or newer
 
@@ -26,6 +26,16 @@ Limit Orders for WooCommerce lets you limit the number of orders your store will
 Configuration for Limit Orders for WooCommerce is available through WooCommerce &rsaquo; Settings &rsaquo; Order Limiting:
 
 ![The settings screen for Limit Orders for WooCommerce](.wordpress-org/screenshot-1.png)
+
+⚠️ **Please be aware** that any changes made to the settings will take effect immediately.
+
+For example, if you're using an hourly interval and switch it to daily, the plugin will re-calculate whether or not to disable ordering based on the number of orders received since the start of the current day (midnight, by default).
+
+If you need to clear the cached order count, you may do so via WooCommerce &rsaquo; Status &rsaquo; Tools &rsaquo; Reset Order Limiting within WP Admin.
+
+### General settings
+
+These settings determine how and when order limiting should take effect.
 
 <dl>
 	<dt>Enable Order Limiting</dt>
@@ -96,6 +106,11 @@ The plugin includes a few intervals by default:
 
 If your store needs a custom interval, you may add them using filters built into the plugin.
 
+You may also use these gists, which define custom plugins that can be run alongside Limit Orders:
+
+* [Limit Orders for WooCommerce - 15min Intervals](https://gist.github.com/stevegrunwell/ab8a7a2036f993c3c09c6504acda96eb)
+* [Limit Orders for WooCommerce - Never-ending Interval](https://gist.github.com/stevegrunwell/f9cc978cd5c23f744142798b7b772ba6)
+
 #### Example: Reset Limits Annually
 
 Let's say your store can only accept a certain number of orders in a year.
@@ -112,7 +127,7 @@ You may accomplish this by adding the following code into your theme's `function
  */
 
 /**
- * Add "fortnightly" to the list of intervals.
+ * Add "Annually" to the list of intervals.
  *
  * @param array $intervals Available time intervals.
  *
@@ -160,7 +175,7 @@ add_filter( 'limit_orders_interval_start', function ( $start, $interval ) {
  *                   current $interval is not "annually".
  */
 add_filter( 'limit_orders_next_interval', function ( $start, $current, $interval ) {
-	if ( 'annually' !== 'interval' ) {
+	if ( 'annually' !== $interval ) {
 		return $start;
 	}
 
@@ -192,3 +207,73 @@ add_filter( 'limit_orders_message_placeholders', function ( $placeholders ) {
 Now, we can create customer-facing notices like:
 
 > {store_name} is a little overwhelmed right now, but we'll be able to take more orders on {next_interval:date}. Please check back then!
+
+### Dynamically changing limiter behavior
+
+In certain cases, you may want to further customize the logic around _which_ orders count toward the limit or, for example, change the behavior based on time of day. Limit Orders for WooCommerce has you covered:
+
+#### Customize the counting of qualified orders
+
+Sometimes, you only want to limit certain types of orders. Maybe some orders are fulfilled via third parties (e.g. [dropshipping](https://www.liquidweb.com/woocommerce-resource/dropshipping-glossary/)), or perhaps you're willing to bend the limits a bit for orders that contain certain products.
+
+You can customize the logic used to calculate the count via the `limit_orders_pre_count_qualifying_orders` filter:
+
+```php
+/**
+ * Determine how many orders to count against the current interval.
+ *
+ * @param bool $preempt         Whether the counting logic should be preempted. Returning
+ *                              anything but FALSE will bypass the default logic.
+ * @param OrderLimiter $limiter The current OrderLimiter instance.
+ *
+ * @return int The number of orders that should be counted against the limit.
+ */
+add_filter( 'limit_orders_pre_count_qualifying_orders', function ( $preempt, $limiter ) {
+	/*
+	 * Do whatever you need to do here to count how many orders count.
+	 *
+	 * Pay close attention to date ranges here, and check out the public methods
+	 * on the Nexcess\LimitOrders\OrderLimiter class.
+	 */
+}, 10, 2 );
+```
+
+Please note that the `LimitOrders::count_qualifying_orders()` method (where this filter is defined) is only called in two situations:
+
+1. When a new order is created.
+2. If the `limit_orders_order_count` transient disappears.
+
+#### Dynamically change the order limit
+
+If, for example, you want to automatically turn off the store overnight, you might do so by setting the limit to `0` only during certain hours.
+
+You can accomplish this using the `limit_orders_pre_get_remaining_orders` filter:
+
+```php
+/**
+ * Disable the store between 10pm and 8am.
+ *
+ * This works by setting the limit on Limit Orders for WooCommerce to zero if
+ * the current time is between those hours.
+ *
+ * @param bool $preempt Whether or not the default logic should be preempted.
+ *                      Returning anything besides FALSE will be treated as the
+ *                      number of remaining orders that can be accepted.
+ *
+ * @return int|bool Either 0 if the store is closed (meaning zero orders remaining)
+ *                  or the value of $preempt if Limit Orders should proceed normally.
+ */
+add_filter( 'limit_orders_pre_get_remaining_orders', function ( $preempt ) {
+	$open  = new \DateTime('08:00', wp_timezone());
+	$close = new \DateTime('22:00', wp_timezone());
+	$now   = current_datetime();
+
+	// We're currently inside normal business hours.
+	if ( $now >= $open && $now < $close ) {
+		return $preempt;
+	}
+
+	// If we've gotten this far, turn off ordering.
+	return 0;
+} );
+```
