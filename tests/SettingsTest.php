@@ -86,10 +86,10 @@ class SettingsTest extends TestCase {
 			'limit'   => 10,
 		] );
 
-		$this->generate_order();
-
 		$limiter = new OrderLimiter();
 		$limiter->init();
+
+		$this->generate_order();
 
 		$this->assertContains(
 			'<div class="notice notice-info">',
