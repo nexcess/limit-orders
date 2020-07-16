@@ -3,6 +3,23 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Version 1.3.0] — 2020-07-16
+
+### Added
+
+* Add a new "Reset order limiting" tool to WooCommerce &rsaquo; Status &rsaquo; Tools ([#42])
+* Introduce new filters — `limit_orders_pre_count_qualifying_orders` and `limit_orders_pre_get_remaining_orders` — for customizing the logic around counting qualifying and remaining orders, respectively ([#41])
+* Automatically clear the cached order count when settings are changed or when WooCommerce order transients are cleared ([#37], [#42])
+
+### Updated
+
+* Bump "WC tested up to" to 4.3 ([#43]).
+
+### Fixed
+
+* Added missing plugin headers ([#32])
+
+
 ## [Version 1.2.1] — 2020-05-08
 
 ### Updated
@@ -67,6 +84,7 @@ Initial plugin release.
 [Version 1.1.2]: https://github.com/nexcess/limit-orders/releases/tag/v1.1.2
 [Version 1.2.0]: https://github.com/nexcess/limit-orders/releases/tag/v1.2.0
 [Version 1.2.1]: https://github.com/nexcess/limit-orders/releases/tag/v1.2.1
+[Version 1.3.0]: https://github.com/nexcess/limit-orders/releases/tag/v1.3.0
 [#5]: https://github.com/nexcess/limit-orders/pull/5
 [#6]: https://github.com/nexcess/limit-orders/pull/6
 [#8]: https://github.com/nexcess/limit-orders/pull/8
@@ -77,3 +95,8 @@ Initial plugin release.
 [#23]: https://github.com/nexcess/limit-orders/pull/23
 [#26]: https://github.com/nexcess/limit-orders/pull/26
 [#28]: https://github.com/nexcess/limit-orders/issues/28
+[#32]: https://github.com/nexcess/limit-orders/pull/32
+[#37]: https://github.com/nexcess/limit-orders/pull/37
+[#41]: https://github.com/nexcess/limit-orders/pull/41
+[#42]: https://github.com/nexcess/limit-orders/pull/42
+[#43]: https://github.com/nexcess/limit-orders/pull/43

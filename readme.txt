@@ -57,6 +57,12 @@ The plugin is designed to work based on the total number of orders, but as of ve
 
 For a complete list of changes, please [see the plugin's changelog on GitHub](https://github.com/nexcess/limit-orders/blob/master/CHANGELOG.md).
 
+= 1.3.0 (2020-07-16) =
+* Added new "Reset order limiting" WooCommerce tool.
+* Introduce new filters for customizing order counting logic.
+* Automatically clear the cached order count when settings are updated or WooCommerce order transients are cleared.
+* Verify compatibility with WooCommerce 4.3.
+
 = 1.2.1 (2020-05-08) =
 * Verify compatibility with WooCommerce 4.1.
 
