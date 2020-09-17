@@ -57,6 +57,10 @@ The plugin is designed to work based on the total number of orders, but as of ve
 
 For a complete list of changes, please [see the plugin's changelog on GitHub](https://github.com/nexcess/limit-orders/blob/master/CHANGELOG.md).
 
+= 1.3.1 (2020-09-17) =
+* Fixed issue where clearing transients would prevent the order limiting from working.
+* Clarify the behavior of the {current_interval} and {next_interval} placeholders.
+
 = 1.3.0 (2020-07-16) =
 * Added new "Reset order limiting" WooCommerce tool.
 * Introduce new filters for customizing order counting logic.
@@ -83,6 +87,9 @@ For a complete list of changes, please [see the plugin's changelog on GitHub](ht
 Initial release of the plugin.
 
 == Upgrade Notice ==
+
+= 1.3.1 =
+Fixes issue where limiting would periodically stop working
 
 = 1.2.0 =
 Added the ability to limit the number of orders per hour a store can receive.
