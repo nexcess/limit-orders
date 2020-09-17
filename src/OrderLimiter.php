@@ -7,6 +7,7 @@
 
 namespace Nexcess\LimitOrders;
 
+use Nexcess\LimitOrders\Exceptions\EmptyOrderTypesException;
 use Nexcess\LimitOrders\Exceptions\OrdersNotAcceptedException;
 
 class OrderLimiter {
@@ -129,12 +130,13 @@ class OrderLimiter {
 		$time_format  = get_option( 'time_format' );
 		$current      = $this->get_interval_start();
 		$next         = $this->get_next_interval_start();
+		$within24hr   = $next->getTimestamp() - $current->getTimestamp() < DAY_IN_SECONDS;
 		$placeholders = [
-			'{current_interval}'      => $current->format( $date_format ),
+			'{current_interval}'      => $current->format( $within24hr ? $time_format : $date_format ),
 			'{current_interval:date}' => $current->format( $date_format ),
 			'{current_interval:time}' => $current->format( $time_format ),
 			'{limit}'                 => $this->get_limit(),
-			'{next_interval}'         => $next->format( $date_format ),
+			'{next_interval}'         => $next->format( $within24hr ? $time_format : $date_format ),
 			'{next_interval:date}'    => $next->format( $date_format ),
 			'{next_interval:time}'    => $next->format( $time_format ),
 			'{timezone}'              => $next->format( 'T' ),
@@ -367,7 +369,13 @@ class OrderLimiter {
 	 * @return int The number of qualifying orders.
 	 */
 	public function regenerate_transient() {
-		$count = $this->count_qualifying_orders();
+		try {
+			$count = $this->count_qualifying_orders();
+		} catch ( EmptyOrderTypesException $e ) {
+			// Return 0 for now but try to populate this transient later, after $wc_order_types has been populated.
+			add_action( 'init', [ $this, 'regenerate_transient' ] );
+			return 0;
+		}
 
 		set_transient( self::TRANSIENT_NAME, $count, $this->get_seconds_until_next_interval() );
 
@@ -402,7 +410,7 @@ class OrderLimiter {
 		/**
 		 * Replace the logic used to count qualified orders.
 		 *
-		 * @param bool $preempt         Whether the counting logic should be preempted. Returning
+		 * @param bool         $preempt Whether the counting logic should be preempted. Returning
 		 *                              anything but FALSE will bypass the default logic.
 		 * @param OrderLimiter $limiter The current OrderLimiter instance.
 		 */
@@ -412,8 +420,14 @@ class OrderLimiter {
 			return (int) $count;
 		}
 
+		$order_types = wc_get_order_types( 'order-count' );
+
+		if ( empty( $order_types ) ) {
+			throw new EmptyOrderTypesException( 'No order types were found.' );
+		}
+
 		$orders = wc_get_orders( [
-			'type'         => wc_get_order_types( 'order-count' ),
+			'type'         => $order_types,
 			'date_created' => '>=' . $this->get_interval_start()->getTimestamp(),
 			'return'       => 'ids',
 			'limit'        => max( $this->get_limit(), 1000 ),

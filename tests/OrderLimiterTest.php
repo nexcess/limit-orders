@@ -7,8 +7,10 @@
 
 namespace Tests;
 
+use Nexcess\LimitOrders\Exceptions\EmptyOrderTypesException;
 use Nexcess\LimitOrders\OrderLimiter;
 use WC_Helper_Product;
+use WC_Order;
 
 /**
  * @covers Nexcess\LimitOrders\OrderLimiter
@@ -122,11 +124,11 @@ class OrderLimiterTest extends TestCase {
 	public function get_message_should_replace_current_interval_placeholder( $placeholder ) {
 		update_option( 'date_format', 'F j, Y' );
 		update_option( OrderLimiter::OPTION_KEY, [
-			'interval'        => 'weekly',
+			'interval'        => 'monthly',
 			'customer_notice' => "This started on {$placeholder}",
 		] );
 
-		$now     = new \DateTimeImmutable( 'now', wp_timezone() );
+		$now     = new \DateTimeImmutable( '2020-04-28 00:00:00', wp_timezone() );
 		$limiter = new OrderLimiter( $now );
 
 		$this->assertSame(
@@ -143,11 +145,11 @@ class OrderLimiterTest extends TestCase {
 	public function get_message_should_replace_current_interval_time_placeholder() {
 		update_option( 'time_format', 'g:ia' );
 		update_option( OrderLimiter::OPTION_KEY, [
-			'interval'        => 'hourly',
+			'interval'        => 'monthly',
 			'customer_notice' => "This started at {current_interval:time}",
 		] );
 
-		$now     = new \DateTimeImmutable( 'now', wp_timezone() );
+		$now     = new \DateTimeImmutable( '2020-04-28 00:00:00', wp_timezone() );
 		$limiter = new OrderLimiter( $now );
 
 		$this->assertSame(
@@ -184,11 +186,11 @@ class OrderLimiterTest extends TestCase {
 	public function get_message_should_replace_next_interval_placeholder( $placeholder ) {
 		update_option( 'date_format', 'F j, Y' );
 		update_option( OrderLimiter::OPTION_KEY, [
-			'interval'        => 'weekly',
+			'interval'        => 'monthly',
 			'customer_notice' => "Check back on {$placeholder}",
 		] );
 
-		$now     = new \DateTimeImmutable( 'now', wp_timezone() );
+		$now     = new \DateTimeImmutable( '2020-04-28 00:00:00', wp_timezone() );
 		$limiter = new OrderLimiter( $now );
 
 		$this->assertSame(
@@ -205,11 +207,11 @@ class OrderLimiterTest extends TestCase {
 	public function get_message_should_replace_next_interval_time_placeholder() {
 		update_option( 'time_format', 'g:ia' );
 		update_option( OrderLimiter::OPTION_KEY, [
-			'interval'        => 'hourly',
+			'interval'        => 'monthly',
 			'customer_notice' => "Check back at {next_interval:time}",
 		] );
 
-		$now     = new \DateTimeImmutable( 'now', wp_timezone() );
+		$now     = new \DateTimeImmutable( '2020-04-27 00:00:00', wp_timezone() );
 		$limiter = new OrderLimiter( $now );
 
 		$this->assertSame(
@@ -228,12 +230,12 @@ class OrderLimiterTest extends TestCase {
 		update_option( 'date_format', 'F j, Y' );
 		update_option( 'time_format', 'g:ia' );
 		update_option( OrderLimiter::OPTION_KEY, [
-			'interval' => 'hourly',
+			'interval' => 'daily',
 		] );
 
-		$now          = new \DateTimeImmutable( '2020-04-27 12:15:00', wp_timezone() );
-		$current      = new \DateTimeImmutable( '2020-04-27 12:00:00', wp_timezone() );
-		$next         = new \DateTimeImmutable( '2020-04-27 13:00:00', wp_timezone() );
+		$now          = new \DateTimeImmutable( '2020-04-27 00:00:00', wp_timezone() );
+		$current      = new \DateTimeImmutable( '2020-04-27 00:00:00', wp_timezone() );
+		$next         = new \DateTimeImmutable( '2020-04-28 00:00:00', wp_timezone() );
 		$placeholders = ( new OrderLimiter( $now ) )->get_placeholders();
 
 		$this->assertSame( $current->format( 'F j, Y' ), $placeholders['{current_interval}'] );
@@ -263,6 +265,26 @@ class OrderLimiterTest extends TestCase {
 
 		$this->assertSame( __( 'midnight', 'limit-orders' ), $placeholders['{current_interval:time}'] );
 		$this->assertSame( __( 'midnight', 'limit-orders' ), $placeholders['{next_interval:time}'] );
+	}
+
+	/**
+	 * @test
+	 * @group Placeholders
+	 * @ticket https://github.com/nexcess/limit-orders/issues/51
+	 */
+	public function placeholders_should_switch_between_date_and_time_based_on_interval_length() {
+		update_option( 'time_format', 'g:ia' );
+		update_option( OrderLimiter::OPTION_KEY, [
+			'interval' => 'hourly',
+		] );
+
+		$now          = new \DateTimeImmutable( '2020-09-17 12:15:00', wp_timezone() );
+		$current      = new \DateTimeImmutable( '2020-09-17 12:00:00', wp_timezone() );
+		$next         = new \DateTimeImmutable( '2020-09-17 13:00:00', wp_timezone() );
+		$placeholders = ( new OrderLimiter( $now ) )->get_placeholders();
+
+		$this->assertSame( $current->format( 'g:ia' ), $placeholders['{current_interval}'] );
+		$this->assertSame( $next->format( 'g:ia' ), $placeholders['{next_interval}'] );
 	}
 
 	/**
@@ -698,9 +720,7 @@ class OrderLimiterTest extends TestCase {
 		$limiter->init();
 
 		$this->assertFalse( $limiter->has_orders_in_current_interval() );
-
-		$this->generate_order();
-
+		$this->set_current_order_count( 1 );
 		$this->assertTrue( $limiter->has_orders_in_current_interval() );
 	}
 
@@ -890,6 +910,35 @@ class OrderLimiterTest extends TestCase {
 
 	/**
 	 * @test
+	 * @ticket https://github.com/nexcess/limit-orders/issues/48
+	 */
+	public function regenerate_transient_should_return_zero_if_no_count_is_available() {
+		update_option( OrderLimiter::OPTION_KEY, [
+			'enabled'  => true,
+			'interval' => 'daily',
+			'limit'    => 5,
+		] );
+
+		$this->assertFalse( get_transient( OrderLimiter::TRANSIENT_NAME ) );
+
+		$limiter = $this->getMockBuilder( OrderLimiter::class )
+			->setMethods( [ 'count_qualifying_orders' ] )
+			->getMock();
+		$limiter->expects( $this->once() )
+			->method( 'count_qualifying_orders' )
+			->will( $this->throwException( new EmptyOrderTypesException( 'No order types were found.' ) ) );
+
+		$this->assertSame( 0, $limiter->regenerate_transient() );
+		$this->assertFalse( get_transient( OrderLimiter::TRANSIENT_NAME ) );
+		$this->assertGreaterThan(
+			5,
+			has_action( 'init', [ $limiter, 'regenerate_transient' ] ),
+			'The function should attempt to save itself by hooking in after $wc_order_types is populated (init:5).'
+		);
+	}
+
+	/**
+	 * @test
 	 */
 	public function reset_should_delete_the_transient_cache() {
 		set_transient( OrderLimiter::TRANSIENT_NAME, 5 );
@@ -966,6 +1015,51 @@ class OrderLimiterTest extends TestCase {
 
 	/**
 	 * @test
+	 */
+	public function count_qualifying_orders_should_focus_only_on_orders() {
+		$this->factory()->post->create();
+		$this->factory()->post->create( [
+			'post_type' => 'page',
+		] );
+		$this->generate_order();
+
+		// To avoid race conditions, start the current interval 30s ago.
+		$instance = new OrderLimiter( new \DateTimeImmutable( '30 seconds ago' ) );
+		$method   = new \ReflectionMethod( $instance, 'count_qualifying_orders' );
+		$method->setAccessible( true );
+
+		$this->assertSame( 1, $method->invoke( $instance ) );
+	}
+
+	/**
+	 * @test
+	 */
+	public function count_qualifying_orders_should_limit_based_on_interval() {
+		update_option( OrderLimiter::OPTION_KEY, [
+			'enabled'  => true,
+			'interval' => 'hourly',
+		] );
+
+		$instance = new OrderLimiter();
+		$this->generate_order();
+		$this->generate_order();
+
+		$previous = new WC_Order( $this->generate_order() );
+		$previous->set_date_created(
+			$instance->get_interval_start()
+				->sub( new \DateInterval( 'PT1M' ) ) // 1min before the current interval began.
+				->format( 'u' )
+		);
+		$previous->save();
+
+		$method = new \ReflectionMethod( $instance, 'count_qualifying_orders' );
+		$method->setAccessible( true );
+
+		$this->assertSame( 2, $method->invoke( $instance ) );
+	}
+
+	/**
+	 * @test
 	 * @ticket https://github.com/nexcess/limit-orders/pull/13
 	 */
 	public function count_qualifying_orders_should_not_limit_results() {
@@ -1012,6 +1106,27 @@ class OrderLimiterTest extends TestCase {
 
 		$this->assertSame( 5, $method->invoke( $instance ) );
 		$this->assertTrue( $called );
+	}
+
+	/**
+	 * @test
+	 * @ticket https://github.com/nexcess/limit-orders/issues/48
+	 */
+	public function count_qualifying_orders_should_throw_an_EmptyOrderTypesException_if_order_types_are_empty() {
+		global $wc_order_types;
+
+		$wc_order_types = [];
+		$instance       = new OrderLimiter();
+		$method         = new \ReflectionMethod( $instance, 'count_qualifying_orders' );
+		$method->setAccessible( true );
+
+		update_option( OrderLimiter::OPTION_KEY, [
+			'enabled' => true,
+			'limit'   => 1,
+		] );
+
+		$this->expectException( EmptyOrderTypesException::class );
+		$method->invoke( $instance );
 	}
 
 	/**

@@ -7,6 +7,7 @@
 
 namespace Tests;
 
+use Nexcess\LimitOrders\OrderLimiter;
 use WC_Checkout;
 use WC_Helper_Product;
 use WP_UnitTestCase;
@@ -30,5 +31,14 @@ abstract class TestCase extends WP_UnitTestCase {
 			'billing_email'  => 'test_customer@example.com',
 			'payment_method' => 'dummy_payment_gateway',
 		] );
+	}
+
+	/**
+	 * Explicitly set the current interval's order count.
+	 *
+	 * @param int $orders The current number of orders.
+	 */
+	protected function set_current_order_count( $orders ) {
+		set_transient( OrderLimiter::TRANSIENT_NAME, (int) $orders );
 	}
 }

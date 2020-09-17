@@ -51,7 +51,7 @@
             "@test:standards",
             "@test:analysis"
         ],
-        "test:analysis": "vendor/bin/phpstan analyze",
+        "test:analysis": "vendor/bin/phpstan analyze -c phpstan.neon.dist",
         "test:standards": "vendor/bin/phpcs",
         "test:unit": "vendor/bin/phpunit --testdox --color=always"
     },
