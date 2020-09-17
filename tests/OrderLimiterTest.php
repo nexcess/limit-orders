@@ -699,9 +699,7 @@ class OrderLimiterTest extends TestCase {
 		$limiter->init();
 
 		$this->assertFalse( $limiter->has_orders_in_current_interval() );
-
-		$this->generate_order();
-
+		$this->set_current_order_count( 1 );
 		$this->assertTrue( $limiter->has_orders_in_current_interval() );
 	}
 
