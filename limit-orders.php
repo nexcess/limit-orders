@@ -44,7 +44,13 @@ spl_autoload_register( function ( $class ) {
 } );
 
 // Initialize the plugin.
-add_action( 'woocommerce_loaded', function () {
+add_action( 'init', function () {
+
+	// Abort if WooCommerce hasn't loaded.
+	if ( ! did_action( 'woocommerce_loaded' ) ) {
+		return;
+	}
+
 	$limiter = new OrderLimiter();
 	$admin   = new Admin( $limiter );
 

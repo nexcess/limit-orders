@@ -88,8 +88,7 @@ class SettingsTest extends TestCase {
 
 		$limiter = new OrderLimiter();
 		$limiter->init();
-
-		$this->generate_order();
+		$this->set_current_order_count( 1 );
 
 		$this->assertContains(
 			'<div class="notice notice-info">',
@@ -110,6 +109,7 @@ class SettingsTest extends TestCase {
 
 		$limiter = new OrderLimiter();
 		$limiter->init();
+		$this->set_current_order_count( 0 );
 
 		$this->assertNotContains(
 			'<div class="notice notice-info">',
