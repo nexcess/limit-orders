@@ -130,12 +130,13 @@ class OrderLimiter {
 		$time_format  = get_option( 'time_format' );
 		$current      = $this->get_interval_start();
 		$next         = $this->get_next_interval_start();
+		$within24hr   = $next->getTimestamp() - $current->getTimestamp() < DAY_IN_SECONDS;
 		$placeholders = [
-			'{current_interval}'      => $current->format( $date_format ),
+			'{current_interval}'      => $current->format( $within24hr ? $time_format : $date_format ),
 			'{current_interval:date}' => $current->format( $date_format ),
 			'{current_interval:time}' => $current->format( $time_format ),
 			'{limit}'                 => $this->get_limit(),
-			'{next_interval}'         => $next->format( $date_format ),
+			'{next_interval}'         => $next->format( $within24hr ? $time_format : $date_format ),
 			'{next_interval:date}'    => $next->format( $date_format ),
 			'{next_interval:time}'    => $next->format( $time_format ),
 			'{timezone}'              => $next->format( 'T' ),
