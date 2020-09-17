@@ -122,11 +122,11 @@ class OrderLimiterTest extends TestCase {
 	public function get_message_should_replace_current_interval_placeholder( $placeholder ) {
 		update_option( 'date_format', 'F j, Y' );
 		update_option( OrderLimiter::OPTION_KEY, [
-			'interval'        => 'weekly',
+			'interval'        => 'monthly',
 			'customer_notice' => "This started on {$placeholder}",
 		] );
 
-		$now     = new \DateTimeImmutable( 'now', wp_timezone() );
+		$now     = new \DateTimeImmutable( '2020-04-28 00:00:00', wp_timezone() );
 		$limiter = new OrderLimiter( $now );
 
 		$this->assertSame(
@@ -143,11 +143,11 @@ class OrderLimiterTest extends TestCase {
 	public function get_message_should_replace_current_interval_time_placeholder() {
 		update_option( 'time_format', 'g:ia' );
 		update_option( OrderLimiter::OPTION_KEY, [
-			'interval'        => 'hourly',
+			'interval'        => 'monthly',
 			'customer_notice' => "This started at {current_interval:time}",
 		] );
 
-		$now     = new \DateTimeImmutable( 'now', wp_timezone() );
+		$now     = new \DateTimeImmutable( '2020-04-28 00:00:00', wp_timezone() );
 		$limiter = new OrderLimiter( $now );
 
 		$this->assertSame(
@@ -184,11 +184,11 @@ class OrderLimiterTest extends TestCase {
 	public function get_message_should_replace_next_interval_placeholder( $placeholder ) {
 		update_option( 'date_format', 'F j, Y' );
 		update_option( OrderLimiter::OPTION_KEY, [
-			'interval'        => 'weekly',
+			'interval'        => 'monthly',
 			'customer_notice' => "Check back on {$placeholder}",
 		] );
 
-		$now     = new \DateTimeImmutable( 'now', wp_timezone() );
+		$now     = new \DateTimeImmutable( '2020-04-28 00:00:00', wp_timezone() );
 		$limiter = new OrderLimiter( $now );
 
 		$this->assertSame(
@@ -205,11 +205,11 @@ class OrderLimiterTest extends TestCase {
 	public function get_message_should_replace_next_interval_time_placeholder() {
 		update_option( 'time_format', 'g:ia' );
 		update_option( OrderLimiter::OPTION_KEY, [
-			'interval'        => 'hourly',
+			'interval'        => 'monthly',
 			'customer_notice' => "Check back at {next_interval:time}",
 		] );
 
-		$now     = new \DateTimeImmutable( 'now', wp_timezone() );
+		$now     = new \DateTimeImmutable( '2020-04-27 00:00:00', wp_timezone() );
 		$limiter = new OrderLimiter( $now );
 
 		$this->assertSame(
