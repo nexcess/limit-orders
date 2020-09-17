@@ -7,6 +7,7 @@
 
 namespace Tests;
 
+use Nexcess\LimitOrders\Exceptions\EmptyOrderTypesException;
 use Nexcess\LimitOrders\OrderLimiter;
 use WC_Helper_Product;
 
@@ -890,6 +891,35 @@ class OrderLimiterTest extends TestCase {
 
 	/**
 	 * @test
+	 * @ticket https://github.com/nexcess/limit-orders/issues/48
+	 */
+	public function regenerate_transient_should_return_zero_if_no_count_is_available() {
+		update_option( OrderLimiter::OPTION_KEY, [
+			'enabled'  => true,
+			'interval' => 'daily',
+			'limit'    => 5,
+		] );
+
+		$this->assertFalse( get_transient( OrderLimiter::TRANSIENT_NAME ) );
+
+		$limiter = $this->getMockBuilder( OrderLimiter::class )
+			->setMethods( [ 'count_qualifying_orders' ] )
+			->getMock();
+		$limiter->expects( $this->once() )
+			->method( 'count_qualifying_orders' )
+			->will( $this->throwException( new EmptyOrderTypesException( 'No order types were found.' ) ) );
+
+		$this->assertSame( 0, $limiter->regenerate_transient() );
+		$this->assertFalse( get_transient( OrderLimiter::TRANSIENT_NAME ) );
+		$this->assertGreaterThan(
+			5,
+			has_action( 'init', [ $limiter, 'regenerate_transient' ] ),
+			'The function should attempt to save itself by hooking in after $wc_order_types is populated (init:5).'
+		);
+	}
+
+	/**
+	 * @test
 	 */
 	public function reset_should_delete_the_transient_cache() {
 		set_transient( OrderLimiter::TRANSIENT_NAME, 5 );
@@ -1012,6 +1042,27 @@ class OrderLimiterTest extends TestCase {
 
 		$this->assertSame( 5, $method->invoke( $instance ) );
 		$this->assertTrue( $called );
+	}
+
+	/**
+	 * @test
+	 * @ticket https://github.com/nexcess/limit-orders/issues/48
+	 */
+	public function count_qualifying_orders_should_throw_an_EmptyOrderTypesException_if_order_types_are_empty() {
+		global $wc_order_types;
+
+		$wc_order_types = [];
+		$instance       = new OrderLimiter();
+		$method         = new \ReflectionMethod( $instance, 'count_qualifying_orders' );
+		$method->setAccessible( true );
+
+		update_option( OrderLimiter::OPTION_KEY, [
+			'enabled' => true,
+			'limit'   => 1,
+		] );
+
+		$this->expectException( EmptyOrderTypesException::class );
+		$method->invoke( $instance );
 	}
 
 	/**
