@@ -975,7 +975,8 @@ class OrderLimiterTest extends TestCase {
 		] );
 		$this->generate_order();
 
-		$instance = new OrderLimiter();
+		// To avoid race conditions, start the current interval 30s ago.
+		$instance = new OrderLimiter( new \DateTimeImmutable( '30 seconds ago' ) );
 		$method   = new \ReflectionMethod( $instance, 'count_qualifying_orders' );
 		$method->setAccessible( true );
 
