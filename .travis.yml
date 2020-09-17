@@ -23,9 +23,9 @@ php:
 # To keep the test matrix from exploding over time, we'll actively test against the latest three
 # releases, then cherry-pick what to test across older ones.
 env:
+  - WP_VERSION=latest WC_VERSION=4.5
+  - WP_VERSION=latest WC_VERSION=4.4
   - WP_VERSION=latest WC_VERSION=4.3
-  - WP_VERSION=latest WC_VERSION=4.2
-  - WP_VERSION=latest WC_VERSION=4.1
   - WP_VERSION=latest WC_VERSION=3.9.3
 
 matrix:
