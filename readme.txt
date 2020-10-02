@@ -4,7 +4,7 @@ Tags: WooCommerce, ordering, limits, throttle
 Requires at least: 5.3
 Tested up to: 5.5
 Requires PHP: 7.0
-Stable tag: 1.3.0
+Stable tag: 1.3.1
 License: MIT
 License URI: https://github.com/nexcess/limit-orders/blob/master/LICENSE.txt
 
