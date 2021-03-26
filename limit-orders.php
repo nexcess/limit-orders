@@ -14,7 +14,7 @@
  * Domain Path:       /languages
  *
  * WC requires at least: 3.9
- * WC tested up to:      4.5
+ * WC tested up to:      5.1
  *
  * @package Nexcess\LimitOrders
  */
