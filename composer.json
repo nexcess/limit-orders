@@ -27,12 +27,12 @@
         "php": ">=7.0"
     },
     "require-dev": {
-        "assertwell/wp-core-test-framework": "^0.1.1",
-        "dealerdirect/phpcodesniffer-composer-installer": "^0.6",
-        "php-stubs/woocommerce-stubs": "^4.0",
+        "assertwell/wp-core-test-framework": "^0.2",
+        "dealerdirect/phpcodesniffer-composer-installer": "^0.7",
+        "php-stubs/woocommerce-stubs": "^5.1",
         "phpcompatibility/phpcompatibility-wp": "*",
         "phpunit/phpunit": "^6.5|^7.5",
-        "szepeviktor/phpstan-wordpress": "^0.6.0",
+        "szepeviktor/phpstan-wordpress": "^0.7",
         "wp-coding-standards/wpcs": "^2.2"
     },
     "autoload": {
