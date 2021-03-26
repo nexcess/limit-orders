@@ -14,34 +14,35 @@ cache:
     - $HOME/.composer/cache
 
 php:
-  - "7.4"
-  - "7.3"
-  - "7.2"
-  - "7.1"
-  - "7.0"
+  - '8.0'
+  - '7.4'
+  - '7.3'
+  - '7.2'
+  - '7.1'
+  - '7.0'
 
 # To keep the test matrix from exploding over time, we'll actively test against the latest three
 # releases, then cherry-pick what to test across older ones.
 env:
-  - WP_VERSION=latest WC_VERSION=4.5
-  - WP_VERSION=latest WC_VERSION=4.4
-  - WP_VERSION=latest WC_VERSION=4.3
+  - WP_VERSION=latest WC_VERSION=5.1
+  - WP_VERSION=latest WC_VERSION=5.0
+  - WP_VERSION=latest WC_VERSION=4.9
   - WP_VERSION=latest WC_VERSION=3.9.3
 
 matrix:
   fast_finish: true
   include:
     - name: Coding Standards
-      php: "7.3"
+      php: '7.4'
       env: WP_TRAVISCI=phpcs
     - name: Static Code Analysis
-      php: "7.3"
+      php: '7.4'
       env: WP_TRAVISCI=phpstan
     - name: Minimum requirements
-      php: "7.0"
+      php: '7.0'
       env: WP_VERSION=5.3 WC_VERSION=3.9.3
     - name: Bleeding Edge
-      php: "7.4"
+      php: '8.0'
       env: WP_VERSION=trunk WC_VERSION=latest
   allow_failures:
     - name: Bleeding Edge
@@ -52,7 +53,7 @@ before_install:
 
 install:
   - |
-    if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.0" ]]; then
+    if [[ ${TRAVIS_PHP_VERSION:0:3} == '7.0' ]]; then
       composer remove --dev szepeviktor/phpstan-wordpress --no-update
       composer update --prefer-source --prefer-lowest --no-interaction --no-ansi
     else
@@ -67,9 +68,9 @@ install:
 script:
   - |
     if [[ $WP_TRAVISCI = 'phpcs' ]]; then
-      composer run-script test:standards
+       composer test:standards
     elif [[ $WP_TRAVISCI = 'phpstan' ]]; then
-      composer run-script test:analysis
+      composer test:analysis
     else
-      composer run-script test:unit
+      composer test:unit
     fi
