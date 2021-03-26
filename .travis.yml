@@ -2,7 +2,7 @@ language: php
 dist: xenial
 
 services:
-    - mysql
+  - mysql
 
 notifications:
   email:
@@ -14,11 +14,11 @@ cache:
     - $HOME/.composer/cache
 
 php:
-  - 7.4
-  - 7.3
-  - 7.2
-  - 7.1
-  - 7.0
+  - "7.4"
+  - "7.3"
+  - "7.2"
+  - "7.1"
+  - "7.0"
 
 # To keep the test matrix from exploding over time, we'll actively test against the latest three
 # releases, then cherry-pick what to test across older ones.
@@ -32,23 +32,23 @@ matrix:
   fast_finish: true
   include:
     - name: Coding Standards
-      php: 7.3
+      php: "7.3"
       env: WP_TRAVISCI=phpcs
     - name: Static Code Analysis
-      php: 7.3
+      php: "7.3"
       env: WP_TRAVISCI=phpstan
     - name: Minimum requirements
-      php: 7.0
+      php: "7.0"
       env: WP_VERSION=5.3 WC_VERSION=3.9.3
     - name: Bleeding Edge
-      php: 7.4
+      php: "7.4"
       env: WP_VERSION=trunk WC_VERSION=latest
   allow_failures:
     - name: Bleeding Edge
 
 before_install:
-  - export PATH="$HOME/.composer/vendor/bin:$PATH"
   - phpenv config-rm xdebug.ini || true
+  - composer validate --strict
 
 install:
   - |
@@ -60,16 +60,16 @@ install:
     fi
   - |
     if [[ $WP_TRAVISCI != 'phpcs' && $WP_TRAVISCI != 'phpstan' ]]; then
-        bash vendor/bin/install-wp-tests.sh wordpress_test root '' localhost $WP_VERSION
-        DEBUG=1 bash tests/bin/install-woocommerce.sh $WC_VERSION
+      bash vendor/bin/install-wp-tests.sh wordpress_test root '' localhost $WP_VERSION
+      DEBUG=1 bash tests/bin/install-woocommerce.sh $WC_VERSION
     fi
 
 script:
   - |
     if [[ $WP_TRAVISCI = 'phpcs' ]]; then
-        ./vendor/bin/phpcs
+      composer run-script test:standards
     elif [[ $WP_TRAVISCI = 'phpstan' ]]; then
-        ./vendor/bin/phpstan analyze
+      composer run-script test:analysis
     else
-      ./vendor/bin/phpunit
+      composer run-script test:unit
     fi
