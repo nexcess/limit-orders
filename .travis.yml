@@ -30,7 +30,7 @@ env:
     - WP_VERSION: 'latest'
       WC_VERSION: '4.9'
     - WP_VERSION: 'latest'
-      WC_VERSION: '4.4'
+      WC_VERSION: '3.9.3'
 
 _shared_install_xenial_php70: &install_xenial_php70
   dist: 'xenial'
@@ -40,6 +40,7 @@ _shared_install_xenial_php70: &install_xenial_php70
      - 'composer update --no-interaction --no-ansi --prefer-source --prefer-lowest'
      - |
        bash vendor/bin/install-wp-tests.sh wordpress_test root "" localhost "$WP_VERSION"
+       if dpkg --compare-versions "$WC_VERSION" lt "4.8"; composer self-update --1; fi
        DEBUG=1 bash tests/bin/install-woocommerce.sh "$WC_VERSION"
 
 jobs:
@@ -63,10 +64,10 @@ jobs:
           WC_VERSION: '4.9'
       <<: *install_xenial_php70
  
-    - name: 'PHP 7.0 WP latest WC 4.4'
+    - name: 'PHP 7.0 WP latest WC 3.9.3'
       env:
         - WP_VERSION: 'latest'
-          WC_VERSION: '4.4'
+          WC_VERSION: '3.9.3'
       <<: *install_xenial_php70
  
     - name: 'Coding Standards'
@@ -106,6 +107,7 @@ install:
   - 'composer install --no-interaction --no-ansi --prefer-source'
   - |
     bash vendor/bin/install-wp-tests.sh wordpress_test root "" localhost "$WP_VERSION"
+    if dpkg --compare-versions "$WC_VERSION" lt "4.8"; composer self-update --1; fi
     DEBUG=1 bash tests/bin/install-woocommerce.sh "$WC_VERSION"
 
 script:
