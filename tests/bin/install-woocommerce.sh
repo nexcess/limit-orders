@@ -76,7 +76,7 @@ fi
 # https://github.com/woocommerce/woocommerce/wiki/How-to-set-up-WooCommerce-development-environment
 debug "Building WooCommerce ${WC_VERSION} in ${TARGET_DIR}"
 
-composer install -d "$TARGET_DIR" --no-dev --no-suggest --no-interaction --prefer-dist --no-scripts
+composer install -d "$TARGET_DIR" --no-dev --no-interaction --prefer-dist --no-scripts
 
 # The Jetpack autoloader requires a second dump of the autoloader.
 composer dump-autoload -d "$TARGET_DIR"
