@@ -81,11 +81,10 @@ jobs:
         - 'composer test:analysis'
 
     - name: 'Minimum requirements'
-      dist: 'xenial'
-      php: '7.0'
       env:
         - WP_VERSION: '5.3'
           WC_VERSION: '4.4'
+      <<: *install_xenial_php70
 
     - name: 'Bleeding Edge'
       php: '8.0'
