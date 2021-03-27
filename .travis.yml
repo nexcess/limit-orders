@@ -40,7 +40,7 @@ _shared_install_xenial_php70: &install_xenial_php70
      - 'composer update --no-interaction --no-ansi --prefer-source --prefer-lowest'
      - |
        bash vendor/bin/install-wp-tests.sh wordpress_test root "" localhost "$WP_VERSION"
-       if dpkg --compare-versions "$WC_VERSION" lt "4.8"; composer self-update --1; fi
+       if dpkg --compare-versions "$WC_VERSION" lt "4.8"; then composer self-update --1; fi
        DEBUG=1 bash tests/bin/install-woocommerce.sh "$WC_VERSION"
 
 jobs:
@@ -107,7 +107,7 @@ install:
   - 'composer install --no-interaction --no-ansi --prefer-source'
   - |
     bash vendor/bin/install-wp-tests.sh wordpress_test root "" localhost "$WP_VERSION"
-    if dpkg --compare-versions "$WC_VERSION" lt "4.8"; composer self-update --1; fi
+    if dpkg --compare-versions "$WC_VERSION" lt "4.8"; then composer self-update --1; fi
     DEBUG=1 bash tests/bin/install-woocommerce.sh "$WC_VERSION"
 
 script:
