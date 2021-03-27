@@ -72,11 +72,15 @@ jobs:
  
     - name: 'Coding Standards'
       php: '7.4'
+      install:
+        - 'composer install --no-interaction --no-ansi --prefer-source'
       script:
         - 'composer test:standards'
 
     - name: 'Static Code Analysis'
       php: '7.4'
+      install:
+        - 'composer install --no-interaction --no-ansi --prefer-source'
       script:
         - 'composer test:analysis'
 
