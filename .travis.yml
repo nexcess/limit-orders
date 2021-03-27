@@ -1,17 +1,15 @@
-language: php
-dist: xenial
+# TravisCI configuration for nexcess/limit-orders
+
+if: 'branch = develop OR branch = master'
+
+language: 'php'
+os:
+  - 'linux'
+# 18.04 Bionic: PHP 7.1 - 8.0
+dist: 'bionic'
 
 services:
   - mysql
-
-notifications:
-  email:
-    on_success: never
-    on_failure: change
-
-cache:
-  directories:
-    - $HOME/.composer/cache
 
 php:
   - '8.0'
@@ -19,58 +17,101 @@ php:
   - '7.3'
   - '7.2'
   - '7.1'
-  - '7.0'
 
-# To keep the test matrix from exploding over time, we'll actively test against the latest three
-# releases, then cherry-pick what to test across older ones.
+# To keep the test matrix from exploding over time,
+# we'll actively test against the latest three releases,
+# then cherry-pick what to test across older ones.
 env:
-  - WP_VERSION=latest WC_VERSION=5.1
-  - WP_VERSION=latest WC_VERSION=5.0
-  - WP_VERSION=latest WC_VERSION=4.9
-  - WP_VERSION=latest WC_VERSION=3.9.3
+  jobs:
+    - WP_VERSION: 'latest'
+      WC_VERSION: '5.1'
+    - WP_VERSION: 'latest'
+      WC_VERSION: '5.0'
+    - WP_VERSION: 'latest'
+      WC_VERSION: '4.9'
+    - WP_VERSION: 'latest'
+      WC_VERSION: '4.4'
 
-matrix:
+_shared_install_xenial_php70: &install_xenial_php70
+  dist: 'xenial'
+  php: '7.0'
+  install:
+     - 'composer remove --dev --no-update szepeviktor/phpstan-wordpress'
+     - 'composer update --no-interaction --no-ansi --prefer-source --prefer-lowest'
+     - |
+       bash vendor/bin/install-wp-tests.sh wordpress_test root "" localhost "$WP_VERSION"
+       DEBUG=1 bash tests/bin/install-woocommerce.sh "$WC_VERSION"
+
+jobs:
   fast_finish: true
   include:
-    - name: Coding Standards
+    - name: 'PHP 7.0 WP latest WC 5.1'
+      env:
+        - WP_VERSION: 'latest'
+          WC_VERSION: '5.1'
+      <<: *install_xenial_php70
+ 
+    - name: 'PHP 7.0 WP latest WC 5.0'
+      env:
+        - WP_VERSION: 'latest'
+          WC_VERSION: '5.0'
+      <<: *install_xenial_php70
+ 
+    - name: 'PHP 7.0 WP latest WC 4.9'
+      env:
+        - WP_VERSION: 'latest'
+          WC_VERSION: '4.9'
+      <<: *install_xenial_php70
+ 
+    - name: 'PHP 7.0 WP latest WC 4.4'
+      env:
+        - WP_VERSION: 'latest'
+          WC_VERSION: '4.4'
+      <<: *install_xenial_php70
+ 
+    - name: 'Coding Standards'
       php: '7.4'
-      env: WP_TRAVISCI=phpcs
-    - name: Static Code Analysis
+      script:
+        - 'composer test:standards'
+
+    - name: 'Static Code Analysis'
       php: '7.4'
-      env: WP_TRAVISCI=phpstan
-    - name: Minimum requirements
+      script:
+        - 'composer test:analysis'
+
+    - name: 'Minimum requirements'
+      dist: 'xenial'
       php: '7.0'
-      env: WP_VERSION=5.3 WC_VERSION=3.9.3
-    - name: Bleeding Edge
+      env:
+        - WP_VERSION: '5.3'
+          WC_VERSION: '4.4'
+
+    - name: 'Bleeding Edge'
       php: '8.0'
-      env: WP_VERSION=trunk WC_VERSION=latest
+      env:
+        - WP_VERSION: 'trunk'
+          WC_VERSION: 'latest'
   allow_failures:
-    - name: Bleeding Edge
+    - name: 'Bleeding Edge'
+
+cache:
+  directories:
+    - '$HOME/.composer/cache'
 
 before_install:
-  - phpenv config-rm xdebug.ini || true
-  - composer validate --strict
+  - 'phpenv config-rm xdebug.ini'
+  - 'composer validate --strict'
 
 install:
+  - 'composer install --no-interaction --no-ansi --prefer-source'
   - |
-    if [[ ${TRAVIS_PHP_VERSION:0:3} == '7.0' ]]; then
-      composer remove --dev szepeviktor/phpstan-wordpress --no-update
-      composer update --prefer-source --prefer-lowest --no-interaction --no-ansi
-    else
-      composer install --prefer-source --no-interaction --no-ansi
-    fi
-  - |
-    if [[ $WP_TRAVISCI != 'phpcs' && $WP_TRAVISCI != 'phpstan' ]]; then
-      bash vendor/bin/install-wp-tests.sh wordpress_test root '' localhost $WP_VERSION
-      DEBUG=1 bash tests/bin/install-woocommerce.sh $WC_VERSION
-    fi
+    bash vendor/bin/install-wp-tests.sh wordpress_test root "" localhost "$WP_VERSION"
+    DEBUG=1 bash tests/bin/install-woocommerce.sh "$WC_VERSION"
 
 script:
-  - |
-    if [[ $WP_TRAVISCI = 'phpcs' ]]; then
-       composer test:standards
-    elif [[ $WP_TRAVISCI = 'phpstan' ]]; then
-      composer test:analysis
-    else
-      composer test:unit
-    fi
+  - 'composer test:unit'
+
+notifications:
+  email:
+    on_success: 'never'
+    on_failure: 'change'
