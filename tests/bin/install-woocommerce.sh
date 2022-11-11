@@ -41,7 +41,7 @@ debug() {
 WC_VERSION=${1:-latest}
 VENDOR_DIR=$(composer config --absolute vendor-dir)
 GIT_URL="https://github.com/woocommerce/woocommerce.git"
-BRANCH=master
+BRANCH=trunk
 
 debug "Installing WooCommerce ${WC_VERSION} from source"
 
@@ -52,19 +52,24 @@ fi
 
 # See if the version already exists.
 TARGET_DIR="${VENDOR_DIR}/woocommerce/woocommerce-src-${WC_VERSION}"
+TMP_DIR="${VENDOR_DIR}/woocommerce/woocommerce-tmp-${WC_VERSION}"
 
 if [[ -d "$TARGET_DIR" ]]; then
 	debug "Target ${TARGET_DIR} already exists, aborting."
 	exit
 fi
 
+if [[ -d "$TMP_DIR" ]]; then
+	rm -rf ${TMP_DIR}
+fi
+
 debug "Cloning branch '${BRANCH}' from ${GIT_URL}"
 if git ls-remote --exit-code --heads "$GIT_URL" "$BRANCH" &>/dev/null; then
-	git clone --depth 1 --single-branch --branch "$BRANCH" "$GIT_URL" "$TARGET_DIR" \
+	git clone --depth 1 --single-branch --branch "$BRANCH" "$GIT_URL" "$TMP_DIR" \
 		|| error "Unable to clone branch ${BRANCH} from ${GIT_URL}"
 else
 	debug "Remote branch ${BRANCH} not found, attempting to clone from tag"
-	git clone --depth 1 --single-branch --branch "$WC_VERSION" "$GIT_URL" "$TARGET_DIR" \
+	git clone --depth 1 --single-branch --branch "$WC_VERSION" "$GIT_URL" "$TMP_DIR" \
 		|| error "Unable to clone tag ${WC_VERSION} from ${GIT_URL}"
 fi
 
@@ -76,7 +81,11 @@ fi
 # https://github.com/woocommerce/woocommerce/wiki/How-to-set-up-WooCommerce-development-environment
 debug "Building WooCommerce ${WC_VERSION} in ${TARGET_DIR}"
 
-composer install -d "$TARGET_DIR" --no-dev --no-suggest --no-interaction --prefer-dist --no-scripts
+# We only need WooCommerce and not the entire monorepo.
+mv ${TMP_DIR}/plugins/woocommerce $TARGET_DIR
+rm -rf ${TMP_DIR}
+
+composer install -d "$TARGET_DIR" --no-dev --no-interaction --prefer-dist --no-scripts
 
 # The Jetpack autoloader requires a second dump of the autoloader.
 composer dump-autoload -d "$TARGET_DIR"
