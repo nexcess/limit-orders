@@ -164,7 +164,7 @@ class OrderLimiter {
 		/**
 		 * Filter the number of orders remaining for the current interval.
 		 *
-		 * @param bool         $preempt Whether or not the default logic should be preempted.
+		 * @param bool         $preempt Whether the default logic should be preempted.
 		 *                              Returning anything besides FALSE will be treated as the
 		 *                              number of remaining orders that can be accepted.
 		 * @param OrderLimiter $limiter The current OrderLimiter object.
