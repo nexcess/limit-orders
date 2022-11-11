@@ -4,7 +4,7 @@
  * Plugin URI:        https://wordpress.org/plugins/limit-orders/
  * Description:       Automatically disable WooCommerce's checkout process after reaching a maximum number of orders.
  * Version:           1.3.1
- * Requires at least: 5.3
+ * Requires at least: 5.7
  * Requires PHP:      7.2
  * License:           MIT
  * License URI:       https://github.com/nexcess/limit-orders/blob/develop/LICENSE.txt
@@ -13,7 +13,7 @@
  * Text Domain:       limit-orders
  * Domain Path:       /languages
  *
- * WC requires at least: 4.4
+ * WC requires at least: 6.5
  * WC tested up to:      7.1
  *
  * @package Nexcess\LimitOrders
