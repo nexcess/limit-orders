@@ -28,7 +28,7 @@
         "composer-runtime-api": "^2"
     },
     "require-dev": {
-        "composer/installers": "^2.0",
+        "composer/installers": "^1.12",
         "assertwell/wp-core-test-framework": "^0.2",
         "dealerdirect/phpcodesniffer-composer-installer": "^0.7",
         "phpcompatibility/phpcompatibility-wp": "*",
