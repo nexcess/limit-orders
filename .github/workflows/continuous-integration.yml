@@ -1,0 +1,106 @@
+# This is the main Continuous Integration (CI) pipeline for the nexcess/limit-orders plugin.
+#
+# Any time code is pushed to one of the main branches or a PR is opened, this pipeline should be
+# run to ensure everything still works as designed and meets our coding standards.
+name: CI Pipeline
+
+# Execute on pushes to develop or main, as well as all PRs.
+on:
+  push:
+    branches:
+      - develop
+      - master
+  pull_request:
+
+# Cancel outstanding jobs for this workflow/branch combo.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+
+  # Execute all PHPUnit tests.
+  phpunit:
+    name: PHPUnit (PHP ${{ matrix.php-versions }}, WC ${{ matrix.wc-versions }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # Run on all versions of PHP supported by WooCommerce.
+        php-versions: ['7.2', '7.3', '7.4', '8.0', '8.1']
+        wc-versions: ['4.4.4', '6.9', '7.0', '7.1']
+
+    services:
+      mysql:
+        image: mysql:${{ (matrix.php-versions < 7.4 && '5.7') || '8.0' }}
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: false
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=10s --health-retries=10
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Configure PHP environment
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-versions }}
+          extensions: mbstring, mysqli
+          coverage: none
+
+      - name: Remove unneeded Composer dependencies
+        run: |
+          composer remove --dev --no-progress --no-update \
+            wp-coding-standards/wpcs \
+            szepeviktor/phpstan-wordpress
+      - uses: ramsey/composer-install@v2
+        with:
+          dependency-versions: highest
+
+      - name: Set up WordPress
+        run: bash vendor/bin/install-wp-tests.sh wordpress_test root '' 127.0.0.1:3306 latest
+
+      - name: Set up WooCommerce
+        run: DEBUG=1 bash tests/bin/install-woocommerce.sh ${{ matrix.wc-versions }}
+
+      - name: Run PHPUnit
+        run: composer test:unit
+
+  # Check coding standards (PHP_CodeSniffer, PHP-CS-Fixer)
+  coding-standards:
+    name: Coding standards
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Configure PHP environment
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.0'
+          extensions: mbstring
+          coverage: none
+
+      - uses: ramsey/composer-install@v2
+
+      - name: Check coding standards
+        run: composer test:standards
+
+  # Static Code Analysis (PHPStan)
+  static-code-analysis:
+    name: Static code analysis
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Configure PHP environment
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.0'
+          extensions: mbstring, intl
+          coverage: none
+
+      - uses: ramsey/composer-install@v2
+
+      - name: Run PHPStan
+        run: composer test:analysis
