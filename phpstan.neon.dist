@@ -11,8 +11,6 @@ parameters:
 	paths:
 		- %currentWorkingDirectory%/src/
 		- %currentWorkingDirectory%/limit-orders.php
-	excludePaths:
-		- %currentWorkingDirectory%/vendor/*
 	ignoreErrors:
 		# PHPStan doesn't care for variables being scoped into template includes.
 		-
