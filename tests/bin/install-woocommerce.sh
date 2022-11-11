@@ -86,6 +86,7 @@ mv ${TMP_DIR}/plugins/woocommerce $TARGET_DIR
 rm -rf ${TMP_DIR}
 
 composer install -d "$TARGET_DIR" --no-dev --no-interaction --prefer-dist --no-scripts
+php bin/generate-feature-config.php
 
 # The Jetpack autoloader requires a second dump of the autoloader.
 composer dump-autoload -d "$TARGET_DIR"
