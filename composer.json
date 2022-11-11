@@ -24,9 +24,11 @@
     ],
     "minimum-stability": "stable",
     "require": {
-        "php": "7.2"
+        "php": "7.2",
+        "composer-runtime-api": "^2"
     },
     "require-dev": {
+        "composer/installers": "^2.0",
         "assertwell/wp-core-test-framework": "^0.2",
         "dealerdirect/phpcodesniffer-composer-installer": "^0.7",
         "phpcompatibility/phpcompatibility-wp": "*",
@@ -71,7 +73,11 @@
         "preferred-install": "dist",
         "sort-packages": true,
         "allow-plugins": {
+            "composer/installers": true,
             "dealerdirect/phpcodesniffer-composer-installer": true
         }
+    },
+    "extra": {
+        "installer-disable": true
     }
 }
