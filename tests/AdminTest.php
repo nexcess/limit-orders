@@ -88,7 +88,7 @@ class AdminTest extends TestCase {
 			'role' => 'editor',
 		] ) );
 
-		$next    = ( new \DateTime( 'now' ) )->setTime( 7, 0, 0 );
+		$next    = ( current_datetime() )->setTime( 7, 0, 0 );
 		$limiter = $this->getMockBuilder( OrderLimiter::class )
 			->setMethods( [ 'has_reached_limit', 'get_next_interval_start' ] )
 			->getMock();
@@ -113,7 +113,7 @@ class AdminTest extends TestCase {
 			'role' => 'editor',
 		] ) );
 
-		$next    = ( new \DateTime( 'now' ) )->setTime( 24, 0, 0 ); // Midnight.
+		$next    = ( current_datetime() )->setTime( 24, 0, 0 ); // Midnight.
 		$limiter = $this->getMockBuilder( OrderLimiter::class )
 			->setMethods( [ 'has_reached_limit', 'get_next_interval_start' ] )
 			->getMock();

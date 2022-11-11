@@ -12,8 +12,8 @@
 	<file>src</file>
 	<file>limit-orders.php</file>
 
-	<!-- Ensure compatibility with PHP 7.0 and newer. -->
-	<config name="testVersion" value="7.0-" />
+	<!-- Ensure compatibility with PHP 7.2 and newer. -->
+	<config name="testVersion" value="7.2-" />
 	<rule ref="PHPCompatibilityWP" />
 
 	<!-- Requires WordPress 5.3 or newer. -->

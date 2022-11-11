@@ -1,5 +1,5 @@
 {
-    "name": "nexcess/limit-orders-for-woocommerce",
+    "name": "nexcess/limit-orders",
     "description": "Automatically disable WooCommerce's checkout process after reaching a maximum number of orders.",
     "type": "wordpress-plugin",
     "license": "MIT",
@@ -8,8 +8,8 @@
         "woocommerce-extension"
     ],
     "support": {
-        "issues": "https://github.com/nexcess/limit-orders-for-woocommerce/issues",
-        "source": "https://github.com/nexcess/limit-orders-for-woocommerce"
+        "issues": "https://github.com/nexcess/limit-orders/issues",
+        "source": "https://github.com/nexcess/limit-orders"
     },
     "readme": "README.md",
     "authors": [
@@ -24,16 +24,17 @@
     ],
     "minimum-stability": "stable",
     "require": {
-        "php": ">=7.0"
+        "php": "7.2"
     },
     "require-dev": {
         "assertwell/wp-core-test-framework": "^0.2",
         "dealerdirect/phpcodesniffer-composer-installer": "^0.7",
-        "php-stubs/woocommerce-stubs": "^5.1",
         "phpcompatibility/phpcompatibility-wp": "*",
-        "phpunit/phpunit": "^6.5|^7.5",
-        "szepeviktor/phpstan-wordpress": "^0.7",
-        "wp-coding-standards/wpcs": "^2.2"
+        "phpunit/phpunit": "^7.5",
+        "php-stubs/woocommerce-stubs": "^7.1",
+        "szepeviktor/phpstan-wordpress": "^1.1",
+        "wp-coding-standards/wpcs": "^2.3",
+        "yoast/phpunit-polyfills": "^1.0"
     },
     "autoload": {
         "psr-4": {
@@ -46,16 +47,18 @@
         }
     },
     "scripts": {
+        "fix:standards": "./vendor/bin/phpcbf",
         "test": [
             "@test:unit",
             "@test:standards",
             "@test:analysis"
         ],
-        "test:analysis": "vendor/bin/phpstan analyze -c phpstan.neon.dist",
+        "test:analysis": "vendor/bin/phpstan analyze -c phpstan.neon.dist --memory-limit 512M",
         "test:standards": "vendor/bin/phpcs",
         "test:unit": "vendor/bin/phpunit --testdox --color=always"
     },
     "scripts-descriptions": {
+        "fix:standards": "Automatically fix coding standards violations where possible.",
         "test": "Run all automated tests for the plugin.",
         "test:analysis": "Perform static code analysis on the plugin.",
         "test:standards": "Check the codebase against coding standards.",
@@ -63,9 +66,12 @@
     },
     "config": {
         "platform": {
-            "php": "7.4"
+            "php": "7.2"
         },
         "preferred-install": "dist",
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
     }
 }

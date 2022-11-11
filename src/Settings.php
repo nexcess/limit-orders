@@ -34,7 +34,7 @@ class Settings extends WC_Settings_Page {
 	 *
 	 * @return array
 	 */
-	public function get_settings() {
+	public function get_settings(): array {
 		$placeholders           = (array) $this->limiter->get_placeholders();
 		$update_warning         = '';
 		$available_placeholders = '';
@@ -130,7 +130,7 @@ class Settings extends WC_Settings_Page {
 	 *
 	 * @return array An array of interval names, keyed with their lengths in seconds.
 	 */
-	protected function get_intervals() {
+	protected function get_intervals(): array {
 		global $wp_locale;
 
 		$intervals = [

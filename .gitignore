@@ -5,6 +5,7 @@ vendor/
 # Hidden files
 .DS_Store
 Thumbs.db
+.idea
 
 # Local overrides
 .phpcs.xml

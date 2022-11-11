@@ -10,14 +10,14 @@ namespace Nexcess\LimitOrders;
 class Admin {
 
 	/**
-	 * @var \Nexcess\LimitOrders\OrderLimiter
+	 * @var OrderLimiter
 	 */
 	protected $limiter;
 
 	/**
 	 * Create a new instance of the UI, built around the passed $limiter.
 	 *
-	 * @param \Nexcess\LimitOrders\OrderLimiter $limiter
+	 * @param OrderLimiter $limiter
 	 */
 	public function __construct( OrderLimiter $limiter ) {
 		$this->limiter = $limiter;
@@ -29,9 +29,10 @@ class Admin {
 	public function init() {
 		$basename = plugin_basename( dirname( __DIR__ ) . '/limit-orders.php' );
 
+		add_action( 'admin_notices', [ $this, 'admin_notice' ] );
+
 		add_filter( 'woocommerce_get_settings_pages', [ $this, 'register_settings_page' ] );
-		add_filter( 'admin_notices', [ $this, 'admin_notice' ] );
-		add_filter( 'plugin_action_links_' . $basename, [ $this, 'action_links' ] );
+		add_filter( sprintf( 'plugin_action_links_%s', $basename ), [ $this, 'action_links' ] );
 		add_filter( 'woocommerce_debug_tools', [ $this, 'debug_tools' ] );
 		add_action( 'woocommerce_delete_shop_order_transients', [ $this, 'reset_limiter' ] );
 		add_action( 'woocommerce_system_status_report', [ $this, 'system_status_report' ] );
@@ -42,7 +43,7 @@ class Admin {
 	 *
 	 * @param array $actions A link of available actions.
 	 */
-	public function action_links( $actions ) {
+	public function action_links( array $actions ): array {
 		array_unshift( $actions, sprintf(
 			'<a href="%s">%s</a>',
 			$this->get_settings_url(),
@@ -59,7 +60,7 @@ class Admin {
 	 *
 	 * @return array The filtered $pages array.
 	 */
-	public function register_settings_page( $pages ) {
+	public function register_settings_page( array $pages ): array {
 		$pages[] = new Settings( $this->limiter );
 
 		return $pages;
@@ -121,7 +122,7 @@ class Admin {
 	 *
 	 * @return array The $tools array with our button included.
 	 */
-	public function debug_tools( $tools ) {
+	public function debug_tools( array $tools ): array {
 		$tools['limit_orders'] = [
 			'name'     => __( 'Reset order limiting', 'limit-orders' ),
 			'button'   => __( 'Reset limiter', 'limit-orders' ),
@@ -144,7 +145,7 @@ class Admin {
 	 *
 	 * @return string An absolute URL to the settings page.
 	 */
-	protected function get_settings_url() {
+	protected function get_settings_url(): string {
 		return admin_url( 'admin.php?page=wc-settings&tab=limit-orders' );
 	}
 
@@ -152,9 +153,9 @@ class Admin {
 	 * Render a view from within the Views/ directory.
 	 *
 	 * @param string $view The view name.
-	 * @param array  $vars Variables that should be exposed to the view.
+	 * @param array $vars Variables that should be exposed to the view.
 	 */
-	protected function render_view( $view, $vars = [] ) {
+	protected function render_view( string $view, array $vars = [] ) {
 		$template = sprintf( '%1$s/Views/%2$s.php', untrailingslashit( __DIR__ ), $view );
 
 		// We don't have enough of these yet to justify needing heavy error handling.
