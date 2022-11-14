@@ -1,6 +1,6 @@
 # Limit Orders for WooCommerce
 
-[![Build Status](https://travis-ci.org/nexcess/limit-orders.svg?branch=develop)](https://travis-ci.org/nexcess/limit-orders)
+[![Build Status](https://github.com/nexcess/limit-orders/actions/workflows/continuous-integration.yml/badge.svg?branch=develop)](https://github.com/nexcess/limit-orders/actions/workflows/continuous-integration.yml)
 [![WordPress Plugin Version](https://img.shields.io/wordpress/plugin/v/limit-orders)](https://wordpress.org/plugins/limit-orders)
 
 While many stores would be thrilled to have a never-ending order queue, some store owners are faced with the opposite problem: how can I make sure I don't get overwhelmed by _too many_ orders?
@@ -11,9 +11,9 @@ Limit Orders for WooCommerce lets you limit the number of orders your store will
 
 ## Requirements
 
-* WordPress 5.3 or newer
-* WooCommerce 3.9 or newer
-* PHP 7.0 or newer
+* WordPress 5.7 or newer
+* WooCommerce 6.9 or newer
+* PHP 7.4 or newer
 
 ## Installation
 

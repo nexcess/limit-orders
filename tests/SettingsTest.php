@@ -72,7 +72,7 @@ class SettingsTest extends TestCase {
 		$description = $this->get_setting_by_id( 'limit-orders-messaging', $instance )['desc'];
 
 		foreach ( $limiter->get_placeholders() as $placeholder => $value ) {
-			$this->assertContains( '<var>' . $placeholder . '</var>', $description );
+			$this->assertStringContainsString( '<var>' . $placeholder . '</var>', $description );
 		}
 	}
 
@@ -90,7 +90,7 @@ class SettingsTest extends TestCase {
 		$limiter->init();
 		$this->set_current_order_count( 1 );
 
-		$this->assertContains(
+		$this->assertStringContainsString(
 			'<div class="notice notice-info">',
 			$this->get_setting_by_id( 'limit-orders-general', new Settings( $limiter ) )['desc'],
 			'Expected to see a notice about limits being recalculated.'
@@ -111,7 +111,7 @@ class SettingsTest extends TestCase {
 		$limiter->init();
 		$this->set_current_order_count( 0 );
 
-		$this->assertNotContains(
+		$this->assertStringNotContainsString(
 			'<div class="notice notice-info">',
 			$this->get_setting_by_id( 'limit-orders-general', new Settings( $limiter ) )['desc'],
 			'Did not expect to see a notice about limits being recalculated.'
@@ -123,12 +123,12 @@ class SettingsTest extends TestCase {
 	 *
 	 * If more than one setting matches, the first result will be returned.
 	 *
-	 * @param string $section_id The setting ID.
-	 * @param Settings $instance Optional. An instantiated Settings object, if available.
+	 * @param string $setting_id The setting ID.
+	 * @param Settings|null $instance Optional. An instantiated Settings object, if available.
 	 *
 	 * @return array|null Either the first matching setting or null if no matches were found.
 	 */
-	protected function get_setting_by_id( $setting_id, Settings $instance = null ) {
+	protected function get_setting_by_id( string $setting_id, Settings $instance = null ): ?array {
 		$instance = $instance ?: new Settings( new OrderLimiter() );
 		$settings = array_filter( $instance->get_settings(), function ( $setting ) use ( $setting_id ) {
 			return $setting_id === $setting['id'];

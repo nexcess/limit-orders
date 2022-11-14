@@ -7,6 +7,7 @@
 
 namespace Nexcess\LimitOrders;
 
+use DateTimeImmutable;
 use Nexcess\LimitOrders\Exceptions\EmptyOrderTypesException;
 use Nexcess\LimitOrders\Exceptions\OrdersNotAcceptedException;
 
@@ -15,7 +16,7 @@ class OrderLimiter {
 	/**
 	 * Holds the current DateTime.
 	 *
-	 * @var \DateTimeImmutable
+	 * @var DateTimeImmutable
 	 */
 	private $now;
 
@@ -39,10 +40,10 @@ class OrderLimiter {
 	/**
 	 * Create a new instance of the OrderLimiter.
 	 *
-	 * @param \DateTimeImmutable $now Optional. A DateTimeImmutable object to use as the basis for
+	 * @param DateTimeImmutable|null $now Optional. A DateTimeImmutable object to use as the basis for
 	 *                                all calculations. Default is current_datetime().
 	 */
-	public function __construct( \DateTimeImmutable $now = null ) {
+	public function __construct( DateTimeImmutable $now = null ) {
 		$this->now = $now ? $now : current_datetime();
 	}
 
@@ -59,7 +60,7 @@ class OrderLimiter {
 	 *
 	 * @return bool
 	 */
-	public function is_enabled() {
+	public function is_enabled(): bool {
 		return (bool) $this->get_setting( 'enabled', false );
 	}
 
@@ -68,7 +69,7 @@ class OrderLimiter {
 	 *
 	 * @return string The order limiter's interval.
 	 */
-	public function get_interval() {
+	public function get_interval(): ?string {
 		return $this->get_setting( 'interval', 'daily' );
 	}
 
@@ -77,7 +78,7 @@ class OrderLimiter {
 	 *
 	 * @return int The maximum number of orders, or -1 if there is no limit.
 	 */
-	public function get_limit() {
+	public function get_limit(): int {
 		$limit = $this->get_setting( 'limit' );
 
 		return $this->is_enabled() && is_numeric( $limit ) && 0 <= $limit ? (int) $limit : -1;
@@ -91,7 +92,7 @@ class OrderLimiter {
 	 *
 	 * @return string The user-provided setting, or a generic default if nothing is available.
 	 */
-	public function get_message( string $setting ) {
+	public function get_message( string $setting ): string {
 		$settings = [
 			'checkout_error',
 			'customer_notice',
@@ -125,7 +126,7 @@ class OrderLimiter {
 	 *
 	 * @return array An array of placeholder => replacements.
 	 */
-	public function get_placeholders( $setting = '', $message = '' ) {
+	public function get_placeholders( string $setting = '', string $message = '' ): array {
 		$date_format  = get_option( 'date_format' );
 		$time_format  = get_option( 'time_format' );
 		$current      = $this->get_interval_start();
@@ -157,13 +158,13 @@ class OrderLimiter {
 	 *
 	 * @return int The maximum number of that may still be accepted, or -1 if there is no limit.
 	 */
-	public function get_remaining_orders() {
+	public function get_remaining_orders(): int {
 		$limit = $this->get_limit();
 
 		/**
 		 * Filter the number of orders remaining for the current interval.
 		 *
-		 * @param bool         $preempt Whether or not the default logic should be preempted.
+		 * @param bool         $preempt Whether the default logic should be preempted.
 		 *                              Returning anything besides FALSE will be treated as the
 		 *                              number of remaining orders that can be accepted.
 		 * @param OrderLimiter $limiter The current OrderLimiter object.
@@ -194,9 +195,9 @@ class OrderLimiter {
 	/**
 	 * Get a DateTime object representing the start of the current interval.
 	 *
-	 * @return \DateTime
+	 * @return DateTimeImmutable
 	 */
-	public function get_interval_start() {
+	public function get_interval_start(): DateTimeImmutable {
 		$interval = $this->get_setting( 'interval' );
 		$start    = $this->now;
 
@@ -238,8 +239,8 @@ class OrderLimiter {
 		/**
 		 * Filter the DateTime object representing the start of the current interval.
 		 *
-		 * @param \DateTime $start    The DateTime representing the start of the current interval.
-		 * @param string    $interval The type of interval being calculated.
+		 * @param DateTimeImmutable $start    The DateTimeImmutable representing the start of the current interval.
+		 * @param string             $interval The type of interval being calculated.
 		 */
 		return apply_filters( 'limit_orders_interval_start', $start, $interval );
 	}
@@ -247,9 +248,9 @@ class OrderLimiter {
 	/**
 	 * Get a DateTime object representing the start of the next interval.
 	 *
-	 * @return \DateTime
+	 * @return DateTimeImmutable
 	 */
-	public function get_next_interval_start() {
+	public function get_next_interval_start(): DateTimeImmutable {
 		$interval = $this->get_setting( 'interval' );
 		$current  = $this->get_interval_start();
 		$start    = clone $current;
@@ -275,8 +276,8 @@ class OrderLimiter {
 		/**
 		 * Filter the DateTime at which the next interval should begin.
 		 *
-		 * @param \DateTime $start    A DateTime representing the start time for the next interval.
-		 * @param \DateTime $current  A DateTime representing the beginning of the current interval.
+		 * @param DateTimeImmutable $start    A DateTime representing the start time for the next interval.
+		 * @param DateTimeImmutable $current  A DateTime representing the beginning of the current interval.
 		 * @param string    $interval The specified interval.
 		 */
 		return apply_filters( 'limit_orders_next_interval', $start, $current, $interval );
@@ -287,25 +288,25 @@ class OrderLimiter {
 	 *
 	 * @return int The number of seconds until the limiting interval resets.
 	 */
-	public function get_seconds_until_next_interval() {
+	public function get_seconds_until_next_interval(): int {
 		return $this->get_next_interval_start()->getTimestamp() - $this->now->getTimestamp();
 	}
 
 	/**
-	 * Determine whether or not the store has any orders in the given interval.
+	 * Determine whether the store has any orders in the given interval.
 	 *
 	 * @return bool
 	 */
-	public function has_orders_in_current_interval() {
+	public function has_orders_in_current_interval(): bool {
 		return $this->get_limit() > $this->get_remaining_orders();
 	}
 
 	/**
-	 * Determine whether or not the store has reached its limits.
+	 * Determine whether the store has reached its limits.
 	 *
 	 * @return bool
 	 */
-	public function has_reached_limit() {
+	public function has_reached_limit(): bool {
 		return 0 === $this->get_remaining_orders();
 	}
 
@@ -328,7 +329,7 @@ class OrderLimiter {
 	/**
 	 * Abort the checkout process.
 	 *
-	 * @throws \Nexcess\LimitOrders\Exceptions\OrdersNotAcceptedException
+	 * @throws OrdersNotAcceptedException
 	 */
 	public function abort_checkout() {
 		throw new OrdersNotAcceptedException( $this->get_message( 'checkout_error' ) );
@@ -339,7 +340,7 @@ class OrderLimiter {
 	 *
 	 * @return string
 	 */
-	public function order_button_html() {
+	public function order_button_html(): string {
 		return '<p>' . wp_kses_post( $this->get_message( 'order_button' ) ) . '</p>';
 	}
 
@@ -368,7 +369,7 @@ class OrderLimiter {
 	 *
 	 * @return int The number of qualifying orders.
 	 */
-	public function regenerate_transient() {
+	public function regenerate_transient(): int {
 		try {
 			$count = $this->count_qualifying_orders();
 		} catch ( EmptyOrderTypesException $e ) {
@@ -406,7 +407,7 @@ class OrderLimiter {
 	 *
 	 * @return int The number of orders that have taken place within the defined interval.
 	 */
-	protected function count_qualifying_orders() {
+	protected function count_qualifying_orders(): int {
 		/**
 		 * Replace the logic used to count qualified orders.
 		 *
@@ -450,6 +451,6 @@ class OrderLimiter {
 			$this->settings = get_option( self::OPTION_KEY, [] );
 		}
 
-		return isset( $this->settings[ $setting ] ) ? $this->settings[ $setting ] : $default;
+		return $this->settings[ $setting ] ?? $default;
 	}
 }

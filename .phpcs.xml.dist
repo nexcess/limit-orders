@@ -2,22 +2,29 @@
 <ruleset name="Limit Orders for WooCommerce">
 	<description>Rules for Limit Orders for WooCommerce.</description>
 
-	<!-- What to scan -->
+	<!-- Show progresss & use colors. -->
 	<arg value="ps" />
-	<arg name="basepath" value="./" />
 	<arg name="colors" />
+
+	<!-- Strip the file paths down to the relevant bit and only apply to .php files. -->
+	<arg name="basepath" value="./" />
 	<arg name="extensions" value="php" />
+
+	<!-- Enables parallel processing when available for faster results. -->
 	<arg name="parallel" value="8" />
 
-	<file>src</file>
-	<file>limit-orders.php</file>
+	<!-- What to scan -->
+	<file>src</file>                 <!-- The rest of the plugin files. -->
+	<file>limit-orders.php</file>    <!-- Main plugin file.-->
+	<file>./tests</file>             <!-- Test files. -->
 
-	<!-- Ensure compatibility with PHP 7.0 and newer. -->
-	<config name="testVersion" value="7.0-" />
+
+	<!-- Ensure compatibility with PHP 7.2 and newer. -->
+	<config name="testVersion" value="7.2-" />
 	<rule ref="PHPCompatibilityWP" />
 
-	<!-- Requires WordPress 5.3 or newer. -->
-	<config name="minimum_supported_wp_version" value="5.3" />
+	<!-- Requires WordPress 5.8 or newer. -->
+	<config name="minimum_supported_wp_version" value="5.8" />
 
 	<!-- Configure the plugin text domain. -->
 	<rule ref="WordPress.WP.I18n">
@@ -25,6 +32,13 @@
 			<property name="text_domain" type="array" value="limit-orders"/>
 		</properties>
 	</rule>
+
+	<!-- No PHP syntax errors. -->
+	<rule ref="Generic.PHP.Syntax"/>
+
+	<!-- PHPCompatibilityWP -->
+	<!-- https://github.com/PHPCompatibility/PHPCompatibilityWP -->
+	<rule ref="PHPCompatibilityWP" />
 
 	<!-- Use strict WordPress coding standards -->
 	<rule ref="WordPress-Extra">
@@ -38,5 +52,61 @@
 		<exclude name="PEAR.Functions.FunctionCallSignature.ContentAfterOpenBracket" />
 		<exclude name="PEAR.Functions.FunctionCallSignature.CloseBracketLine" />
 		<exclude name="PEAR.Functions.FunctionCallSignature.MultipleArguments" />
+
+		<!-- Short ternaries are fine. -->
+		<exclude name="WordPress.PHP.DisallowShortTernary.Found" />
+	</rule>
+
+	<!-- Spacing before/after control structures. -->
+	<rule ref="WordPress.WhiteSpace.ControlStructureSpacing" />
+
+	<!-- Tests -->
+
+	<!-- Tests can use whichever naming conventions we see fit. -->
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedNamespaceFound">
+		<exclude-pattern>tests/*</exclude-pattern>
+	</rule>
+
+	<rule ref="WordPress.NamingConventions.ValidFunctionName.MethodNameInvalid">
+		<exclude-pattern>tests/*</exclude-pattern>
+	</rule>
+
+	<rule ref="WordPress.NamingConventions.ValidVariableName.PropertyNotSnakeCase">
+		<exclude-pattern>tests/*</exclude-pattern>
+	</rule>
+
+	<rule ref="WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase">
+		<exclude-pattern>tests/*</exclude-pattern>
+	</rule>
+
+	<!-- Tests can use whatever methods we see fit. -->
+	<rule ref="WordPress.PHP.DevelopmentFunctions">
+		<exclude-pattern>tests/*</exclude-pattern>
+	</rule>
+	<rule ref="WordPress.PHP.DiscouragedPHPFunctions">
+		<exclude-pattern>tests/*</exclude-pattern>
+	</rule>
+	<rule ref="WordPress.WP.AlternativeFunctions">
+		<exclude-pattern>tests/*</exclude-pattern>
+	</rule>
+
+	<!-- Tests aren't required to escape output. -->
+	<rule ref="WordPress.Security.EscapeOutput">
+		<exclude-pattern>tests/*</exclude-pattern>
+	</rule>
+
+	<!-- Tests don't need to worry about nonces. -->
+	<rule ref="WordPress.Security.NonceVerification">
+		<exclude-pattern>tests/*</exclude-pattern>
+	</rule>
+
+	<!-- Short ternaries are fine. -->
+	<rule ref="WordPress.PHP.DisallowShortTernary.Found">
+		<exclude-pattern>tests/*</exclude-pattern>
+	</rule>
+
+	<!-- Tests don't need to define a text domain. -->
+	<rule ref="WordPress.WP.I18n.MissingArgDomain">
+		<exclude-pattern>tests/*</exclude-pattern>
 	</rule>
 </ruleset>
