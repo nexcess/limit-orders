@@ -8,7 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Updated
 
-* Verified compatability with WooCommerce 7.1. ([#70])
+* Verified compatibility with WooCommerce 7.1. ([#70])
 
 ## [Version 1.3.1] — 2020-09-17
 
