@@ -9,14 +9,32 @@ namespace Tests;
 
 use Nexcess\LimitOrders\Exceptions\EmptyOrderTypesException;
 use Nexcess\LimitOrders\OrderLimiter;
+use PHPUnit\Framework\MockObject\MockObject;
 use WC_Helper_Product;
 use WC_Order;
 
 /**
- * @covers Nexcess\LimitOrders\OrderLimiter
+ * @covers \Nexcess\LimitOrders\OrderLimiter
  * @group Limiting
  */
 class OrderLimiterTest extends TestCase {
+
+	/**
+	 * Plugins that should be installed.
+	 *
+	 * @var array
+	 */
+	protected static $plugins = [
+		'wpackagist-plugin/woocommerce',
+	];
+
+	/**
+	 * @before
+	 */
+	public function activateWooCommerce() {
+		$this->activatePlugin( 'woocommerce' );
+		WC()->init();
+	}
 
 	/**
 	 * @before
@@ -35,7 +53,7 @@ class OrderLimiterTest extends TestCase {
 			'interval' => 'weekly',
 		] );
 
-		$this->assertSame( 'weekly', ( new OrderLimiter )->get_interval() );
+		$this->assertSame( 'weekly', ( new OrderLimiter() )->get_interval() );
 	}
 
 	/**
@@ -44,7 +62,7 @@ class OrderLimiterTest extends TestCase {
 	 * @group Intervals
 	 */
 	public function get_interval_should_default_to_daily() {
-		$this->assertSame( 'daily', ( new OrderLimiter )->get_interval() );
+		$this->assertSame( 'daily', ( new OrderLimiter() )->get_interval() );
 	}
 
 	/**
@@ -57,7 +75,7 @@ class OrderLimiterTest extends TestCase {
 			'limit'   => 7,
 		] );
 
-		$this->assertSame( 7, ( new OrderLimiter )->get_limit() );
+		$this->assertSame( 7, ( new OrderLimiter() )->get_limit() );
 	}
 
 	/**
@@ -70,7 +88,7 @@ class OrderLimiterTest extends TestCase {
 			'limit'   => 7,
 		] );
 
-		$this->assertSame( -1, ( new OrderLimiter )->get_limit() );
+		$this->assertSame( -1, ( new OrderLimiter() )->get_limit() );
 	}
 
 	/**
@@ -146,7 +164,7 @@ class OrderLimiterTest extends TestCase {
 		update_option( 'time_format', 'g:ia' );
 		update_option( OrderLimiter::OPTION_KEY, [
 			'interval'        => 'monthly',
-			'customer_notice' => "This started at {current_interval:time}",
+			'customer_notice' => 'This started at {current_interval:time}',
 		] );
 
 		$now     = new \DateTimeImmutable( '2020-04-28 00:00:00', wp_timezone() );
@@ -208,7 +226,7 @@ class OrderLimiterTest extends TestCase {
 		update_option( 'time_format', 'g:ia' );
 		update_option( OrderLimiter::OPTION_KEY, [
 			'interval'        => 'monthly',
-			'customer_notice' => "Check back at {next_interval:time}",
+			'customer_notice' => 'Check back at {next_interval:time}',
 		] );
 
 		$now     = new \DateTimeImmutable( '2020-04-27 00:00:00', wp_timezone() );
@@ -921,6 +939,9 @@ class OrderLimiterTest extends TestCase {
 
 		$this->assertFalse( get_transient( OrderLimiter::TRANSIENT_NAME ) );
 
+		/**
+		 * @var MockObject $limiter
+		 */
 		$limiter = $this->getMockBuilder( OrderLimiter::class )
 			->setMethods( [ 'count_qualifying_orders' ] )
 			->getMock();

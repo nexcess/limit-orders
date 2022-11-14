@@ -8,6 +8,7 @@
 namespace Tests;
 
 use Nexcess\LimitOrders\OrderLimiter;
+use Tests\Exceptions\MissingDependencyException;
 use WC_Checkout;
 use WC_Helper_Product;
 use WP_UnitTestCase;
@@ -18,6 +19,7 @@ use WP_UnitTestCase;
  * @group Settings
  */
 abstract class TestCase extends WP_UnitTestCase {
+	use Concerns\InstallsDependencies;
 
 	/**
 	 * Create a new order by emulating the checkout process.

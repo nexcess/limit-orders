@@ -6,20 +6,26 @@ includes:
 	- vendor/szepeviktor/phpstan-wordpress/extension.neon
 parameters:
 	level: 5
-	autoload_files:
-		- %rootDir%/../../php-stubs/wordpress-stubs/wordpress-stubs.php
-		- %rootDir%/../../php-stubs/woocommerce-stubs/woocommerce-stubs.php
+
+	# Define global constants.
+	bootstrapFiles:
+		- %currentWorkingDirectory%/vendor/wpackagist-plugin/woocommerce/vendor/autoload.php
+		- %currentWorkingDirectory%/vendor/php-stubs/woocommerce-stubs/woocommerce-stubs.php
 	paths:
 		- %currentWorkingDirectory%/src/
 		- %currentWorkingDirectory%/limit-orders.php
 	ignoreErrors:
-		# Let a closure be used for the autoloader.
-		- '#^Parameter \#1 \$autoload_function of function spl_autoload_register expects callable\(string\): void,#'
-
-		# Apply filters can be called with any number of parameters.
-		- '#^Function apply_filters invoked with \d parameters, 2 required#'
-
 		# PHPStan doesn't care for variables being scoped into template includes.
 		-
-			message: '#Undefined variable: \$limiter$#'
+			message: '#Variable \$limiter might not be defined#'
 			path: %currentWorkingDirectory%/src/Views/
+
+		# We're using a function that set's the transient and returns data as an action callback
+		-
+			message: '#Action callback returns int but should not return anything#'
+			path: %currentWorkingDirectory%/src/OrderLimiter.php
+
+		# The reported value could be falsey if the filters relied upon are used incorrectly.
+		-
+			message: '#Ternary operator condition is always true#'
+			path: %currentWorkingDirectory%/src/Settings.php
