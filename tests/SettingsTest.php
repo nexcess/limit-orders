@@ -128,7 +128,7 @@ class SettingsTest extends TestCase {
 	 *
 	 * @return array|null Either the first matching setting or null if no matches were found.
 	 */
-	protected function get_setting_by_id(string $setting_id, Settings $instance = null ): ?array {
+	protected function get_setting_by_id( string $setting_id, Settings $instance = null ): ?array {
 		$instance = $instance ?: new Settings( new OrderLimiter() );
 		$settings = array_filter( $instance->get_settings(), function ( $setting ) use ( $setting_id ) {
 			return $setting_id === $setting['id'];

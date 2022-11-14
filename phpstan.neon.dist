@@ -9,7 +9,6 @@ parameters:
 
 	# Define global constants.
 	bootstrapFiles:
-		- %currentWorkingDirectory%/tests/phpstan-bootstrap.php
 		- %currentWorkingDirectory%/vendor/wpackagist-plugin/woocommerce/vendor/autoload.php
 
 	scanFiles:

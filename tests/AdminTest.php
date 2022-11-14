@@ -31,7 +31,7 @@ class AdminTest extends TestCase {
 	 * @before
 	 */
 	public function activateWooCommerce() {
-		$this->activatePlugin('woocommerce');
+		$this->activatePlugin( 'woocommerce' );
 		WC()->init();
 	}
 

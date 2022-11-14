@@ -5,7 +5,7 @@
  * Description:       Automatically disable WooCommerce's checkout process after reaching a maximum number of orders.
  * Version:           1.3.1
  * Requires at least: 5.7
- * Requires PHP:      7.2
+ * Requires PHP:      7.4
  * License:           MIT
  * License URI:       https://github.com/nexcess/limit-orders/blob/develop/LICENSE.txt
  * Author:            Nexcess
