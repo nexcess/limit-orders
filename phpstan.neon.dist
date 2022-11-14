@@ -10,9 +10,6 @@ parameters:
 	# Define global constants.
 	bootstrapFiles:
 		- %currentWorkingDirectory%/vendor/wpackagist-plugin/woocommerce/vendor/autoload.php
-
-	scanFiles:
-		- %currentWorkingDirectory%/vendor/php-stubs/wordpress-tests-stubs/wordpress-tests-stubs.php
 		- %currentWorkingDirectory%/vendor/php-stubs/woocommerce-stubs/woocommerce-stubs.php
 	paths:
 		- %currentWorkingDirectory%/src/
