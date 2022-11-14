@@ -19,6 +19,23 @@ use WC_REST_System_Status_Tools_V2_Controller;
 class AdminTest extends TestCase {
 
 	/**
+	 * Plugins that should be installed.
+	 *
+	 * @var array
+	 */
+	protected static $plugins = [
+		'wpackagist-plugin/woocommerce',
+	];
+
+	/**
+	 * @before
+	 */
+	public function activateWooCommerce() {
+		$this->activatePlugin('woocommerce');
+		WC()->init();
+	}
+
+	/**
 	 * @test
 	 */
 	public function admin_notices_should_not_be_shown_if_no_limits_have_been_reached() {
@@ -53,7 +70,7 @@ class AdminTest extends TestCase {
 		( new Admin( $limiter ) )->admin_notice();
 		$output = ob_get_clean();
 
-		$this->assertContains( esc_attr( admin_url( 'admin.php?page=wc-settings&tab=limit-orders' ) ), $output );
+		$this->assertStringContainsString( esc_attr( admin_url( 'admin.php?page=wc-settings&tab=limit-orders' ) ), $output );
 	}
 
 	/**
@@ -75,7 +92,7 @@ class AdminTest extends TestCase {
 		( new Admin( $limiter ) )->admin_notice();
 		$output = ob_get_clean();
 
-		$this->assertNotContains( admin_url( 'admin.php?page=wc-settings' ), $output );
+		$this->assertStringNotContainsString( admin_url( 'admin.php?page=wc-settings' ), $output );
 	}
 
 	/**
@@ -101,7 +118,7 @@ class AdminTest extends TestCase {
 		( new Admin( $limiter ) )->admin_notice();
 		$output = ob_get_clean();
 
-		$this->assertContains( $next->format( get_option( 'time_format' ) ), $output );
+		$this->assertStringContainsString( $next->format( get_option( 'time_format' ) ), $output );
 	}
 
 	/**
@@ -126,7 +143,7 @@ class AdminTest extends TestCase {
 		( new Admin( $limiter ) )->admin_notice();
 		$output = ob_get_clean();
 
-		$this->assertContains( __( 'midnight' ), $output );
+		$this->assertStringContainsString( __( 'midnight' ), $output );
 	}
 
 	/**

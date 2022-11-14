@@ -28,7 +28,7 @@ jobs:
       matrix:
         # Run on all versions of PHP supported by WooCommerce.
         php-versions: ['7.2', '7.3', '7.4', '8.0', '8.1']
-        wc-versions: ['6.5', '6.9', '7.0', '7.1']
+        wc-versions: ['6.0', '6.9', '7.0', '7.1']
 
     services:
       mysql:
@@ -58,11 +58,15 @@ jobs:
         with:
           dependency-versions: highest
 
+      - name: Ensure we're running dependencies suitable for this version
+        run: |
+          composer config --unset platform.php
+          composer require --dev wpackagist-plugin/woocommerce:${{ matrix.wc-versions }}
+          composer update --with-all-dependencies --prefer-dist --no-interaction
+          composer check-platform-reqs
+
       - name: Set up WordPress
         run: bash vendor/bin/install-wp-tests.sh wordpress_test root '' 127.0.0.1:3306 latest
-
-      - name: Set up WooCommerce
-        run: DEBUG=1 bash tests/bin/install-woocommerce.sh ${{ matrix.wc-versions }}
 
       - name: Run PHPUnit
         run: composer test:unit

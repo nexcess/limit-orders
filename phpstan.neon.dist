@@ -6,7 +6,14 @@ includes:
 	- vendor/szepeviktor/phpstan-wordpress/extension.neon
 parameters:
 	level: 5
+
+	# Define global constants.
+	bootstrapFiles:
+		- %currentWorkingDirectory%/tests/phpstan-bootstrap.php
+		- %currentWorkingDirectory%/vendor/wpackagist-plugin/woocommerce/vendor/autoload.php
+
 	scanFiles:
+		- %currentWorkingDirectory%/vendor/php-stubs/wordpress-tests-stubs/wordpress-tests-stubs.php
 		- %currentWorkingDirectory%/vendor/php-stubs/woocommerce-stubs/woocommerce-stubs.php
 	paths:
 		- %currentWorkingDirectory%/src/

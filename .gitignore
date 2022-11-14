@@ -6,6 +6,7 @@ vendor/
 .DS_Store
 Thumbs.db
 .idea
+.phpunit.result.cache
 
 # Local overrides
 .phpcs.xml

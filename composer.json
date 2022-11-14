@@ -23,29 +23,37 @@
         }
     ],
     "minimum-stability": "stable",
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://wpackagist.org"
+        }
+    ],
     "require": {
-        "php": "7.2",
+        "php": "^7.2 | ^8.0",
         "composer-runtime-api": "^2"
     },
     "require-dev": {
-        "composer/installers": "^1.12",
         "assertwell/wp-core-test-framework": "^0.2",
+        "composer/installers": "~1.0 || ^2.0",
         "dealerdirect/phpcodesniffer-composer-installer": "^0.7",
-        "phpcompatibility/phpcompatibility-wp": "*",
-        "phpunit/phpunit": "^7.5",
-        "php-stubs/woocommerce-stubs": "^7.1",
+        "php-stubs/wordpress-tests-stubs": "^5.8",
+        "phpcompatibility/phpcompatibility-wp": "^2.1",
+        "phpunit/phpunit": "^7.0 || ^8.0 || ^9.0",
         "szepeviktor/phpstan-wordpress": "^1.1",
         "wp-coding-standards/wpcs": "^2.3",
+        "wpackagist-plugin/woocommerce": "^7.1",
         "yoast/phpunit-polyfills": "^1.0"
     },
     "autoload": {
         "psr-4": {
-            "Nexcess\\LimitOrders\\": ["src/"]
+            "Nexcess\\LimitOrders\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Tests\\": ["tests/"]
+            "Automattic\\WooCommerce\\": "vendor/wpackagist-plugin/woocommerce/src/",
+            "Tests\\": "tests/"
         }
     },
     "scripts": {
