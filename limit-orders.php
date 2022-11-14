@@ -13,7 +13,7 @@
  * Text Domain:       limit-orders
  * Domain Path:       /languages
  *
- * WC requires at least: 6.5
+ * WC requires at least: 6.9
  * WC tested up to:      7.1
  *
  * @package Nexcess\LimitOrders
