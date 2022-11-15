@@ -7,9 +7,7 @@ includes:
 parameters:
 	level: 5
 
-	# Define global constants.
 	bootstrapFiles:
-		- %currentWorkingDirectory%/vendor/wpackagist-plugin/woocommerce/vendor/autoload.php
 		- %currentWorkingDirectory%/vendor/php-stubs/woocommerce-stubs/woocommerce-stubs.php
 	paths:
 		- %currentWorkingDirectory%/src/
